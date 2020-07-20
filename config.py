@@ -37,6 +37,15 @@ def config_edit():
             print(f"Select a new {cfg_layout[int(line_selection)]}")
             if "location" in cfg_layout[int(line_selection)]:
                 config_lines[int(line_selection) - 1] = find_path() + '\n'
+            elif "browser" in cfg_layout[int(line_selection)]:
+                while True:
+                    pref_browser = input("Do you want to use Chrome or Firefox? Type C/F\n> ")
+                    if pref_browser.upper() == 'C':
+                        config_lines[int(line_selection) - 1] = 'chrome\n'
+                        break
+                    elif pref_browser.upper() == 'F':
+                        config_lines[int(line_selection) - 1] = 'firefox\n'
+                        break
             else:
                 config_lines[int(line_selection) - 1] = input("> ") + '\n'
             continue
