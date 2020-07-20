@@ -159,7 +159,7 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
                     continue
     # endregion
 
-    driver = set_up_new_driver(browser_using='browser')
+    driver = set_up_new_driver(browser_using=browser)
     log_into_mantis(driver, username, password)
 
     # region Filling up the report form
