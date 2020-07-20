@@ -11,29 +11,29 @@ Just copy the folder containing this README onto your computer. When you first l
 1. Trunk
 For TSReporter to be able to find your current trunk revision, your trunk directory must be structured accordingly:
 
-Trunk<br/>
-+--ATS<br/>
+Trunk  
++--ATS  
 +--ETS2
 
 Trunk is the directory you select, it can be named anything. However, the game subdirectories MUST be named ATS and ETS2. This is to avoid ambiguity, where some people have an ATS_old and ATS_new.
 
 If you only use one Trunk game, that's okay. However, if you have the games in different directories, it will crash! If you have multiple trunk versions of the same game and you report from any of them, it will report from the CURRENT of the game selected here.
 
-Trunk_1<br/>
-+--ATS<br/>
-Trunk_2<br/>
-+--ETS2<br/>
+Trunk_1  
++--ATS  
+Trunk_2  
++--ETS2  
 WILL CRASH!
 
 2. Documents
 Your documents directory is the one where the games automatically save files. 
 
-Documents<br/>
-+--American Truck Simulator<br/>
-|	+--bugs.txt<br/>
-|	+--game.log.txt<br/>
-+--Euro Truck Simulator<br/>
-|	+--bugs.txt<br/>
+Documents  
++--American Truck Simulator  
+|	+--bugs.txt  
+|	+--game.log.txt  
++--Euro Truck Simulator  
+|	+--bugs.txt  
 |	+--game_log.txt
 
 3. Edited images
@@ -56,28 +56,28 @@ TSReporter will now take every bug and do the following:
 #### Convention
 When using F11 or Shift+F11 in the game, you will have to fill in some additional information. 
 
-[m|a|av|ac|ar|aa]\_reportname<br/>
-determines the category of the asset, as per the testing guide<br/>
--m: Map<br/>
--a: Asset - You will be asked to specify the type later!<br/>
--av: Vegetation asset<br/>
--ac: Animated character asset<br/>
--ar: Road asset<br/>
+[m|a|av|ac|ar|aa]\_reportname  
+determines the category of the asset, as per the testing guide  
+-m: Map  
+-a: Asset - You will be asked to specify the type later!  
+-av: Vegetation asset  
+-ac: Animated character asset  
+-ar: Road asset  
 -aa: Other assets
 
-.reportname<br/>
+.reportname  
 Attatches this coordinate/screenshot to the previous report. 
 
-!reportname<br/>
+!reportname  
 This will not be reported. You can also leave the report blank and it will not be reported.
 
 reportname will be what is put into the Summary in Mantis, so you have to follow the testing guide in naming it.
 
 Here are some examples:
 
-m_Idaho - Twin Falls - floating cow<br/>
-.floating cow 2<br/>
-!dont forget to buy milk lol<br/>
+m_Idaho - Twin Falls - floating cow  
+.floating cow 2  
+!dont forget to buy milk lol  
 av_Utah - Salt Lake City - Tree without collision
 
 This will create a map report with two images/coordinates attatched and an asset-vegetation report with one image
