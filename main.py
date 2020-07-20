@@ -119,7 +119,7 @@ def main():
                 assign_to = find_assign_to(line, chosen_project[0])
 
                 report_bug(chosen_project, lines_to_report, version, pictures_folder, assign_to,
-                           mantis_username, password)
+                           mantis_username, password, cfg_read[4][:-1])
                 print("Bug reported successfully!\n")
 
             archive.close()
