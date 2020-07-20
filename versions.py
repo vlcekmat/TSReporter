@@ -48,7 +48,7 @@ def find_trunk_version(game, trunk_path):
         trunk_ver = current.read()
         current.close()
     except FileNotFoundError:
-        print(f"ERROR: CURRENT not found in file: {c_path}")
+        print(f"CURRENT not found in file: {c_path}")
         return -1
     ver_out = f"[trunk at revision {trunk_ver[:-1]}]"
     return ver_out

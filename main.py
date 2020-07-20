@@ -63,9 +63,14 @@ def main():
                 print("Edited pictures folder doesn't contain any .jpg or .gif files. Did you select the right one?")
                 continue
 
+            mantis_username = cfg_read[3][:-1]
+            if mantis_username == "":
+                print("Mantis username not found in config.cfg")
+                continue
+
             # If password was not entered successfully this session, it happens here
             if password == "":
-                password = log_into_tsreporter(cfg_read[3][:-1])
+                password = log_into_tsreporter(mantis_username)
                 if password == "":
                     continue
 
@@ -114,7 +119,7 @@ def main():
                 assign_to = find_assign_to(line, chosen_project[0])
 
                 report_bug(chosen_project, lines_to_report, version, pictures_folder, assign_to,
-                           cfg_read[3][:-1], password)
+                           mantis_username, password)
                 print("Bug reported successfully!\n")
 
             archive.close()
