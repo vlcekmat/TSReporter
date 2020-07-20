@@ -1,4 +1,6 @@
 import os
+import webbrowser
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
@@ -7,28 +9,38 @@ from information_compile import generate_description, extract_location_filter
 from information_compile import get_image
 from collections import deque
 
-browser_using = 'chrome'
 
+def set_up_new_driver(headless=False, browser_using='chrome'):
 
-def set_up_new_driver(headless=False):
-    ch_options = webdriver.ChromeOptions()
-    if headless:
-        ch_options.headless = True
-    ch_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-    ch_options.add_argument('--start-maximized')
-    driver = webdriver.Chrome('chromedriver.exe', options=ch_options)
-    return driver
+    if browser_using == 'chrome':
+        options = webdriver.ChromeOptions()
+        if headless:
+            options.headless = True
+        options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        options.add_argument('--start-maximized')
+        driver = webdriver.Chrome(executable_path='chromedriver.exe', options=options)
+        return driver
+    elif browser_using == 'firefox':
+        binary = FirefoxBinary('path/to/installed firefox binary')
+        options = webdriver.FirefoxOptions()
+        if headless:
+            options.headless = True
+        driver = webdriver.Firefox(executable_path='geckodriver.exe', options=options)
+        driver.maximize_window()
+        return driver
 
 
 def log_into_mantis(driver, username, password):
     driver.get('https://qa.scssoft.com/login_page.php')
     username_box = driver.find_element_by_id('username')
-    username_box.send_keys(username + '\n')
+    username_box.send_keys(username)
+    driver.find_element_by_xpath("//input[@type='submit']").click()
     id_box = driver.find_element_by_id('password')
-    id_box.send_keys(password + '\n')  # At this point the program is logged in
+    id_box.send_keys(password)
+    driver.find_element_by_xpath("//input[@type='submit']").click()  # At this point the program is logged in
 
 
-def log_into_tsreporter(test_login_username):
+def log_into_tsreporter(test_login_username, browser='chrome'):
     while True:
         password = input("PASSWORD: ")
         os.system('cls')
@@ -37,7 +49,7 @@ def log_into_tsreporter(test_login_username):
             print("No password entered, returning to menu")
             return ""
         print("Checking your login credentials")
-        driver = set_up_new_driver(headless=True)
+        driver = set_up_new_driver(headless=True, browser_using=browser)
         try:
             log_into_mantis(driver, test_login_username, password)
             driver.find_element_by_id('sidebar-btn')
@@ -46,22 +58,23 @@ def log_into_tsreporter(test_login_username):
             return ""
         else:
             print("Login successful!")
-            driver.close()
+            driver.quit()
             return password
 
 
 # opens mantis so the user can check for duplicates
-def check_for_duplicates(bug_description, username, password):
+def check_for_duplicates(bug_description, username, password, browser):
     print("Opening search for duplicates")
-    driver = set_up_new_driver()
+    driver = set_up_new_driver(browser_using=browser)
     log_into_mantis(driver, username, password)
 
     final_filter = extract_location_filter(bug_description)
 
     # Interact with the website here
     driver.get('https://qa.scssoft.com/view_all_bug_page.php')
-    driver.find_element_by_xpath("//a[@class='btn btn-sm btn-primary btn-white btn-round']").click()
-    driver.find_element_by_id('filter-search-txt').send_keys(final_filter + '\n')
+    driver.find_element_by_xpath("//a[@class='btn btn-sm btn-primary btn-white btn-round']").click()  # reset button
+    driver.find_element_by_id('filter-search-txt').send_keys(final_filter)  # filter box
+    driver.find_element_by_xpath("//input[@value='Apply Filter']").click()  # apply filter button
 
     print('Did you find any duplicates? (Y/N)')
     while True:
@@ -76,9 +89,8 @@ def check_for_duplicates(bug_description, username, password):
 
 
 # opens chrome browser, connects to mantis and uploads all of the gathered information
-def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to, project, username, password, no_vid):
-
-    #region process information to insert in the form
+def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to, project, username, password, no_vid, browser):
+    # region process information to insert in the form
     bug_descriptions = []
     first_path_to_asset = ''
 
@@ -145,12 +157,12 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
                 else:
                     print('Answer Y or N')
                     continue
-    #endregion
+    # endregion
 
-    driver = set_up_new_driver()
+    driver = set_up_new_driver(browser_using='browser')
     log_into_mantis(driver, username, password)
 
-    #region Filling up the report form
+    # region Filling up the report form
     driver.get('https://qa.scssoft.com/login_select_proj_page.php?ref=bug_report_page.php')
     select_project_box = driver.find_element_by_xpath(f"//select[1]/option[text()='{project}']")
     select_project_box.click()
@@ -196,10 +208,15 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
         driver.find_element_by_xpath(f"//option[text()='map']").click()
     elif category == 'a':
         driver.find_element_by_xpath(f"//option[text()='assets']").click()
-    #endregion
+    # endregion
+    while True:
+        try:
+            current_url = driver.current_url
+        except WebDriverException:
+            break
 
-    reporter_running = True
-    while reporter_running:
-        if driver.current_url is None:
-            reporter_running = False
-        pass
+
+# while reporter_running:
+#     if driver.name is None:
+#         reporter_running = False
+#     pass
