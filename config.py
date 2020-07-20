@@ -8,7 +8,8 @@ def get_config_layout():
         1: "Trunk location",
         2: "Documents location",
         3: "Edited images location",
-        4: "Mantis username"
+        4: "Mantis username",
+        5: "Preferred browser"
     }
 
 
@@ -57,6 +58,14 @@ def config_setup():
         write_us.append(find_path() + '\n')
     login_name = input("Enter your Mantis username.\n> ")
     write_us.append(login_name + '\n')
+    while True:
+        pref_browser = input("Do you want to use Chrome or Firefox? Type C/F\n> ")
+        if pref_browser.upper() == 'C':
+            write_us.append('chrome\n')
+            break
+        elif pref_browser.upper() == 'F':
+            write_us.append('firefox\n')
+            break
 
     config_file = open("./config.cfg", "w")
     config_file.writelines(write_us)
