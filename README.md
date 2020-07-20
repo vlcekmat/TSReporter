@@ -17,7 +17,7 @@ Trunk<br/>
 
 Trunk is the directory you select, it can be named anything. However, the game subdirectories MUST be named ATS and ETS2. This is to avoid ambiguity, where some people have an ATS_old and ATS_new.
 
-If you only use one Trunk game, that's okay. However, if you have the games in different directories, it will crash! If you have multiple trunk versions of the same game and you report from any of them, it will report from the CURENT of the game selected here.
+If you only use one Trunk game, that's okay. However, if you have the games in different directories, it will crash! If you have multiple trunk versions of the same game and you report from any of them, it will report from the CURRENT of the game selected here.
 
 Trunk_1<br/>
 +--ATS<br/>
@@ -37,7 +37,7 @@ Documents<br/>
 |	+--game_log.txt
 
 3. Edited images
-This is the folder where you save your edited images. They must be saved directly here, so if you have different folders for different games/dlcs/time periods, you will have to change it to the one where you want to program to get the images from, otherwise it won't find them! (you can just also them manually)
+This is the folder where you save your edited images. They must be saved directly here, so if you have different folders for different games/dlcs/time periods, you will have to change it to the one where you want the program to get images from, otherwise it won't find them! (you can just upload them manually as well)
 
 4. Mantis username
 What you use to log into Mantis. It is necessary because the session handler needs to log in every time during automated sessions.
