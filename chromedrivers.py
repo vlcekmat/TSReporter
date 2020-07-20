@@ -80,8 +80,16 @@ def check_for_duplicates(bug_description, username, password, browser):
     while True:
         answer = input('> ')
         if answer.upper() == 'N':
+            try:
+                driver.quit()
+            except WebDriverException:
+                pass
             return False
         elif answer.upper() == 'Y':
+            try:
+                driver.quit()
+            except WebDriverException:
+                pass
             return True
         else:
             print('Answer Y or N')
@@ -214,9 +222,3 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
             current_url = driver.current_url
         except WebDriverException:
             break
-
-
-# while reporter_running:
-#     if driver.name is None:
-#         reporter_running = False
-#     pass
