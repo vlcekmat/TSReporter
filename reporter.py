@@ -33,10 +33,10 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
             break
         except SessionNotCreatedException:
             print(error_message)
-#        except NoSuchWindowException:
-#            print(error_message)
-#        except WebDriverException:
-#            print(error_message)
+        except NoSuchWindowException:
+            print(error_message)
+        except WebDriverException:
+            print(error_message)
         except AttributeError:
             print(error_message)
         except TypeError:

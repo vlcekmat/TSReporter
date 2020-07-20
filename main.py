@@ -3,13 +3,13 @@ import os
 import config as cfg
 from collections import deque
 import fnmatch
+from time import sleep
 
 from utils import is_int
 from reporter import report_bug
 import versions as ver
 from sector_seek import find_assign_to
 from chromedrivers import log_into_tsreporter
-from time import sleep
 
 
 # Program happens here

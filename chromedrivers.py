@@ -4,6 +4,7 @@ from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
+import getpass
 
 from information_compile import generate_description, extract_location_filter
 from information_compile import get_image
@@ -44,6 +45,7 @@ def log_into_tsreporter(test_login_username, browser='chrome'):
     while True:
         password = input("PASSWORD: ")
         os.system('cls')
+        #password = getpass.getpass()
         # password = "CrYVhn7FSM"
         if password == "":
             print("No password entered, returning to menu")
