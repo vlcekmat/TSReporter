@@ -107,7 +107,7 @@ def main():
             # Reporting occurs here
             lines_to_report = deque()  # Implemented as a stack
             for line in reversed(bug_lines):
-                archive.write(line + '\n')
+                archive.write(line)
                 if line[0] == '.':  # Reports beginning with '.' are added to the previous report
                     lines_to_report.append(line)
                     continue
