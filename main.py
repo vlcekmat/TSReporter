@@ -70,7 +70,7 @@ def main():
 
             # If password was not entered successfully this session, it happens here
             if password == "":
-                password = log_into_tsreporter(mantis_username)
+                password = log_into_tsreporter(mantis_username, cfg_read[4][:-1])
                 if password == "":
                     continue
 
