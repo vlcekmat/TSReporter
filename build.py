@@ -8,10 +8,6 @@ import shutil
 PyInstaller.__main__.run([
     '--name=TSReporter',
     '--onefile',
-    #'--add-binary=./chromedriver.exe',
-    #'--add-data=./chromedriver.exe',
-    #'-r chromedriver.exe;.'
-    #'--add-data=README.md;.',
     '--icon=resources/icon.ico',
     "main.py",
 ])
