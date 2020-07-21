@@ -7,10 +7,11 @@ from selenium.common.exceptions import NoSuchElementException, WebDriverExceptio
 import getpass
 
 from information_compile import generate_description, extract_location_filter
-from information_compile import get_image
+from information_compile import get_image, extract_asset_name
 from collections import deque
 
 
+# creates a new web driver session
 def set_up_new_driver(headless=False, browser_using='chrome'):
 
     if browser_using == 'chrome':
@@ -31,6 +32,7 @@ def set_up_new_driver(headless=False, browser_using='chrome'):
         return driver
 
 
+# uses the given credentials to log into mantis
 def log_into_mantis(driver, username, password):
     driver.get('https://qa.scssoft.com/login_page.php')
     username_box = driver.find_element_by_id('username')
@@ -41,6 +43,7 @@ def log_into_mantis(driver, username, password):
     driver.find_element_by_xpath("//input[@type='submit']").click()  # At this point the program is logged in
 
 
+# first try to log into mantis, so we now that the login credentials are correct
 def log_into_tsreporter(test_login_username, browser='chrome'):
     while True:
         password = input("PASSWORD: ")
@@ -65,12 +68,14 @@ def log_into_tsreporter(test_login_username, browser='chrome'):
 
 
 # opens mantis so the user can check for duplicates
-def check_for_duplicates(bug_description, username, password, browser):
+def check_for_duplicates(username, password, browser, bug_description=None, asset_path=None):
     print("Opening search for duplicates")
     driver = set_up_new_driver(browser_using=browser)
     log_into_mantis(driver, username, password)
-
-    final_filter = extract_location_filter(bug_description)
+    if asset_path is not None:
+        final_filter = extract_asset_name(asset_path)
+    else:
+        final_filter = extract_location_filter(bug_description)
 
     # Interact with the website here
     driver.get('https://qa.scssoft.com/view_all_bug_page.php')
@@ -99,7 +104,7 @@ def check_for_duplicates(bug_description, username, password, browser):
 
 
 # opens chrome browser, connects to mantis and uploads all of the gathered information
-def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to, project, username, password, no_vid, browser):
+def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to, project, username, password, no_vid, browser, path_to_asset=None):
     # region process information to insert in the form
     bug_descriptions = []
     first_path_to_asset = ''
@@ -118,7 +123,6 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
     while len(log_lines) > 0:
         line_to_process = log_lines.pop()
         if category == 'a' and first_loop:
-            path_to_asset = input('Enter path to the problematic asset: ')
             if first_loop:
                 first_path_to_asset = path_to_asset
                 first_loop = False
@@ -201,7 +205,8 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
     summary = bug_descriptions[0].split(';')[0]
     summary_box = driver.find_element_by_xpath(f"//input[@name='summary']")
     if category == 'a':
-        summary_box.send_keys(summary + ' - ' + first_path_to_asset)
+        asset_name = extract_asset_name(first_path_to_asset)
+        summary_box.send_keys(summary + ' - ' + asset_name)
     else:
         summary_box.send_keys(summary)
 

@@ -15,18 +15,23 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
 
     tried_duplicates = False
     duplicate_found = False
+    a_path = None
+    if 'A' in category.upper():
+        a_path = input('Enter path to the problematic asset: ')
 
     while True:
         try:
             if not tried_duplicates:
-                duplicate_found = check_for_duplicates(log_first, username, password, browser)
+                duplicate_found = check_for_duplicates(
+                    username, password, browser,
+                    bug_description=log_first, asset_path=a_path)
                 tried_duplicates = True
                 continue
             if not duplicate_found:
                 use_log_lines = copy.deepcopy(log_lines)
                 upload_to_mantis(
                     version, images_folder_path, category, use_log_lines,
-                    assign, project, username, password, True, browser
+                    assign, project, username, password, True, browser, path_to_asset=a_path
                 )
             else:
                 print('Reporting not needed')
