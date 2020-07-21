@@ -1,9 +1,9 @@
 import os
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+# from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
-import getpass
+# import getpass
 
 from information_compile import generate_description, extract_location_filter
 from information_compile import get_image, extract_asset_name
@@ -12,22 +12,19 @@ from collections import deque
 
 class WebDriver:
     driver = None
-    _is_active = False
 
     def __init__(self, browser='chrome', headless=False):
         WebDriver.driver = set_up_new_driver(browser_using=browser, headless=headless)
 
     def get_driver(self):
-        return WebDriver.driver
+        return self.driver
 
     def is_active(self):
         try:
-            test = WebDriver.driver.current_url
+            test = self.driver.current_url
         except WebDriverException:
-            _is_active = False
             return False
         else:
-            _is_active = True
             return True
 
 
