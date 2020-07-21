@@ -10,9 +10,29 @@ from information_compile import get_image, extract_asset_name
 from collections import deque
 
 
+class WebDriver:
+    driver = None
+    _is_active = False
+
+    def __init__(self, browser='chrome', headless=False):
+        WebDriver.driver = set_up_new_driver(browser_using=browser, headless=headless)
+
+    def get_driver(self):
+        return WebDriver.driver
+
+    def is_active(self):
+        try:
+            test = WebDriver.driver.current_url
+        except WebDriverException:
+            _is_active = False
+            return False
+        else:
+            _is_active = True
+            return True
+
+
 # creates a new web driver session
 def set_up_new_driver(headless=False, browser_using='chrome'):
-
     if browser_using == 'chrome':
         options = webdriver.ChromeOptions()
         if headless:
@@ -47,13 +67,13 @@ def log_into_tsreporter(test_login_username, browser='chrome'):
     while True:
         password = input("PASSWORD: ")
         os.system('cls')
-        #password = getpass.getpass()
+        # password = getpass.getpass()
         # password = "CrYVhn7FSM"
         if password == "":
             print("No password entered, returning to menu")
             return ""
         print("Checking your login credentials")
-        driver = set_up_new_driver(headless=True, browser_using=browser)
+        driver = WebDriver(browser=browser, headless=True).get_driver()
         try:
             log_into_mantis(driver, test_login_username, password)
             driver.find_element_by_id('sidebar-btn')
@@ -67,9 +87,9 @@ def log_into_tsreporter(test_login_username, browser='chrome'):
 
 
 # opens mantis so the user can check for duplicates
-def check_for_duplicates(username, password, browser, bug_description=None, asset_path=None):
+def check_for_duplicates(username, password, bug_description=None, asset_path=None, web_driver=None):
     print("Opening search for duplicates")
-    driver = set_up_new_driver(browser_using=browser)
+    driver = web_driver.get_driver()
     log_into_mantis(driver, username, password)
     if asset_path is not None:
         final_filter = extract_asset_name(asset_path)
@@ -87,13 +107,15 @@ def check_for_duplicates(username, password, browser, bug_description=None, asse
         answer = input('> ')
         if answer.upper() == 'N':
             try:
-                driver.quit()
+                pass
+                #driver.close()
             except WebDriverException:
                 pass
             return False
         elif answer.upper() == 'Y':
             try:
-                driver.quit()
+                pass
+                #driver.close()
             except WebDriverException:
                 pass
             return True
@@ -103,7 +125,8 @@ def check_for_duplicates(username, password, browser, bug_description=None, asse
 
 
 # opens chrome browser, connects to mantis and uploads all of the gathered information
-def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to, project, username, password, no_vid, browser, path_to_asset=None, debug_info=None):
+def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to, project, username, password, no_vid,
+                     browser, path_to_asset=None, debug_info=None, web_driver=None):
     # region process information to insert in the form
     bug_descriptions = []
     first_path_to_asset = ''
@@ -173,9 +196,11 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
                     print('Answer Y or N')
                     continue
     # endregion
+    driver = web_driver.get_driver()
 
-    driver = set_up_new_driver(browser_using=browser)
-    log_into_mantis(driver, username, password)
+    if not web_driver.is_active():
+        driver = WebDriver(browser=browser).get_driver()
+        log_into_mantis(driver, username, password)
 
     # region Filling up the report form
     driver.get('https://qa.scssoft.com/login_select_proj_page.php?ref=bug_report_page.php')

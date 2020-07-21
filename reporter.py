@@ -1,5 +1,5 @@
 from collections import deque
-from chromedrivers import check_for_duplicates, upload_to_mantis
+from chromedrivers import check_for_duplicates, upload_to_mantis, WebDriver
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowException, WebDriverException
 from information_compile import determine_bug_category, extract_asset_path
 import copy
@@ -23,19 +23,20 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
             d_info = a_path
             a_path = extract_asset_path(a_path)
 
+    web_driver = WebDriver(browser=browser)
     while True:
         try:
             if not tried_duplicates:
                 duplicate_found = check_for_duplicates(
-                    username, password, browser,
-                    bug_description=log_first, asset_path=a_path)
+                    username, password, bug_description=log_first, asset_path=a_path, web_driver=web_driver)
                 tried_duplicates = True
                 continue
             if not duplicate_found:
                 use_log_lines = copy.deepcopy(log_lines)
                 upload_to_mantis(
                     version, images_folder_path, category, use_log_lines,
-                    assign, project, username, password, True, browser, path_to_asset=a_path, debug_info=d_info
+                    assign, project, username, password, True, browser,
+                    path_to_asset=a_path, debug_info=d_info, web_driver=web_driver
                 )
             else:
                 print('Reporting not needed')
