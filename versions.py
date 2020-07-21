@@ -80,4 +80,3 @@ def find_version(game):
         version_out = "[" + found_version + "]"
 
     return version_out
-

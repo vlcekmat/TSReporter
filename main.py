@@ -124,8 +124,7 @@ def main():
                     lines_to_report.clear()
                     print("Bug reported successfully!\n")
             finally:
-                # All bugs that were reported during one reporting cycle will now be added to archive, even
-                # if the process terminated early
+                # All bugs that were reported during one reporting cycle will now be added to archive
                 archive = open(game_path + "/bugs_archive.txt", "a")
                 while len(lines_to_archive) > 0:
                     archive_me = lines_to_archive.pop()
