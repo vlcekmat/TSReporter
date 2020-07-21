@@ -108,7 +108,7 @@ def main():
             lines_to_archive = deque()
             try:
                 for line in reversed(bug_lines):
-                    lines_to_archive.append(line)
+                    lines_to_archive.append(line)  # These will be added to archive in finally: block
                     if line[0] == '.':  # Reports beginning with '.' are added to the previous report
                         lines_to_report.append(line)
                         continue
@@ -121,9 +121,11 @@ def main():
 
                     report_bug(chosen_project, lines_to_report, version, pictures_folder, assign_to,
                                mantis_username, password, cfg_read[4][:-1])
-                    lines_to_archive.clear()
+                    lines_to_report.clear()
                     print("Bug reported successfully!\n")
             finally:
+                # All bugs that were reported during one reporting cycle will now be added to archive, even
+                # if the process terminated early
                 archive = open(game_path + "/bugs_archive.txt", "a")
                 while len(lines_to_archive) > 0:
                     archive_me = lines_to_archive.pop()
