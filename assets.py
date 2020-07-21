@@ -21,6 +21,3 @@ def get_asset_name(game):
             version_0 = _line.split("ver.")[1]
             version_1 = version_0.split(" ")[0]
             return version_1
-
-
-

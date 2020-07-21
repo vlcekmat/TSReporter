@@ -104,7 +104,7 @@ def check_for_duplicates(username, password, browser, bug_description=None, asse
 
 
 # opens chrome browser, connects to mantis and uploads all of the gathered information
-def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to, project, username, password, no_vid, browser, path_to_asset=None):
+def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to, project, username, password, no_vid, browser, path_to_asset=None, debug_info=None):
     # region process information to insert in the form
     bug_descriptions = []
     first_path_to_asset = ''
@@ -120,6 +120,8 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
     video_link_entered = False
     video_link = ''
 
+    if debug_info is not None:
+        path_to_asset = f"{path_to_asset}\n{debug_info}"
     while len(log_lines) > 0:
         line_to_process = log_lines.pop()
         if category == 'a' and first_loop:

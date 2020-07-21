@@ -74,3 +74,12 @@ def extract_asset_name(path_to_asset):
     asset_name_suffix = path_to_asset.split('/')[-1]
     asset_name = asset_name_suffix.split('.')[0]
     return asset_name
+
+
+# returns path to the asset
+def extract_asset_path(debug_info):
+    asset_path = ''
+    for part in debug_info.split(' '):
+        if '/' in part:
+            asset_path = part.split("'")[1]
+    return asset_path
