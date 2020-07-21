@@ -87,8 +87,13 @@ def log_into_tsreporter(test_login_username, browser='chrome'):
 
 
 # opens mantis so the user can check for duplicates
-def check_for_duplicates(username, password, bug_description=None, asset_path=None, web_driver=None):
+def check_for_duplicates(username, password, bug_description=None, asset_path=None, web_driver=None, browser=None):
     print("Opening search for duplicates")
+
+    if not web_driver.is_active():
+        driver = WebDriver(browser=browser).get_driver()
+        log_into_mantis(driver, username, password)
+
     driver = web_driver.get_driver()
     log_into_mantis(driver, username, password)
     if asset_path is not None:
