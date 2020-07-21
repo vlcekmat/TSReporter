@@ -42,7 +42,7 @@ def set_up_new_driver(headless=False, browser_using='chrome'):
         driver = webdriver.Chrome(executable_path='chromedriver.exe', options=options)
         return driver
     elif browser_using == 'firefox':
-        binary = FirefoxBinary('path/to/installed firefox binary')
+        # binary = FirefoxBinary('path/to/installed firefox binary')
         options = webdriver.FirefoxOptions()
         if headless:
             options.headless = True
