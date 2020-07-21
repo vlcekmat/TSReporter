@@ -67,3 +67,10 @@ def extract_location_filter(bug_description):
         pass
     final_filter = f'{sector};{first_two_coordinates}'
     return final_filter
+
+
+# so from '/model/advert/billboard/billboard_uni_astand.pmd' it will return 'billboard_uni_astand'
+def extract_asset_name(path_to_asset):
+    asset_name_suffix = path_to_asset.split('/')[-1]
+    asset_name = asset_name_suffix.split('.')[0]
+    return asset_name
