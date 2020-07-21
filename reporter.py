@@ -31,7 +31,6 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
                     username, password, bug_description=log_first,
                     asset_path=a_path, web_driver=web_driver, browser=browser)
                 tried_duplicates = True
-                continue
             if not duplicate_found:
                 use_log_lines = copy.deepcopy(log_lines)
                 upload_to_mantis(
