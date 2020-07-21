@@ -113,14 +113,12 @@ def check_for_duplicates(username, password, bug_description=None, asset_path=No
         if answer.upper() == 'N':
             try:
                 pass
-                #driver.close()
             except WebDriverException:
                 pass
             return False
         elif answer.upper() == 'Y':
             try:
                 pass
-                #driver.close()
             except WebDriverException:
                 pass
             return True
