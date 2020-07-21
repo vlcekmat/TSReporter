@@ -40,6 +40,7 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
                 )
             else:
                 print('Reporting not needed')
+                web_driver.get_driver().quit()
             break
         except SessionNotCreatedException:
             print(error_message)
