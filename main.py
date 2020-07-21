@@ -103,26 +103,33 @@ def main():
             while '\n' in bug_lines:  # Cleanses bug_lines of empty lines to prevent later crash
                 bug_lines.remove('\n')
 
-            archive = open(game_path + "/bugs_archive.txt", "a")
             # Reporting occurs here
             lines_to_report = deque()  # Implemented as a stack
-            for line in reversed(bug_lines):
-                archive.write(line)
-                if line[0] == '.':  # Reports beginning with '.' are added to the previous report
-                    lines_to_report.append(line)
-                    continue
-                elif line[0] == '!' or line[0] == ';':  # Reports beginning with '!' or blank ones are ignored
-                    continue
-                else:
-                    lines_to_report.append(line)
+            lines_to_archive = deque()
+            try:
+                for line in reversed(bug_lines):
+                    lines_to_archive.append(line)
+                    if line[0] == '.':  # Reports beginning with '.' are added to the previous report
+                        lines_to_report.append(line)
+                        continue
+                    elif line[0] == '!' or line[0] == ';':  # Reports beginning with '!' or blank ones are ignored
+                        continue
+                    else:
+                        lines_to_report.append(line)
 
-                assign_to = find_assign_to(line, chosen_project[0])
+                    assign_to = find_assign_to(line, chosen_project[0])
 
-                report_bug(chosen_project, lines_to_report, version, pictures_folder, assign_to,
-                           mantis_username, password, cfg_read[4][:-1])
-                print("Bug reported successfully!\n")
+                    report_bug(chosen_project, lines_to_report, version, pictures_folder, assign_to,
+                               mantis_username, password, cfg_read[4][:-1])
+                    lines_to_archive.clear()
+                    print("Bug reported successfully!\n")
+            finally:
+                archive = open(game_path + "/bugs_archive.txt", "a")
+                while len(lines_to_archive) > 0:
+                    archive_me = lines_to_archive.pop()
+                    archive.write(archive_me)
+                archive.close()
 
-            archive.close()
             bugs_file = open(game_path + "/bugs.txt", "w")  # Clear bugs.txt after use, all have been saved to archive
             bugs_file.close()
 
