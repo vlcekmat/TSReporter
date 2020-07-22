@@ -72,13 +72,6 @@ class ConfigHandler:
             else:
                 ls -= 1
                 ConfigHandler.cfg_dict[cfg_layout[ls]] = ConfigHandler.ask_config_line(cfg_layout[ls])
-                #print(f"Select a new {cfg_layout[ls]}")
-                #if "location" in cfg_layout[ls]:
-                #    ConfigHandler.cfg_dict[cfg_layout[ls]] = find_path()
-                #elif "browser" in cfg_layout[ls]:
-                #    ConfigHandler.cfg_dict[cfg_layout[ls]] = ask_preferred_browser()
-                #else:
-                #    ConfigHandler.cfg_dict[cfg_layout[ls]] = input("> ")
                 ConfigHandler.save_config()
                 continue
 
@@ -97,7 +90,6 @@ class ConfigHandler:
     @staticmethod
     def ask_config_line(key_to_ask):
         print(f"Select your {key_to_ask}")
-        new_value = ""
         if 'location' in key_to_ask:
             new_value = find_path()
         elif 'browser' in key_to_ask:
@@ -115,4 +107,3 @@ def ask_preferred_browser():
             return 'chrome'
         elif pref_browser.upper() == 'F':
             return 'firefox'
-
