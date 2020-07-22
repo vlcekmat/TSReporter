@@ -1,33 +1,30 @@
 import os
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+# from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
-import getpass
+# import getpass
 
 from information_compile import generate_description, extract_location_filter
-from information_compile import get_image, extract_asset_name
+from information_compile import get_image, extract_asset_name, generate_no_version_des
 from collections import deque
 
 
 class WebDriver:
     driver = None
-    _is_active = False
 
     def __init__(self, browser='chrome', headless=False):
         WebDriver.driver = set_up_new_driver(browser_using=browser, headless=headless)
 
     def get_driver(self):
-        return WebDriver.driver
+        return self.driver
 
     def is_active(self):
         try:
-            test = WebDriver.driver.current_url
+            test = self.driver.current_url
         except WebDriverException:
-            _is_active = False
             return False
         else:
-            _is_active = True
             return True
 
 
@@ -42,7 +39,7 @@ def set_up_new_driver(headless=False, browser_using='chrome'):
         driver = webdriver.Chrome(executable_path='chromedriver.exe', options=options)
         return driver
     elif browser_using == 'firefox':
-        binary = FirefoxBinary('path/to/installed firefox binary')
+        # binary = FirefoxBinary('path/to/installed firefox binary')
         options = webdriver.FirefoxOptions()
         if headless:
             options.headless = True
@@ -87,8 +84,13 @@ def log_into_tsreporter(test_login_username, browser='chrome'):
 
 
 # opens mantis so the user can check for duplicates
-def check_for_duplicates(username, password, bug_description=None, asset_path=None, web_driver=None):
+def check_for_duplicates(username, password, bug_description=None, asset_path=None, web_driver=None, browser=None):
     print("Opening search for duplicates")
+
+    if not web_driver.is_active():
+        driver = WebDriver(browser=browser).get_driver()
+        log_into_mantis(driver, username, password)
+
     driver = web_driver.get_driver()
     log_into_mantis(driver, username, password)
     if asset_path is not None:
@@ -108,14 +110,12 @@ def check_for_duplicates(username, password, bug_description=None, asset_path=No
         if answer.upper() == 'N':
             try:
                 pass
-                #driver.close()
             except WebDriverException:
                 pass
             return False
         elif answer.upper() == 'Y':
             try:
                 pass
-                #driver.close()
             except WebDriverException:
                 pass
             return True
@@ -212,22 +212,24 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
         driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))  # upload an image
     description_box = driver.find_element_by_xpath("//textarea[@class='form-control']")
     if len(bug_descriptions) <= 1:
+        no_ver_description = generate_no_version_des(bug_descriptions)
         if video_link_entered:
-            description_box.send_keys(str(''.join(bug_descriptions)) + "\n" + 'Video link: ' + video_link + '\n')
+            description_box.send_keys(str(''.join(no_ver_description)) + "\n" + 'Video link: ' + video_link + '\n')
         else:
-            description_box.send_keys(str(''.join(bug_descriptions)) + '\n')
+            description_box.send_keys(str(''.join(no_ver_description)) + '\n')
     else:
         first_time = True
         for p in range(len(bug_descriptions)):
+            no_ver_description = generate_no_version_des(bug_descriptions[p])
             if first_time:
                 if video_link_entered:
-                    description_box.send_keys(bug_descriptions[p] + "\n" + 'Video link: ' + video_link + '\n\n')
+                    description_box.send_keys(''.join(no_ver_description) + "\n" + 'Video link: ' + video_link + '\n\n')
                     first_time = False
                 else:
-                    description_box.send_keys(bug_descriptions[p] + '\n\n')
+                    description_box.send_keys(''.join(no_ver_description) + '\n\n')
                     first_time = False
             else:
-                description_box.send_keys('Additional image ' + str((p - 1)) + ' : ' + bug_descriptions[p] + '\n')
+                description_box.send_keys(no_ver_description)
     summary = bug_descriptions[0].split(';')[0]
     summary_box = driver.find_element_by_xpath(f"//input[@name='summary']")
     if category == 'a':
@@ -241,7 +243,7 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
             assign_to_option = driver.find_element_by_xpath(f"//option[text()='{assign_to}']")
             assign_to_option.click()
         except WebDriverException:
-            print(f'Unable to find user named: {assign_to}')
+            print(f'Unable to find user named: {assign_to}, leaving blank')
     reproducibility_option = driver.find_element_by_xpath(f"//option[text()='always']")
     reproducibility_option.click()
 

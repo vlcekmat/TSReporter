@@ -1,22 +1,19 @@
 import os
-
-import config as cfg
 from collections import deque
 import fnmatch
-from time import sleep
 
 from utils import is_int
 from reporter import report_bug
 import versions as ver
 from sector_seek import find_assign_to
 from chromedrivers import log_into_tsreporter
+from config import ConfigHandler
 
 
 # Program happens here
 def main():
-    if not os.path.isfile('./config.cfg'):
-        cfg.config_setup()
     password = ""
+    cfg_handler = ConfigHandler()
 
     # Main program loop, ends by selecting mode 3
     while True:
@@ -34,25 +31,17 @@ def main():
             if 1 <= int(use_mode) <= 3:
                 use_mode = int(use_mode)
                 break
+
         # noinspection PyUnboundLocalVariable
         if use_mode == 3:  # Quit use_mode
             print("Ending")
             break
         elif use_mode == 2:  # Edit configuration use_mode
-            cfg.config_edit()
+            cfg_handler.config_edit()
         elif use_mode == 1:  # Report bugs use_mode
-            try:  # Opens config.cfg, reads its contents into cfg_read
-                cfg_file = open("./config.cfg", "r")
-                cfg_read = cfg_file.readlines()
-                cfg_file.close()
-            except FileNotFoundError:
-                print("Could not locate config.cfg file, running config setup")
-                sleep(1)
-                cfg.config_setup()
-                continue
 
             # This section validates the edited pictures directory from config.cfg
-            pictures_folder = cfg_read[2][:-1]
+            pictures_folder = cfg_handler.read("edited images location")
             if pictures_folder == "":
                 print("Edited pictures folder missing from config.cfg. Set it up before reporting.")
                 continue
@@ -63,30 +52,30 @@ def main():
                 print("Edited pictures folder doesn't contain any .jpg or .gif files. Did you select the right one?")
                 continue
 
-            mantis_username = cfg_read[3][:-1]
+            mantis_username = cfg_handler.read("mantis username")
             if mantis_username == "":
                 print("Mantis username not found in config.cfg")
                 continue
 
             # If password was not entered successfully this session, it happens here
             if password == "":
-                password = log_into_tsreporter(mantis_username, cfg_read[4][:-1])
+                password = log_into_tsreporter(mantis_username, cfg_handler.read("preferred browser"))
                 if password == "":
                     continue
 
-            doc_path = cfg_read[1]  # Path to documents
+            doc_path = cfg_handler.read("documents location")  # Path to documents
 
             # Here,the user selects which project to report into
             # This is important because it determines which game's files and versions will be accessed
             chosen_project = ver.get_project_from_user()
             if chosen_project[0] == 'A':
-                game_path = doc_path[:-1] + "/American Truck Simulator"
+                game_path = doc_path + "/American Truck Simulator"
             else:
-                game_path = doc_path[:-1] + "/Euro Truck Simulator 2"
+                game_path = doc_path + "/Euro Truck Simulator 2"
 
             # bugs.txt is found and read into bug_lines
             if not os.path.isfile(game_path + "/bugs.txt"):
-                print("bugs.txt not found in documents folder. Change config or report some bugs first.")
+                print(f"bugs.txt not found in {game_path}. Change config or report some bugs first.")
                 continue
             bugs_file = open(game_path + "/bugs.txt", "r")
             bug_lines = bugs_file.readlines()
@@ -95,7 +84,7 @@ def main():
                 print("No bugs to report from bugs.txt")
                 continue
 
-            version = ver.find_version(chosen_project[0])
+            version = ver.find_version(chosen_project[0], cfg_handler)
             if version == -1:  # Version is not found, would result in invalid report
                 continue
             print(f"Reporting in project [{chosen_project}] at version {version}")
@@ -120,7 +109,7 @@ def main():
                     assign_to = find_assign_to(line, chosen_project[0])
 
                     report_bug(chosen_project, lines_to_report, version, pictures_folder, assign_to,
-                               mantis_username, password, cfg_read[4][:-1])
+                               mantis_username, password, cfg_handler.read("preferred browser"))
                     lines_to_report.clear()
                     print("Bug reported successfully!\n")
             finally:
