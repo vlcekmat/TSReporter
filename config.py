@@ -25,7 +25,7 @@ def config_edit():
     while True:
         print("These is your current configuration, type the number of what you want to modify:")
         print("0: Exit config")
-        for _i in range(0, len(config_lines)):
+        for _i in range(0, len(config_lines)):  # Print out the current configuration
             print(f"{_i+1}: {cfg_layout[_i+1]}:\t{config_lines[_i][:-1]}")
         line_selection = input("> ")
         if not is_int(line_selection) or not 0 <= int(line_selection) <= len(cfg_layout):
@@ -38,14 +38,7 @@ def config_edit():
             if "location" in cfg_layout[int(line_selection)]:
                 config_lines[int(line_selection) - 1] = find_path() + '\n'
             elif "browser" in cfg_layout[int(line_selection)]:
-                while True:
-                    pref_browser = input("Do you want to use Chrome or Firefox? Type C/F\n> ")
-                    if pref_browser.upper() == 'C':
-                        config_lines[int(line_selection) - 1] = 'chrome\n'
-                        break
-                    elif pref_browser.upper() == 'F':
-                        config_lines[int(line_selection) - 1] = 'firefox\n'
-                        break
+                config_lines[int(line_selection) - 1] = ask_preferred_browser()
             else:
                 config_lines[int(line_selection) - 1] = input("> ") + '\n'
             continue
@@ -53,6 +46,16 @@ def config_edit():
     config_file.writelines(config_lines)
     config_file.close()
     print("Configuration changes saved")
+
+
+# Asks user for browser
+def ask_preferred_browser():
+    while True:
+        pref_browser = input("Do you want to use Chrome or Firefox? Type C/F\n> ")
+        if pref_browser.upper() == 'C':
+            return 'chrome\n'
+        elif pref_browser.upper() == 'F':
+            return 'firefox\n'
 
 
 # Opens windows dialogue windows and has the user select their Trunk, Steam and edited pictures directories
