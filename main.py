@@ -1,6 +1,7 @@
 import os
 from collections import deque
 import fnmatch
+import copy
 
 from utils import is_int
 from reporter import report_bug
@@ -19,8 +20,9 @@ def main():
     while True:
         print('Select desired mode:')
         print('''    1: Report bugs
-    2: Change config
-    3: Exit
+    2: Batch report (WIP)
+    3: Change config
+    4: Exit
         ''')
 
         # Selects a valid use mode and breaks
@@ -28,17 +30,19 @@ def main():
             use_mode = input('> ')
             if not is_int(use_mode):
                 continue
-            if 1 <= int(use_mode) <= 3:
+            if 1 <= int(use_mode) <= 4:
                 use_mode = int(use_mode)
                 break
 
         # noinspection PyUnboundLocalVariable
-        if use_mode == 3:  # Quit use_mode
+        if use_mode == 4:  # Quit use_mode
             print("Ending")
             break
-        elif use_mode == 2:  # Edit configuration use_mode
+
+        elif use_mode == 3:  # Edit configuration use_mode
             cfg_handler.config_edit()
-        elif use_mode == 1:  # Report bugs use_mode
+
+        elif use_mode in [1, 2]:  # Report bugs use_mode
 
             # This section validates the edited pictures directory from config.cfg
             pictures_folder = cfg_handler.read("edited images location")
@@ -92,39 +96,70 @@ def main():
             while '\n' in bug_lines:  # Cleanses bug_lines of empty lines to prevent later crash
                 bug_lines.remove('\n')
 
+            archive = open(game_path + "/bugs_archive.txt", "a")
+
             # Reporting occurs here
-            lines_to_report = deque()  # Implemented as a stack
-            lines_to_archive = deque()
-            try:
+            if use_mode == 1:  # Standard reporting use_mode
+                lines_to_report = deque()  # Implemented as a stack
+                lines_to_archive = deque()
+                try:
+                    for line in reversed(bug_lines):
+                        archive.write(line)
+                        if line[0] == '.':  # Reports beginning with '.' are added to the previous report
+                            lines_to_report.append(line)
+                            continue
+                        elif line[0] == '!' or line[0] == ';':  # Reports beginning with '!' or blank ones are ignored
+                            continue
+                        else:
+                            lines_to_report.append(line)
+
+                        assign_to = find_assign_to(line, chosen_project[0])
+
+                        report_bug(chosen_project, lines_to_report, version, pictures_folder, assign_to,
+                                   mantis_username, password, cfg_handler.read("preferred browser"))
+                        lines_to_report.clear()
+                        print("Bug reported successfully!\n")
+                finally:
+                    # All bugs that were reported during one reporting cycle will now be added to archive
+                    archive = open(game_path + "/bugs_archive.txt", "a")
+                    while len(lines_to_archive) > 0:
+                        archive_me = lines_to_archive.pop()
+                        archive.write(archive_me)
+                    archive.close()
+                    # Clear bugs.txt after use, all have been saved to archive
+                    bugs_file = open(game_path + "/bugs.txt", "w")
+                    bugs_file.close()
+
+            elif use_mode == 2:  # Batch reporting use_mode
+                print("WARNING: Batch reporting is still WIP!")
+                # This prefix will be added at the beginning of all summaries to save time
+                # writing "State - City -" at the beginning of each report
+                prefix = input("Enter your desired summary prefix\n> ")
+                all_bugs = deque()
+                temp_bug_deque = deque()
+
+                # Here, all bugs in bugs.txt are read and put into a list of stack of individual report lines
+                line_no = 0
+                format_is_correct = True
                 for line in reversed(bug_lines):
-                    lines_to_archive.append(line)  # These will be added to archive in finally: block
+                    line_no += 1
                     if line[0] == '.':  # Reports beginning with '.' are added to the previous report
-                        lines_to_report.append(line)
+                        temp_bug_deque.append(line)
                         continue
                     elif line[0] == '!' or line[0] == ';':  # Reports beginning with '!' or blank ones are ignored
                         continue
+                    # In batch mode, bugs must be prefixed by their priority
+                    elif '_' in line and line.split('_', maxsplit=1)[0].lower() in ['l', 'n', 'h', 'u', 'i']:
+                        temp_bug_deque.append(line)
+                        all_bugs.append(copy.deepcopy(temp_bug_deque))
+                        temp_bug_deque.clear()
                     else:
-                        lines_to_report.append(line)
+                        print(f"Invalid format of bug on line {line_no}:\n{line}")
+                        format_is_correct = False
+                        continue
 
-                    assign_to = find_assign_to(line, chosen_project[0])
-
-                    report_bug(chosen_project, lines_to_report, version, pictures_folder, assign_to,
-                               mantis_username, password, cfg_handler.read("preferred browser"))
-                    lines_to_report.clear()
-                    print("Bug reported successfully!\n")
-            finally:
-                # All bugs that were reported during one reporting cycle will now be added to archive
-                archive = open(game_path + "/bugs_archive.txt", "a")
-                while len(lines_to_archive) > 0:
-                    archive_me = lines_to_archive.pop()
-                    archive.write(archive_me)
-                archive.close()
-
-            bugs_file = open(game_path + "/bugs.txt", "w")  # Clear bugs.txt after use, all have been saved to archive
-            bugs_file.close()
 
 
 # Program begins here
 print("Welcome to TSReporter")
 main()
-quit()

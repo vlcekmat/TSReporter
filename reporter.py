@@ -35,7 +35,7 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
                 use_log_lines = copy.deepcopy(log_lines)
                 upload_to_mantis(
                     version, images_folder_path, category, use_log_lines,
-                    assign, project, username, password, True, browser,
+                    assign, project, username, password, browser,
                     path_to_asset=a_path, debug_info=d_info, web_driver=web_driver
                 )
             else:
@@ -48,8 +48,8 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
             print(error_message)
         except WebDriverException:
             print(error_message)
-       # except AttributeError:
-       #     print(error_message)
+        except AttributeError:
+            print(error_message)
         except TypeError:
             print(error_message)
         except NameError:
