@@ -56,6 +56,12 @@ PATH TO THE ASSET: {asset}'''
     return report_description
 
 
+# cuts the version off the given description
+def generate_no_version_des(description):
+    no_ver_des = ''.join(description).split('] - ')[1:]
+    return no_ver_des
+
+
 # uses log line (bug_description) to gather sector and the first two letters of coordinates
 def extract_location_filter(bug_description):
     time_sector = bug_description.split(';')[1]  # Generates a filter to use in mantis for the duplicate check

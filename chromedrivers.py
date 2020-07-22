@@ -6,7 +6,7 @@ from selenium.common.exceptions import NoSuchElementException, WebDriverExceptio
 # import getpass
 
 from information_compile import generate_description, extract_location_filter
-from information_compile import get_image, extract_asset_name
+from information_compile import get_image, extract_asset_name, generate_no_version_des
 from collections import deque
 
 
@@ -212,22 +212,24 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
         driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))  # upload an image
     description_box = driver.find_element_by_xpath("//textarea[@class='form-control']")
     if len(bug_descriptions) <= 1:
+        no_ver_description = generate_no_version_des(bug_descriptions)
         if video_link_entered:
-            description_box.send_keys(str(''.join(bug_descriptions)) + "\n" + 'Video link: ' + video_link + '\n')
+            description_box.send_keys(str(''.join(no_ver_description)) + "\n" + 'Video link: ' + video_link + '\n')
         else:
-            description_box.send_keys(str(''.join(bug_descriptions)) + '\n')
+            description_box.send_keys(str(''.join(no_ver_description)) + '\n')
     else:
         first_time = True
         for p in range(len(bug_descriptions)):
+            no_ver_description = generate_no_version_des(bug_descriptions[p])
             if first_time:
                 if video_link_entered:
-                    description_box.send_keys(bug_descriptions[p] + "\n" + 'Video link: ' + video_link + '\n\n')
+                    description_box.send_keys(''.join(no_ver_description) + "\n" + 'Video link: ' + video_link + '\n\n')
                     first_time = False
                 else:
-                    description_box.send_keys(bug_descriptions[p] + '\n\n')
+                    description_box.send_keys(''.join(no_ver_description) + '\n\n')
                     first_time = False
             else:
-                description_box.send_keys('Additional image ' + str((p - 1)) + ' : ' + bug_descriptions[p] + '\n')
+                description_box.send_keys(no_ver_description)
     summary = bug_descriptions[0].split(';')[0]
     summary_box = driver.find_element_by_xpath(f"//input[@name='summary']")
     if category == 'a':
