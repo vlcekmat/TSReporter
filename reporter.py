@@ -54,3 +54,31 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
             print(error_message)
         except NameError:
             print(error_message)
+
+
+def batch_report_bugs(project, bugs_stack, version, images_folder_path, prefix, username, password, browser='chrome'):
+    #reporter_driver = WebDriver(browser, headless=True)
+    reporter_driver = WebDriver(browser)
+    log_into_mantis(reporter_driver.driver, username, password)
+    while len(bugs_stack) > 0:
+        current_bug = bugs_stack.pop()
+        split_bug = current_bug[0].split('_', maxsplit=1)
+        priority = get_full_priority(split_bug[0])
+        current_bug[0] = prefix + ''.join(split_bug[1:])
+        use_log_lines = copy.deepcopy(current_bug)
+        print(use_log_lines)
+        upload_to_mantis(
+            version, images_folder_path, 'm', use_log_lines, "", project,
+            username, password, browser, web_driver=reporter_driver, priority=priority
+        )
+
+
+def get_full_priority(prio):
+    prio_dict = {
+        "l": "low",
+        "n": "normal",
+        "h": "high",
+        "u": "urgent",
+        "i": "immediate"
+    }
+    return prio_dict[prio]

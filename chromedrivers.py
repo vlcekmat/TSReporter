@@ -126,7 +126,7 @@ def check_for_duplicates(username, password, bug_description=None, asset_path=No
 
 # opens chrome browser, connects to mantis and uploads all of the gathered information
 def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to, project, username, password,
-                     browser, path_to_asset=None, debug_info=None, web_driver=None):
+                     browser, path_to_asset=None, debug_info=None, web_driver=None, priority=None):
     # region process information to insert in the form
     bug_descriptions = []
     first_path_to_asset = ''
@@ -213,14 +213,22 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
             assign_to_option.click()
         except WebDriverException:
             print(f'Unable to find user named: {assign_to}, leaving blank')
-    reproducibility_option = driver.find_element_by_xpath(f"//option[text()='always']")
-    reproducibility_option.click()
+    driver.find_element_by_xpath(f"//option[text()='always']").click()
 
     if category == 'm':
         driver.find_element_by_xpath(f"//option[text()='map']").click()
     elif category == 'a':
         driver.find_element_by_xpath(f"//option[text()='assets']").click()
+
+    if priority:
+        driver.find_element_by_xpath(f"//select[@name='priority']/option[text()='{priority}']").click()
+        if priority != "low":
+            driver.find_element_by_xpath(f"//select[@name='severity']/option[text()='major']").click()
     # endregion
+
+    # TODO: make report auto submit in headless browser
+    # if
+    #     driver.find_element_by_xpath("//input[@value='Submit Issue']").click()
 
     while True:
         try:

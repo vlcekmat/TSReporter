@@ -4,7 +4,7 @@ import fnmatch
 import copy
 
 from utils import is_int
-from reporter import report_bug
+from reporter import report_bug, batch_report_bugs
 import versions as ver
 from sector_seek import find_assign_to
 from chromedrivers import log_into_tsreporter
@@ -45,11 +45,11 @@ def main():
         elif use_mode in [1, 2]:  # Report bugs use_mode
 
             # This section validates the edited pictures directory from config.cfg
-            pictures_folder = cfg_handler.read("edited images location")
-            if pictures_folder == "":
-                print("Edited pictures folder missing from config.cfg. Set it up before reporting.")
+            images_folder = cfg_handler.read("edited images location")
+            if images_folder == "":
+                print("Edited images folder missing from config.cfg. Set it up before reporting.")
                 continue
-            for is_this_image in os.listdir(pictures_folder):
+            for is_this_image in os.listdir(images_folder):
                 if fnmatch.fnmatch(is_this_image, "*.jpg") or fnmatch.fnmatch(is_this_image, "*.gif"):
                     break
             else:
@@ -115,7 +115,7 @@ def main():
 
                         assign_to = find_assign_to(line, chosen_project[0])
 
-                        report_bug(chosen_project, lines_to_report, version, pictures_folder, assign_to,
+                        report_bug(chosen_project, lines_to_report, version, images_folder, assign_to,
                                    mantis_username, password, cfg_handler.read("preferred browser"))
                         lines_to_report.clear()
                         print("Bug reported successfully!\n")
@@ -157,7 +157,11 @@ def main():
                         print(f"Invalid format of bug on line {line_no}:\n{line}")
                         format_is_correct = False
                         continue
-
+                if format_is_correct:
+                    batch_report_bugs(
+                        chosen_project, all_bugs, version, images_folder, prefix,
+                        mantis_username, password, cfg_handler.read("preferred browser")
+                         )
 
 
 # Program begins here
