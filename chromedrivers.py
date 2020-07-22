@@ -125,22 +125,13 @@ def check_for_duplicates(username, password, bug_description=None, asset_path=No
 
 
 # opens chrome browser, connects to mantis and uploads all of the gathered information
-def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to, project, username, password, no_vid,
+def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to, project, username, password,
                      browser, path_to_asset=None, debug_info=None, web_driver=None):
     # region process information to insert in the form
     bug_descriptions = []
     first_path_to_asset = ''
-
     images = []
-
     first_loop = True
-    if no_vid:
-        first_loop_for_videos = False
-    else:
-        first_loop_for_videos = True
-
-    video_link_entered = False
-    video_link = ''
 
     if debug_info is not None:
         path_to_asset = f"{path_to_asset}\n{debug_info}"
@@ -180,21 +171,6 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
         if image_to_append:
             images.append(image_to_append)
 
-        # Asks user once to add a video
-        if first_loop_for_videos:
-            first_loop_for_videos = False
-            while True:
-                print('Add a video link? (Y/N)')
-                answer = input('> ')
-                if answer.upper() == 'Y':
-                    video_link = input('Video link: ')
-                    video_link_entered = True
-                    break
-                elif answer.upper() == 'N':
-                    break
-                else:
-                    print('Answer Y or N')
-                    continue
     # endregion
     driver = web_driver.get_driver()
 
@@ -213,21 +189,14 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
     description_box = driver.find_element_by_xpath("//textarea[@class='form-control']")
     if len(bug_descriptions) <= 1:
         no_ver_description = generate_no_version_des(bug_descriptions)
-        if video_link_entered:
-            description_box.send_keys(str(''.join(no_ver_description)) + "\n" + 'Video link: ' + video_link + '\n')
-        else:
-            description_box.send_keys(str(''.join(no_ver_description)) + '\n')
+        description_box.send_keys(str(''.join(no_ver_description)) + '\n')
     else:
         first_time = True
         for p in range(len(bug_descriptions)):
             no_ver_description = generate_no_version_des(bug_descriptions[p])
             if first_time:
-                if video_link_entered:
-                    description_box.send_keys(''.join(no_ver_description) + "\n" + 'Video link: ' + video_link + '\n\n')
-                    first_time = False
-                else:
-                    description_box.send_keys(''.join(no_ver_description) + '\n\n')
-                    first_time = False
+                description_box.send_keys(''.join(no_ver_description) + '\n\n')
+                first_time = False
             else:
                 description_box.send_keys(no_ver_description)
     summary = bug_descriptions[0].split(';')[0]
@@ -252,6 +221,7 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
     elif category == 'a':
         driver.find_element_by_xpath(f"//option[text()='assets']").click()
     # endregion
+
     while True:
         try:
             current_url = driver.current_url
