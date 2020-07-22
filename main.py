@@ -135,6 +135,6 @@ def main():
             bugs_file.close()
 
 
-# Program begins here
-print("Welcome to TSReporter")
+# The program begins here
+print('Welcome to TSReporter!')
 main()
