@@ -39,15 +39,6 @@ def main():
         elif use_mode == 2:  # Edit configuration use_mode
             cfg_handler.config_edit()
         elif use_mode == 1:  # Report bugs use_mode
-            # try:  # Opens config.cfg, reads its contents into cfg_read
-            #     cfg_file = open("./config.cfg", "r")
-            #     cfg_read = cfg_file.readlines()
-            #     cfg_file.close()
-            # except FileNotFoundError:
-            #     print("Could not locate config.cfg file, running config setup")
-            #     sleep(1)
-            #     cfg.config_setup()
-            #     continue
 
             # This section validates the edited pictures directory from config.cfg
             pictures_folder = cfg_handler.read("edited images location")
