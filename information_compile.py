@@ -37,12 +37,10 @@ def determine_bug_category(log):
 # puts information from main in a cohesive report and returns it
 def generate_description(line, version, category, asset='', first_time=False):
     split_log = line.split(';')
-    if '_' in split_log[0]:
-        log_without_category = ''.join(split_log[0].split('_', maxsplit=1)[1]) + ';' + ''.join(split_log[1]) + ';' + ';'.join(
-            split_log[2:])
+    if '_' in split_log[0]:  # First join is there to convert array to string easily
+        log_without_category = ''.join(split_log[0].split('_', maxsplit=1)[1]) + ';' + ';'.join(split_log[1:])
     elif '.' in split_log[0]:
-        log_without_category = ''.join(split_log[0].split('.', maxsplit=1)[1]) + ';' + ''.join(split_log[1]) + ';' + ';'.join(
-            split_log[2:])
+        log_without_category = ''.join(split_log[0].split('.', maxsplit=1)[1]) + ';' + ';'.join(split_log[1:])
     else:
         log_without_category = line
     if category == 'a' and first_time:
