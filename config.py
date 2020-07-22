@@ -52,8 +52,7 @@ class ConfigHandler:
             print(str(i) + ": " + key + ":\t\t" + ConfigHandler.cfg_dict[key])
             i += 1
 
-
-
+    # Saves content of dictionary to config.cfg in correct format
     @staticmethod
     def save_config():
         cfg_file = open("./config.cfg", "w")
