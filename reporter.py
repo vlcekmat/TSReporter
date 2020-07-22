@@ -23,14 +23,14 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
             d_info = a_path
             a_path = extract_asset_path(a_path)
 
-    web_driver = WebDriver(browser=browser)
     while True:
         try:
+            web_driver = WebDriver(browser=browser)
             if not tried_duplicates:
                 duplicate_found = check_for_duplicates(
-                    username, password, bug_description=log_first, asset_path=a_path, web_driver=web_driver)
+                    username, password, bug_description=log_first,
+                    asset_path=a_path, web_driver=web_driver, browser=browser)
                 tried_duplicates = True
-                continue
             if not duplicate_found:
                 use_log_lines = copy.deepcopy(log_lines)
                 upload_to_mantis(
@@ -40,6 +40,7 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
                 )
             else:
                 print('Reporting not needed')
+                web_driver.get_driver().quit()
             break
         except SessionNotCreatedException:
             print(error_message)
@@ -47,8 +48,8 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
             print(error_message)
         except WebDriverException:
             print(error_message)
-        except AttributeError:
-            print(error_message)
+       # except AttributeError:
+       #     print(error_message)
         except TypeError:
             print(error_message)
         except NameError:

@@ -57,14 +57,11 @@ def find_trunk_version(game, trunk_path):
 # Takes first letter of game as argument -- A or E for ATS or ETS2
 # Finds the game version in game.log.txt and if it is a trunk version, finds the version in CURRENT
 # returns -1 if game.log.txt is missing or game crashed before printing out game version
-def find_version(game):
-    _cfg_file = open("./config.cfg", "r")
-    _doc_read = _cfg_file.readlines()
-    _cfg_file.close()
+def find_version(game, config_handler):
     if game == 'A':
-        log_path = _doc_read[1][:-1] + "/American Truck Simulator/game.log.txt"
+        log_path = config_handler.read("documents location") + "/American Truck Simulator/game.log.txt"
     else:
-        log_path = _doc_read[1][:-1] + "/Euro Truck Simulator 2/game.log.txt"
+        log_path = config_handler.read("documents location") + "/Euro Truck Simulator 2/game.log.txt"
     if not os.path.isfile(log_path):
         print(f"game.log.txt not found in path {log_path}")
         return -1
@@ -73,9 +70,9 @@ def find_version(game):
         return -1
 
     if game == 'A' and found_version == "0.1.3":
-        version_out = find_trunk_version(game, _doc_read[0][:-1])
+        version_out = find_trunk_version(game, config_handler.read("trunk location"))
     elif game == 'E' and found_version == "1.11":
-        version_out = find_trunk_version(game, _doc_read[0][:-1])
+        version_out = find_trunk_version(game, config_handler.read("trunk location"))
     else:
         version_out = "[" + found_version + "]"
 
