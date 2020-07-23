@@ -117,7 +117,6 @@ def main():
                         report_bug(chosen_project, lines_to_report, version, images_folder, assign_to,
                                    mantis_username, password, cfg_handler.read("preferred browser"))
                         lines_to_report.clear()
-                        print("Bug reported successfully!\n")
                 finally:
                     # All bugs that were reported during one reporting cycle will now be added to archive
                     archive = open(game_path + "/bugs_archive.txt", "a")

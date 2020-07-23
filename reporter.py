@@ -55,6 +55,8 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
             print(error_message)
         except NameError:
             print(error_message)
+    # TODO: test this, Mantis ded
+    print("Bug reported successfully!\n")
 
 
 def batch_report_bugs(project, bugs_stack, version, images_folder_path, username, password, browser='chrome'):
