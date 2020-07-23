@@ -127,3 +127,4 @@ def main():
 # Program begins here
 print("Welcome to TSReporter")
 main()
+quit()
