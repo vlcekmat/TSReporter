@@ -52,7 +52,7 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
         if not image_to_append and not priority:
             image_to_append = ask_for_missing_image(line_to_process, images_folder_path)
         elif not image_to_append and priority:
-            print(f"No image found for bug: {line_to_process}")
+            print(f"No image added to bug: {line_to_process}")
         if image_to_append:
             images.append(image_to_append)
 

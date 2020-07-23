@@ -19,3 +19,12 @@ def is_int(s):
         return False
     except ValueError:
         return False
+
+
+# def ask_yes_no():
+#     while True:
+#         ans = input("Answer Y/N\n> ")
+#         if ans.upper() in ["Y", "YES", "YEP", "YEA"]:
+#             return True
+#         elif ans.upper() in ["N", "NO", "NOPE", "NAH"]:
+#             return False
