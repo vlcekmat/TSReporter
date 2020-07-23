@@ -8,7 +8,6 @@ import shutil
 PyInstaller.__main__.run([
     '--name=TSReporter',
     '--onefile',
-    '--version=0.2.0',
     '--icon=resources/icon.ico',
     "main.py",
 ])
