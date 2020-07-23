@@ -97,15 +97,13 @@ def main():
             while '\n' in bug_lines:  # Cleanses bug_lines of empty lines to prevent later crash
                 bug_lines.remove('\n')
 
-            archive = open(game_path + "/bugs_archive.txt", "a")
-
             # Reporting occurs here
             if use_mode == 1:  # Standard reporting use_mode
                 lines_to_report = deque()  # Implemented as a stack
                 lines_to_archive = deque()
                 try:
                     for line in reversed(bug_lines):
-                        archive.write(line)
+                        lines_to_archive.append(line)
                         if line[0] == '.':  # Reports beginning with '.' are added to the previous report
                             lines_to_report.append(line)
                             continue
