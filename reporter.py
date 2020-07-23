@@ -1,5 +1,6 @@
 from collections import deque
-from chromedrivers import check_for_duplicates, upload_to_mantis, WebDriver
+from chromedrivers import check_for_duplicates, WebDriver, log_into_mantis
+from upload import upload_to_mantis
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowException, WebDriverException
 from information_compile import determine_bug_category, extract_asset_path
 import copy

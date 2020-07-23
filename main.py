@@ -134,7 +134,6 @@ def main():
                 print("WARNING: Batch reporting is still WIP!")
                 # This prefix will be added at the beginning of all summaries to save time
                 # writing "State - City -" at the beginning of each report
-                prefix = input("Enter your desired summary prefix\n> ")
                 all_bugs = deque()
                 temp_bug_deque = deque()
 
@@ -159,7 +158,7 @@ def main():
                         continue
                 if format_is_correct:
                     batch_report_bugs(
-                        chosen_project, all_bugs, version, images_folder, prefix,
+                        chosen_project, all_bugs, version, images_folder,
                         mantis_username, password, cfg_handler.read("preferred browser")
                          )
 
