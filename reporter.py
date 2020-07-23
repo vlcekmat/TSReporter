@@ -12,8 +12,8 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
     print(f'CURRENT BUG: {log_first}')
     log_lines.append(log_first)
     category = determine_bug_category(log_first)
-    error_message = "Don't interact with browser during the process, trying again..."
 
+    error_message = "Don't interact with browser during the process, trying again..."
     tried_duplicates = False
     duplicate_found = False
     a_path = None

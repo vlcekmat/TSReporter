@@ -19,7 +19,9 @@ def ask_for_missing_image(line_to_process, images_folder_path):
             return image_to_return
 
 
-# opens chrome browser, connects to mantis and uploads all of the gathered information
+# Opens chrome browser, connects to mantis and uploads all of the gathered information
+# If priority is not None, it will treat the report as a batch report = will not as for image if its missing and
+#       will submit it automatically
 def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to, project, username, password,
                      browser, path_to_asset=None, debug_info=None, web_driver=None, priority=None):
     # region process information to insert in the form
@@ -63,10 +65,8 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
 
     # region Filling up the report form
     driver.get('https://qa.scssoft.com/login_select_proj_page.php?ref=bug_report_page.php')
-    select_project_box = driver.find_element_by_xpath(f"//select[1]/option[text()='{project}']")
-    select_project_box.click()
-    select_project_button = driver.find_element_by_xpath("//input[@type='submit']")
-    select_project_button.click()
+    driver.find_element_by_xpath(f"//select[1]/option[text()='{project}']").click()
+    driver.find_element_by_xpath("//input[@type='submit']").click()
     for upload_me in images:
         driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))  # upload an image
     description_box = driver.find_element_by_xpath("//textarea[@class='form-control']")
@@ -82,6 +82,7 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
                 first_time = False
             else:
                 description_box.send_keys(no_ver_description)
+
     summary = bug_descriptions[0].split(';')[0]
     summary_box = driver.find_element_by_xpath(f"//input[@name='summary']")
     if category == 'a':
@@ -113,7 +114,9 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
     # TODO: make report auto submit in headless browser
     # if priority
     #     driver.find_element_by_xpath("//input[@value='Submit Issue']").click()
+    #   else:
 
+    # This waits for the user to close the browser window after submitting the bug
     while True:
         try:
             current_url = driver.current_url
