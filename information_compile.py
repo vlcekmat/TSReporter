@@ -1,4 +1,6 @@
 from pathlib import Path
+from decimal import Decimal
+import re
 from collections import deque
 
 
@@ -10,12 +12,13 @@ def get_image(log, images_folder_path):
     split_date = raw_date_time.split(' ')[0].split('/')
     split_time = raw_date_time.split(' ')[1].split(':')
     date_time_to_find = f'{split_date[2]}{split_date[1]}{split_date[0]}_{split_time[0]}{split_time[1]}'
-
-    coordinates_to_find = str(round(float(split_log[2]))) + '_' + str(round(float(split_log[3]))) + '_' + str(round(float(split_log[4])))
+    coord_0 = str(round(Decimal(str(split_log[2]))))[:-1]
+    coord_1 = str(round(Decimal(str(split_log[3]))))[:-1]
+    coord_2 = str(round(Decimal(str(split_log[4]))))[:-1]
 
     path = Path(images_folder_path)
     for file in path.glob('*.jpg') or path.glob('*.gif'):
-        if date_time_to_find in file.name and coordinates_to_find in file.name:
+        if date_time_to_find in file.name and coord_0 in file.name and coord_2 in file.name:
             return file
         else:
             pass

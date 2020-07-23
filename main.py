@@ -208,4 +208,3 @@ def check_batch_formats(bug_lines, all_bugs):
 # Program begins here
 print("Welcome to TSReporter")
 main()
-quit()
