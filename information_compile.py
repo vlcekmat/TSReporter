@@ -15,7 +15,7 @@ def get_image(log, images_folder_path):
 
     path = Path(images_folder_path)
     for file in path.glob('*.jpg') or path.glob('*.gif'):
-        if date_time_to_find in file.name and coordinates_to_find:
+        if date_time_to_find in file.name and coordinates_to_find in file.name:
             return file
         else:
             pass
