@@ -36,16 +36,13 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
             if first_loop:
                 first_path_to_asset = path_to_asset
                 first_loop = False
-            bug_descriptions.append(generate_description(line_to_process,
-                                                         version,
-                                                         category,
-                                                         path_to_asset,
-                                                         first_time=True))
+            bug_descriptions.append(
+                generate_description(line_to_process, version, category, path_to_asset, first_time=True)
+            )
         else:
-            bug_descriptions.append(generate_description(line_to_process,
-                                                         version,
-                                                         category,
-                                                         first_time=False))
+            bug_descriptions.append(
+                generate_description(line_to_process, version, category, first_time=False)
+            )
 
         image_to_append = get_image(line_to_process, images_folder_path)
 
