@@ -157,10 +157,14 @@ def main():
                         format_is_correct = False
                         continue
                 if format_is_correct:
-                    batch_report_bugs(
+                    reported_all = batch_report_bugs(
                         chosen_project, all_bugs, version, images_folder,
                         mantis_username, password, cfg_handler.read("preferred browser")
                          )
+                else:
+                    continue
+                if not reported_all:
+                    continue
 
 
 # Program begins here

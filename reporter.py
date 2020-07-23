@@ -57,8 +57,11 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
             print(error_message)
 
 
-def batch_report_bugs(project, bugs_stack, version, images_folder_path, prefix, username, password, browser='chrome'):
-    #reporter_driver = WebDriver(browser, headless=True)
+def batch_report_bugs(project, bugs_stack, version, images_folder_path, username, password, browser='chrome'):
+    prefix = ask_for_prefix()
+    if prefix == "":
+        return False
+    # reporter_driver = WebDriver(browser, headless=True)
     reporter_driver = WebDriver(browser)
     log_into_mantis(reporter_driver.driver, username, password)
     while len(bugs_stack) > 0:
@@ -67,11 +70,23 @@ def batch_report_bugs(project, bugs_stack, version, images_folder_path, prefix, 
         priority = get_full_priority(split_bug[0])
         current_bug[0] = prefix + ''.join(split_bug[1:])
         use_log_lines = copy.deepcopy(current_bug)
-        print(use_log_lines)
         upload_to_mantis(
             version, images_folder_path, 'm', use_log_lines, "", project,
             username, password, browser, web_driver=reporter_driver, priority=priority
         )
+
+
+def ask_for_prefix():
+    while True:
+        out_prefix = input("Choose your prefix\n> ")
+        if out_prefix == "":
+            print("No prefix selected, returning to menu")
+            return ""
+        print(f"Double check your prefix, you won't be able to change it later!")
+        print(out_prefix)
+        answer = input("Is your prefix correct(Y/N)?\n> ")
+        if answer.upper() == 'Y':
+            return out_prefix
 
 
 def get_full_priority(prio):
