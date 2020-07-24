@@ -2,6 +2,7 @@ import copy
 from collections import deque
 
 from information_compile import get_image
+from bugs import read_bug_lines
 
 
 def check_batch_images(all_bugs, image_folder_path):
@@ -32,25 +33,17 @@ def check_batch_images(all_bugs, image_folder_path):
     return False
 
 
-def check_batch_formats(bug_lines, all_bugs):
+def check_batch_formats(bug_lines):
     # Checks every line in bugs.txt and determines if the file is valid and ready to be batch reported
-    # In doing so, puts all the bugs into deques and adds all those deques into the all_bugs deque
-    # That is then used for reporting the bugs
-    line_no = len(bug_lines) + 1
-    temp_bug_deque = deque()
+    line_no = 0
     format_is_correct = True
-    for line in reversed(bug_lines):
-        line_no -= 1
-        if line[0] == '.':  # Reports beginning with '.' are added to the previous report
-            temp_bug_deque.append(line)
-            continue
-        elif line[0] == '!' or line[0] == ';':  # Reports beginning with '!' or blank ones are ignored
+    for line in bug_lines:
+        line_no += 1
+        if line[0] in ['.', '!', ';']:  # Reports beginning with '.' are added to the previous report
             continue
         # In batch mode, bugs must be prefixed by their priority
         elif '_' in line and line.split('_', maxsplit=1)[0].lower() in ['l', 'n', 'h', 'u', 'i']:
-            temp_bug_deque.append(line)
-            all_bugs.append(copy.deepcopy(temp_bug_deque))
-            temp_bug_deque.clear()
+            continue
         else:
             print(f"Invalid format of bug on line {line_no}:\n{line}")
             format_is_correct = False
@@ -66,7 +59,7 @@ def ask_for_prefix():
             print("No prefix selected, returning to menu")
             return ""
         print(f"Double check your prefix, you won't be able to change it later!")
-        print(out_prefix)
+        print('"' + out_prefix + '"')
         answer = input("Is your prefix correct(Y/N)?\n> ")
         if answer.upper() == 'Y':
             return out_prefix

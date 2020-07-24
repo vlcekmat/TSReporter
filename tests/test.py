@@ -163,7 +163,6 @@ class TestBatch(unittest.TestCase):
             self.assertEqual(prefix, "Spain - Malaga - ")
 
     def test_check_batch_formats_priorities(self):
-        all_bugs = deque()
         bug_lines = [
             "l_bad barrier ;[01/07/2020 17:01] (sec-0021-0008);-82432.3;85.1157;-28219.9;-0.166068;-0.766375\n",
             "n_collisions by road ;[03/07/2020 11:16] (sec-0020-0016);-77652.6;66.7637;-62775.1;0.323015;-0.789071\n",
@@ -171,11 +170,10 @@ class TestBatch(unittest.TestCase):
             "u_missing invis wall ;[01/07/2020 11:37] (sec-0020-0008);-79469.4;76.7075;-31942.2;2.86773;-0.435756\n",
             "i_bike w/o collision ;[30/06/2020 16:11] (sec-0019-0008);-72681.6;76.9917;-31622.3;-1.51981;-0.599002\n"
         ]
-        formats_correct = batch.check_batch_formats(bug_lines, all_bugs)
+        formats_correct = batch.check_batch_formats(bug_lines)
         self.assertTrue(formats_correct)
 
     def test_check_batch_formats_all(self):
-        all_bugs = deque()
         bug_lines = [
             "l_bad barrier ;[01/07/2020 17:01] (sec-0021-0008);-82432.3;85.1157;-28219.9;-0.166068;-0.766375\n",
             ".bad barrier 2 ;[01/07/2020 17:02] (sec-0021-0008);-82340.5;91.6007;-28261.9;-0.379157;-0.95645\n",
@@ -186,12 +184,11 @@ class TestBatch(unittest.TestCase):
             ";[02/07/2020 10:48] (sec-0021-0007);-83974.6;148.276;-26514.5;-1.93963;-0.892012\n",
             "i_bike w/o collision ;[30/06/2020 16:11] (sec-0019-0008);-72681.6;76.9917;-31622.3;-1.51981;-0.599002\n"
         ]
-        formats_correct = batch.check_batch_formats(bug_lines, all_bugs)
+        formats_correct = batch.check_batch_formats(bug_lines)
         self.assertTrue(formats_correct)
 
     def test_check_batch_formats_wrong(self):
         with mock.patch('sys.stdout', new_callable=io.StringIO) as fake_stdout:
-            all_bugs = deque()
             bug_lines = [
                 "m_reportname 1 ;[01/07/2020 17:01] (sec-0021-0008);-82432.3;85.1157;-28219.9;-0.166068;-0.766375\n",
                 "m_reportname 2 ;[03/07/2020 11:16] (sec-0020-0016);-77652.6;66.7637;-62775.1;0.323015;-0.789071\n",
@@ -199,7 +196,7 @@ class TestBatch(unittest.TestCase):
                 "u_reportname 4 ;[01/07/2020 11:37] (sec-0020-0008);-79469.4;76.7075;-31942.2;2.86773;-0.435756\n",
                 "a_reportname 5 ;[30/06/2020 16:11] (sec-0019-0008);-72681.6;76.9917;-31622.3;-1.51981;-0.599002\n"
             ]
-            formats_correct = batch.check_batch_formats(bug_lines, all_bugs)
+            formats_correct = batch.check_batch_formats(bug_lines)
             self.assertFalse(formats_correct)
 
 

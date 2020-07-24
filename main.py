@@ -73,9 +73,9 @@ def main():
                 continue
             print(f"Reporting in project [{chosen_project}] at version {version}")
 
+            all_bugs = read_bug_lines(bug_lines)
             # Reporting occurs here
             if use_mode == 1:  # Standard reporting use_mode
-                all_bugs = read_bug_lines(bug_lines)
                 while len(all_bugs) > 0:
                     current_bug = all_bugs.popleft()
                     if current_bug[0][0] not in ['!', ';']:
@@ -87,8 +87,7 @@ def main():
             elif use_mode == 2:  # Batch reporting use_mode
                 print("WARNING: Batch reporting is still WIP!")
                 # Here, all bugs in bugs.txt are read and put into a list of stack of individual report lines
-                all_bugs = deque()
-                format_is_correct = check_batch_formats(bug_lines, all_bugs)
+                format_is_correct = check_batch_formats(bug_lines)
                 if not format_is_correct:
                     continue
 
@@ -96,13 +95,16 @@ def main():
                 if image_check:
                     continue
 
-                reported_all = batch_report_bugs(
+                reported = batch_report_bugs(
                     chosen_project, all_bugs, version, images_folder,
                     mantis_username, password, cfg_handler.read("preferred browser")
                      )
-                if not reported_all:
+                if not reported:
                     continue
-                # TODO: Add archiving
+                with open(game_path + "/bugs_archive.txt", "a") as archive:
+                    archive.writelines(bug_lines)
+                with open(game_path + "/bugs.txt", "w") as bugs_txt_save:
+                    pass
 
 
 def validate_cfg_images(cfg_handler):

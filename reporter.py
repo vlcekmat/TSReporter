@@ -69,16 +69,16 @@ def batch_report_bugs(project, bugs_stack, version, images_folder_path, username
     reporter_driver = WebDriver(browser)
     log_into_mantis(reporter_driver.driver, username, password)
     while len(bugs_stack) > 0:
-        current_bug = bugs_stack.pop()
-        b_head = len(current_bug) - 1
-        split_bug = current_bug[b_head].split('_', maxsplit=1)
+        current_bug = bugs_stack.popleft()
+        split_bug = current_bug[0].split('_', maxsplit=1)
         priority = get_full_priority(split_bug[0])
-        current_bug[b_head] = prefix + ''.join(split_bug[1:])
+        current_bug[0] = prefix + ''.join(split_bug[1:])
         use_log_lines = copy.deepcopy(current_bug)
         upload_to_mantis(
             version, images_folder_path, 'm', use_log_lines, "", project,
             username, password, browser, web_driver=reporter_driver, priority=priority
         )
+    return True
 
 
 def get_full_priority(prio):
