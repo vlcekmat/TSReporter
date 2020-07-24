@@ -46,15 +46,8 @@ def main():
         elif use_mode in [1, 2]:  # Report bugs use_mode
 
             # This section validates the edited pictures directory from config.cfg
-            images_folder = cfg_handler.read("edited images location")
+            images_folder = validate_cfg_images(cfg_handler)
             if images_folder == "":
-                print("Edited images folder missing from config.cfg. Set it up before reporting.")
-                continue
-            for is_this_image in os.listdir(images_folder):
-                if fnmatch.fnmatch(is_this_image, "*.jpg") or fnmatch.fnmatch(is_this_image, "*.gif"):
-                    break
-            else:
-                print("Edited pictures folder doesn't contain any .jpg or .gif files. Did you select the right one?")
                 continue
 
             mantis_username = cfg_handler.read("mantis username")
@@ -82,6 +75,7 @@ def main():
             if not os.path.isfile(game_path + "/bugs.txt"):
                 print(f"bugs.txt not found in {game_path}. Change config or report some bugs first.")
                 continue
+
             bugs_file = open(game_path + "/bugs.txt", "r")
             bug_lines = bugs_file.readlines()
             bugs_file.close()
@@ -102,6 +96,7 @@ def main():
                 lines_to_report = deque()  # Implemented as a stack
                 lines_to_archive = deque()
                 try:
+                    # TODO: Make this not reversed
                     for line in reversed(bug_lines):
                         lines_to_archive.append(line)
                         if line[0] == '.':  # Reports beginning with '.' are added to the previous report
@@ -149,6 +144,7 @@ def main():
                      )
                 if not reported_all:
                     continue
+                # TODO: Add archiving
 
 
 # Checks if all reports in bugs.txt have an image, asks user to check again if not
@@ -200,6 +196,19 @@ def check_batch_formats(bug_lines, all_bugs):
             format_is_correct = False
             continue
     return format_is_correct
+
+
+def validate_cfg_images(cfg_handler):
+    images_folder = cfg_handler.read("edited images location")
+    if images_folder == "":
+        print("Edited images folder missing from config.cfg. Set it up before reporting.")
+        return ""
+    for is_this_image in os.listdir(images_folder):
+        if fnmatch.fnmatch(is_this_image, "*.jpg") or fnmatch.fnmatch(is_this_image, "*.gif"):
+            return images_folder
+    else:
+        print("Edited pictures folder doesn't contain any .jpg or .gif files. Did you select the right one?")
+        return ""
 
 
 # Program begins here

@@ -93,8 +93,7 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
 
     if assign_to != "":
         try:
-            assign_to_option = driver.find_element_by_xpath(f"//option[text()='{assign_to}']")
-            assign_to_option.click()
+            driver.find_element_by_xpath(f"//option[text()='{assign_to}']").click()
         except WebDriverException:
             print(f'Unable to find user named: {assign_to}, leaving blank')
     driver.find_element_by_xpath(f"//option[text()='always']").click()

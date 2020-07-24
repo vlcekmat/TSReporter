@@ -20,7 +20,7 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
     d_info = None
     if 'A' in category.upper():
         a_path = input('Enter DEBUG INFO or path to the asset:\n> ')
-        if 'DEBUG INFO' or 'Position' or 'Object' in a_path:
+        if 'DEBUG INFO' in a_path or 'Position' in a_path or 'Object' in a_path:  # To accommodate only partial debug i.
             d_info = a_path
             a_path = extract_asset_path(a_path)
 
