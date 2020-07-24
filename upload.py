@@ -84,12 +84,13 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
             else:
                 description_box.send_keys(no_ver_description)
 
-    summary = bug_descriptions[0].split(';')[0]
     summary_box = driver.find_element_by_xpath(f"//input[@name='summary']")
     if category == 'a':
         asset_name = extract_asset_name(first_path_to_asset)
-        summary_box.send_keys(summary + ' - ' + asset_name)
+        no_ver_summary = generate_no_version_des(bug_descriptions[0].split(';')[0])
+        summary_box.send_keys(f'{version} - {asset_name} - {no_ver_summary}')
     else:
+        summary = bug_descriptions[0].split(';')[0]
         summary_box.send_keys(summary)
 
     if assign_to != "":
