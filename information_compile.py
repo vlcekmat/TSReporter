@@ -12,7 +12,6 @@ def get_image(log, images_folder_path):
     split_time = raw_date_time.split(' ')[1].split(':')
     date_time_to_find = f'{split_date[2]}{split_date[1]}{split_date[0]}_{split_time[0]}{split_time[1]}'
     coord_0 = str(round(Decimal(str(split_log[2]))))[:-1]
-    coord_1 = str(round(Decimal(str(split_log[3]))))[:-1]
     coord_2 = str(round(Decimal(str(split_log[4]))))[:-1]
 
     path = Path(images_folder_path)
@@ -34,6 +33,8 @@ def determine_bug_category(log):
         return category
     elif category in ["aa", "ar", "av", "ac"]:
         return category[0]
+    else:
+        return ""
 
 
 def generate_description(line, version, category, asset='', first_time=False):

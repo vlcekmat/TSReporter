@@ -18,9 +18,13 @@ def request_sector_owner(sector_to_find, game):
     data = {"sectors": sector_to_find}
     reply = requests.post(get_owner_url, headers=headers, data=data)
     js = reply.json()
-    sector_owner = js[sector_to_find]["owner"]["svn_name"]
-    print(f"Owner of sector ({sector_to_find}) found: {sector_owner}")
-    return sector_owner
+    try:
+        sector_owner = js[sector_to_find]["owner"]["svn_name"]
+        print(f"Owner of sector ({sector_to_find}) found: {sector_owner}")
+        return sector_owner
+    except KeyError:
+        print(f"Owner of sector {sector_to_find} not found!")
+        return ""
 
 
 def get_asset_assign_dict():
