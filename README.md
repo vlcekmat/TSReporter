@@ -81,9 +81,10 @@ Here are some examples:
 m_Idaho - Twin Falls - floating cow 
 .floating cow 2  
 !dont forget to buy milk lol   
-av_Utah - Salt Lake City - Tree without collision
+av_Tree without collision
 
-This will create a map report with two images/coordinates attatched and an asset-vegetation report with one image
+This will create a map report with two images/coordinates attatched named: "[version] Idaho - Twin Falls - floating cow"
+and an asset-vegetation report with one image named: "[version] - assetname - tree without collision"
 
 ### Batch reporting mode (WIP)
 If you want to report multiple map bugs in the same area/city/road, you can use the batch report mode. In that case, you will have to use a slightly different convention and take more care before using this mode. Bugs reported using this mode will not be assigned to anyone, you have to do that afterwards. Duplicate bugs are not checked during batch reporting!
