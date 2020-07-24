@@ -1,5 +1,4 @@
 import os
-from collections import deque
 import fnmatch
 
 from batch import check_batch_images, check_batch_formats
@@ -103,7 +102,7 @@ def main():
                     continue
                 with open(game_path + "/bugs_archive.txt", "a") as archive:
                     archive.writelines(bug_lines)
-                with open(game_path + "/bugs.txt", "w") as bugs_txt_save:
+                with open(game_path + "/bugs.txt", "w"):
                     pass
 
 

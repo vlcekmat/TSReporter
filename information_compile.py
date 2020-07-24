@@ -1,13 +1,12 @@
 from pathlib import Path
 from decimal import Decimal
-from collections import deque
 
 
 def get_image(log, images_folder_path):
     # returns a Path() of the particular image file based on date, time and coordinates
     split_log = log.split(';')
 
-    raw_date_time = split_log[1][1 : 17]
+    raw_date_time = split_log[1][1: 17]
     split_date = raw_date_time.split(' ')[0].split('/')
     split_time = raw_date_time.split(' ')[1].split(':')
     date_time_to_find = f'{split_date[2]}{split_date[1]}{split_date[0]}_{split_time[0]}{split_time[1]}'

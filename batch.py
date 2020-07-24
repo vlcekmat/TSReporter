@@ -1,8 +1,4 @@
-import copy
-from collections import deque
-
 from information_compile import get_image
-from bugs import read_bug_lines
 
 
 def check_batch_images(all_bugs, image_folder_path):

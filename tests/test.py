@@ -1,7 +1,6 @@
 from unittest import mock
 import unittest
 import io
-from collections import deque
 
 
 import sector_seek
