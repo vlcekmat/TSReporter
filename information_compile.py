@@ -46,11 +46,10 @@ def generate_description(line, version, category, asset='', first_time=False):
         log_without_category = ''.join(split_log[0].split('.', maxsplit=1)[1]) + ';' + ';'.join(split_log[1:])
     else:
         log_without_category = line
+
     if category == 'a' and first_time:
         first_time = False
-        report_description = f'''{version} - {log_without_category}
-PATH TO THE ASSET: {asset}'''
-
+        report_description = f'{version} - {log_without_category}\nPATH TO THE ASSET: {asset}'
     else:
         report_description = f'''{version} - {log_without_category}'''
     return report_description
@@ -58,7 +57,8 @@ PATH TO THE ASSET: {asset}'''
 
 def generate_no_version_des(description):
     # cuts the version off the given description
-    no_ver_des = ''.join(description).split('] - ')[1:]
+    no_ver_des_field = ''.join(description).split('] - ')[1:]
+    no_ver_des = ''.join(no_ver_des_field)
     return no_ver_des
 
 
@@ -83,7 +83,7 @@ def extract_asset_name(path_to_asset):
 
 
 def extract_asset_path(debug_info):
-    # returns path to the asset
+    # accepts DEBUG INFO and returns path to the asset
     asset_path = ''
     for part in debug_info.split(' '):
         if '/' in part:

@@ -73,13 +73,13 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
     description_box = driver.find_element_by_xpath("//textarea[@class='form-control']")
     if len(bug_descriptions) <= 1:
         no_ver_description = generate_no_version_des(bug_descriptions)
-        description_box.send_keys(str(''.join(no_ver_description)) + '\n')
+        description_box.send_keys(str(no_ver_description) + '\n')
     else:
         first_time = True
         for p in range(len(bug_descriptions)):
             no_ver_description = generate_no_version_des(bug_descriptions[p])
             if first_time:
-                description_box.send_keys(''.join(no_ver_description) + '\n')
+                description_box.send_keys(no_ver_description + '\n')
                 first_time = False
             else:
                 description_box.send_keys(no_ver_description)

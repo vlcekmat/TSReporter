@@ -103,6 +103,35 @@ class TestInformationCompile(unittest.TestCase):
         category = information_compile.determine_bug_category(log_line)
         self.assertEqual(category, "")
 
+    def test_no_version_description(self):
+        description = "[trunk at revision 654321] - Japan - Tokyo - Pikachu without collision"
+        no_ver_desc = information_compile.generate_no_version_des(description)
+        self.assertEqual(no_ver_desc, "Japan - Tokyo - Pikachu without collision")
+
+    def test_extract_location_filter(self):
+        log_line = "m_bad barrier ;[01/07/2020 17:01] (sec-0021-0008);-82432.3;85.1157;-28219.9;-0.166068;-0.766375\n"
+        loc_filter = information_compile.extract_location_filter(log_line)
+        self.assertEqual(loc_filter, "(sec-0021-0008);-82")
+
+    def test_extract_asset_name(self):
+        asset_path = "/model2/building/logistic/parking_roof_01_ibe.pmd"
+        asst_name = information_compile.extract_asset_name(asset_path)
+        self.assertEqual(asst_name, "parking_roof_01_ibe")
+
+    def test_extract_asset_path_long(self):
+        debug_info = "06:27:26.460 : DEBUG INFO: Object ' 0x3302ADF8C04729A5 " \
+                     "'/model/vehicle/parked_cars_groups/static/parked_cars_5x1.pmd''  Position [" \
+                     "-63941.2;59.5;-32751.8]  sec-0016-0009 "
+        asset_path = information_compile.extract_asset_path(debug_info)
+        self.assertEqual(asset_path, "/model/vehicle/parked_cars_groups/static/parked_cars_5x1.pmd")
+
+    def test_extract_asset_path_short(self):
+        debug_info = "DEBUG INFO: Object ' 0x3302ADF8C04729A5 " \
+                     "'/model/vehicle/parked_cars_groups/static/parked_cars_5x1.pmd''  Position [" \
+                     "-63941.2;59.5;-32751.8]  sec-0016-0009 "
+        asset_path = information_compile.extract_asset_path(debug_info)
+        self.assertEqual(asset_path, "/model/vehicle/parked_cars_groups/static/parked_cars_5x1.pmd")
+
 
 class TestBugs(unittest.TestCase):
     def test_read_bug_lines(self):
