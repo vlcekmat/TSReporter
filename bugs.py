@@ -16,11 +16,11 @@ def read_bugs_file(game_path):
     while '\n' in bug_lines:  # Cleanses bug_lines of empty lines to prevent later crash
         bug_lines.remove('\n')
 
-    if bug_lines[0][0] == '.':  # If first line starts with a '.', everything will break, don't even think about it
-        print("First report's name begins with a '.', go fix that!")
-        return None
     if len(bug_lines) == 0:  # Why bother reporting huh
         print("No bugs to report from bugs.txt")
+        return None
+    if bug_lines[0][0] == '.':  # If first line starts with a '.', everything will break, don't even think about it
+        print("First report's name begins with a '.', go fix that!")
         return None
 
     return bug_lines
