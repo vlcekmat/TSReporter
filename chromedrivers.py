@@ -26,8 +26,8 @@ class WebDriver:
             return True
 
 
-# creates a new web driver session
 def set_up_new_driver(headless=False, browser_using='chrome'):
+    # creates a new web driver session
     if browser_using == 'chrome':
         options = webdriver.ChromeOptions()
         if headless:
@@ -46,8 +46,8 @@ def set_up_new_driver(headless=False, browser_using='chrome'):
         return driver
 
 
-# opens mantis so the user can check for duplicates
 def check_for_duplicates(username, password, bug_description=None, asset_path=None, web_driver=None, browser=None):
+    # opens mantis so the user can check for duplicates
     print("Opening search for duplicates")
 
     if not web_driver.is_active():
@@ -87,8 +87,8 @@ def check_for_duplicates(username, password, bug_description=None, asset_path=No
             pass
 
 
-# first try to log into mantis, so we now that the login credentials are correct
 def log_into_tsreporter(test_login_username, browser='chrome'):
+    # first try to log into mantis, so we now that the login credentials are correct
     while True:
         password = input("PASSWORD: ")
         os.system('cls')
@@ -111,8 +111,8 @@ def log_into_tsreporter(test_login_username, browser='chrome'):
             return password
 
 
-# uses the given credentials to log into mantis
 def log_into_mantis(driver, username, password):
+    # uses the given credentials to log into mantis
     driver.get('https://qa.scssoft.com/login_page.php')
     username_box = driver.find_element_by_id('username')
     username_box.send_keys(username)

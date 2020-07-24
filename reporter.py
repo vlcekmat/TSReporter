@@ -1,4 +1,4 @@
-from collections import deque
+from batch import ask_for_prefix
 from chromedrivers import check_for_duplicates, WebDriver, log_into_mantis
 from upload import upload_to_mantis
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowException, WebDriverException
@@ -6,8 +6,8 @@ from information_compile import determine_bug_category, extract_asset_path
 import copy
 
 
-# uploads stuff to Mantis or calls other methods to do that
 def report_bug(project, log_lines, version, images_folder_path, assign, username, password, browser='chrome'):
+    # uploads stuff to Mantis or calls other methods to do that
     log_first = log_lines.popleft()
     print(f'CURRENT BUG: {log_first}')
     log_lines.appendleft(log_first)
@@ -60,6 +60,8 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
 
 
 def batch_report_bugs(project, bugs_stack, version, images_folder_path, username, password, browser='chrome'):
+    # This prefix will be added at the beginning of all summaries to save time
+    # eg. writing "State - City -" at the beginning of each report
     prefix = ask_for_prefix()
     if prefix == "":
         return False
@@ -79,20 +81,8 @@ def batch_report_bugs(project, bugs_stack, version, images_folder_path, username
         )
 
 
-def ask_for_prefix():
-    while True:
-        out_prefix = input("Choose your prefix\n> ")
-        if out_prefix == "":
-            print("No prefix selected, returning to menu")
-            return ""
-        print(f"Double check your prefix, you won't be able to change it later!")
-        print(out_prefix)
-        answer = input("Is your prefix correct(Y/N)?\n> ")
-        if answer.upper() == 'Y':
-            return out_prefix
-
-
 def get_full_priority(prio):
+    # List of legal priorities
     prio_dict = {
         "l": "low",
         "n": "normal",

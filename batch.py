@@ -4,9 +4,9 @@ from collections import deque
 from information_compile import get_image
 
 
-# Checks if all reports in bugs.txt have an image, asks user to check again if not
-# returns True if the user wants to stop batch reporting and return to menu, otherwise False
 def check_batch_images(all_bugs, image_folder_path):
+    # Checks if all reports in bugs.txt have an image, asks user to check again if not
+    # returns True if the user wants to stop batch reporting and return to menu, otherwise False
     try_again = True
     img_missing = False
     while try_again:
@@ -33,6 +33,9 @@ def check_batch_images(all_bugs, image_folder_path):
 
 
 def check_batch_formats(bug_lines, all_bugs):
+    # Checks every line in bugs.txt and determines if the file is valid and ready to be batch reported
+    # In doing so, puts all the bugs into deques and adds all those deques into the all_bugs deque
+    # That is then used for reporting the bugs
     line_no = len(bug_lines) + 1
     temp_bug_deque = deque()
     format_is_correct = True
@@ -53,3 +56,17 @@ def check_batch_formats(bug_lines, all_bugs):
             format_is_correct = False
             continue
     return format_is_correct
+
+
+def ask_for_prefix():
+    # Asks user to provide the prefix that will be added in front of all bug names in the batch report
+    while True:
+        out_prefix = input("Choose your prefix\n> ")
+        if out_prefix == "":
+            print("No prefix selected, returning to menu")
+            return ""
+        print(f"Double check your prefix, you won't be able to change it later!")
+        print(out_prefix)
+        answer = input("Is your prefix correct(Y/N)?\n> ")
+        if answer.upper() == 'Y':
+            return out_prefix

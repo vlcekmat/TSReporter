@@ -19,11 +19,12 @@ def ask_for_missing_image(line_to_process, images_folder_path):
             return image_to_return
 
 
-# Opens chrome browser, connects to mantis and uploads all of the gathered information
-# If priority is not None, it will treat the report as a batch report = will not as for image if its missing and
-#       will submit it automatically
 def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to, project, username, password,
                      browser, path_to_asset=None, debug_info=None, web_driver=None, priority=None):
+    # Opens chrome browser, connects to mantis and uploads all of the gathered information
+    # If priority is not None, it will treat the report as a batch report = will not as for image if its missing and
+    #       will submit it automatically
+
     # region process information to insert in the form
     bug_descriptions = []
     first_path_to_asset = ''
