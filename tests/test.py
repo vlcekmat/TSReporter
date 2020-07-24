@@ -10,6 +10,8 @@ import batch
 import information_compile
 import bugs
 
+# python -m unittest tests/test.py
+
 
 class TestSectorSeek(unittest.TestCase):
     def test_clean_sector(self):
