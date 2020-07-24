@@ -8,9 +8,9 @@ import copy
 
 # uploads stuff to Mantis or calls other methods to do that
 def report_bug(project, log_lines, version, images_folder_path, assign, username, password, browser='chrome'):
-    log_first = log_lines.pop()
+    log_first = log_lines.popleft()
     print(f'CURRENT BUG: {log_first}')
-    log_lines.append(log_first)
+    log_lines.appendleft(log_first)
     category = determine_bug_category(log_first)
 
     error_message = "Don't interact with browser during the process, trying again..."

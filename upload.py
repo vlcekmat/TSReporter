@@ -33,7 +33,7 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
     if debug_info is not None:
         path_to_asset = f"{path_to_asset}\n{debug_info}"
     while len(log_lines) > 0:
-        line_to_process = log_lines.pop()
+        line_to_process = log_lines.popleft()
         if category == 'a' and first_loop:
             if first_loop:
                 first_path_to_asset = path_to_asset
@@ -78,7 +78,7 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
         for p in range(len(bug_descriptions)):
             no_ver_description = generate_no_version_des(bug_descriptions[p])
             if first_time:
-                description_box.send_keys(''.join(no_ver_description) + '\n\n')
+                description_box.send_keys(''.join(no_ver_description) + '\n')
                 first_time = False
             else:
                 description_box.send_keys(no_ver_description)
