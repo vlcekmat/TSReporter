@@ -2,6 +2,8 @@ import copy
 import os
 from collections import deque
 
+import config
+
 
 def read_bugs_file(game_path):
     # Reads bugs.txt, validates it and returns the read lines
@@ -63,3 +65,22 @@ def read_bug_lines(bug_lines):
                 this_bug.append(line)
     all_bugs.append(this_bug)  # The last bug must also be added!
     return all_bugs
+
+
+def count_bugs():
+    ets_bugs_count = 0
+    ats_bugs_count = 0
+    config_handler = config.ConfigHandler()
+    documents_location = config_handler.read('documents location')
+    ats_bugs_path = f"{documents_location}/American Truck Simulator/bugs.txt"
+    ets_bugs_path = f"{documents_location}/Euro Truck Simulator 2/bugs.txt"
+    ats_bugs = open(ats_bugs_path)
+    ets_bugs = open(ets_bugs_path)
+
+    for line in ats_bugs:
+        if ';' in line and line[0] not in ['!', ';']:
+            ats_bugs_count += 1
+    for line in ets_bugs:
+        if ';' in line and line[0] not in ['!', ';']:
+            ets_bugs_count += 1
+    return [ats_bugs_count, ets_bugs_count]

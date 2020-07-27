@@ -58,7 +58,6 @@ class ConfigHandler:
         cfg_file = open("./config.cfg", "w")
         for key in ConfigHandler.cfg_dict:
             cfg_file.write(f'"{key}" : "{ConfigHandler.cfg_dict[key]}"\n')
-        print("Configuration changes saved")
 
     # Shows the contents of the config.cfg file to the user and gives them the option to edit any of the configurations
     @staticmethod
@@ -83,6 +82,13 @@ class ConfigHandler:
                 ConfigHandler.cfg_dict[cfg_layout[ls]] = ConfigHandler.ask_config_line(cfg_layout[ls])
                 ConfigHandler.save_config()
                 continue
+
+    @staticmethod
+    def gui_config_edit(index):
+        cfg_layout = ConfigHandler.get_config_layout()
+        line_selection = index
+        ConfigHandler.cfg_dict[cfg_layout[line_selection]] = ConfigHandler.ask_config_line(cfg_layout[line_selection])
+        ConfigHandler.save_config()
 
     @staticmethod
     # Opens windows dialogue windows and has the user select their Trunk, Steam and edited pictures directories
