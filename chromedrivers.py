@@ -12,7 +12,19 @@ class WebDriver:
     driver = None
 
     def __init__(self, browser='chrome', headless=False):
-        WebDriver.driver = set_up_new_driver(browser_using=browser, headless=headless)
+        if browser == 'chrome':
+            options = webdriver.ChromeOptions()
+            if headless:
+                options.headless = True
+            options.add_experimental_option('excludeSwitches', ['enable-logging'])
+            options.add_argument('--start-maximized')
+            self.driver = webdriver.Chrome(executable_path='chromedriver.exe', options=options)
+        elif browser == 'firefox':
+            options = webdriver.FirefoxOptions()
+            if headless:
+                options.headless = True
+            self.driver = webdriver.Firefox(executable_path='geckodriver.exe', options=options)
+            self.driver.maximize_window()
 
     def get_driver(self):
         return self.driver
@@ -26,25 +38,7 @@ class WebDriver:
             return True
 
 
-def set_up_new_driver(headless=False, browser_using='chrome'):
     # creates a new web driver session
-    if browser_using == 'chrome':
-        options = webdriver.ChromeOptions()
-        if headless:
-            options.headless = True
-        options.add_experimental_option('excludeSwitches', ['enable-logging'])
-        options.add_argument('--start-maximized')
-        driver = webdriver.Chrome(executable_path='chromedriver.exe', options=options)
-        return driver
-    elif browser_using == 'firefox':
-        # binary = FirefoxBinary('path/to/installed firefox binary')
-        options = webdriver.FirefoxOptions()
-        if headless:
-            options.headless = True
-        driver = webdriver.Firefox(executable_path='geckodriver.exe', options=options)
-        driver.maximize_window()
-        return driver
-
 
 def check_for_duplicates(username, password, bug_description=None, asset_path=None, web_driver=None, browser=None):
     # opens mantis so the user can check for duplicates
