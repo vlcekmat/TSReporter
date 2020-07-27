@@ -56,7 +56,7 @@ class ConfigHandler:
     def config_edit():
         cfg_layout = ConfigHandler.get_config_layout()
         while True:
-            print("These is your current configuration, type the number of what you want to modify:")
+            print("This is your current configuration, type the number of what you want to modify:")
             print("0: Exit config")
             ConfigHandler.list_config()
             line_selection = input("> ")
