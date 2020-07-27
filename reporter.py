@@ -44,17 +44,17 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
                 web_driver.get_driver().quit()
             break
         except SessionNotCreatedException:
-            print(error_message)
+            print(error_message + ' SessionNotCreatedException')
         except NoSuchWindowException:
-            print(error_message)
+            print(error_message + ' NoSuchWindowException')
         except WebDriverException:
-            print(error_message)
+            print(error_message + ' WebDriverException')
         except AttributeError:
-            print(error_message)
+            print(error_message + ' AttributeError')
         except TypeError:
-            print(error_message)
+            print(error_message + ' TypeError')
         except NameError:
-            print(error_message)
+            print(error_message + ' NameError')
     # TODO: test this, Mantis ded
     print("Bug reported successfully!\n")
 
