@@ -76,8 +76,10 @@ def main():
                     current_bug = all_bugs.popleft()
                     if current_bug[0][0] not in ['!', ';']:
                         assign_to = find_assign_to(current_bug[0], chosen_project[0])
-                        report_bug(chosen_project, current_bug, version, images_folder, assign_to,
-                                   mantis_username, password, cfg_handler.read("preferred browser"))
+                        keep_reporting = report_bug(chosen_project, current_bug, version, images_folder, assign_to,
+                                                    mantis_username, password, cfg_handler.read("preferred browser"))
+                        if not keep_reporting:
+                            break
                     archive_bug(current_bug, game_path)
 
             elif use_mode == 2:  # Batch reporting use_mode
@@ -93,7 +95,7 @@ def main():
                 reported = batch_report_bugs(
                     chosen_project, all_bugs, version, images_folder,
                     mantis_username, password, cfg_handler.read("preferred browser")
-                     )
+                )
                 if not reported:
                     continue
                 with open(game_path + "/bugs_archive.txt", "a") as archive:

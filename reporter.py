@@ -32,13 +32,16 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
                     username, password, bug_description=log_first,
                     asset_path=a_path, web_driver=driver_handler, browser=browser)
                 tried_duplicates = True
-            if not duplicate_found:
+            if duplicate_found == -1:
+                return False  # For returning to menu during reporting
+            elif duplicate_found == 0:
                 use_log_lines = copy.deepcopy(log_lines)
                 upload_to_mantis(
                     version, images_folder_path, category, use_log_lines,
                     assign, project, username, password, browser,
                     path_to_asset=a_path, debug_info=d_info, web_driver=driver_handler
                 )
+                print("Bug reported successfully!\n")
             else:
                 print('Reporting not needed')
                 driver_handler.get_driver().quit()
@@ -55,7 +58,7 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
             print(error_message + ' TypeError')
         except NameError:
             print(error_message + ' NameError')
-    print("Bug reported successfully!\n")
+    return True
 
 
 def batch_report_bugs(project, bugs_stack, version, images_folder_path, username, password, browser='chrome'):

@@ -58,15 +58,17 @@ def check_for_duplicates(username, password, bug_description=None, asset_path=No
     driver.find_element_by_id('filter-search-txt').send_keys(final_filter)  # filter box
     driver.find_element_by_xpath("//input[@value='Apply Filter']").click()  # apply filter button
 
-    print('Did you find any duplicates? (Y/N)')
+    print('Did you find any duplicates? (Y/N/Q)')
     while True:
         answer = input('> ')
         if answer.upper() == 'N':
-            return False
+            return 0
         elif answer.upper() == 'Y':
-            return True
+            return 1
+        elif answer.upper() == 'Q':
+            return -1
         else:
-            print('Answer Y or N')
+            print('Answer Y/N/Q')
             pass
 
 
