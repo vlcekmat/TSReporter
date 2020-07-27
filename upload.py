@@ -1,6 +1,7 @@
 from selenium.common.exceptions import WebDriverException
+from time import sleep
 
-from chromedrivers import WebDriver, log_into_mantis
+from chromedrivers import DriverHandler, log_into_mantis
 from information_compile import generate_description, get_image, generate_no_version_des, extract_asset_name
 
 
@@ -61,7 +62,7 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
     driver = web_driver.get_driver()
 
     if not web_driver.is_active():
-        driver = WebDriver(browser=browser).get_driver()
+        driver = DriverHandler(browser=browser).get_driver()
         log_into_mantis(driver, username, password)
 
     # region Filling up the report form
@@ -84,14 +85,15 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
             else:
                 description_box.send_keys(no_ver_description)
 
-    summary_box = driver.find_element_by_xpath(f"//input[@name='summary']")
     if category == 'a':
         asset_name = extract_asset_name(first_path_to_asset)
         no_ver_summary = generate_no_version_des(bug_descriptions[0].split(';')[0])
-        summary_box.send_keys(f'{version} - {asset_name} - {no_ver_summary}')
+        summary = f'{version} - {asset_name} - {no_ver_summary}'
     else:
         summary = bug_descriptions[0].split(';')[0]
-        summary_box.send_keys(summary)
+
+    summary_box = driver.find_element_by_xpath(f"//input[@name='summary']")
+    summary_box.send_keys(summary)
 
     if assign_to != "":
         try:
@@ -112,14 +114,15 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
             driver.find_element_by_xpath(f"//select[@name='severity']/option[text()='major']").click()
     # endregion
 
-    # TODO: make report auto submit in headless browser
-    # if priority
-    #     driver.find_element_by_xpath("//input[@value='Submit Issue']").click()
-    #   else:
-
-    # This waits for the user to close the browser window after submitting the bug
-    while True:
-        try:
-            current_url = driver.current_url
-        except WebDriverException:
-            break
+    if priority:  # if in batch reporter mode
+        sleep(1)
+        driver.find_element_by_xpath("//input[@value='Submit Issue']").click()
+        print(f'Reported bug "{summary.split("] - ")[1]}"')
+        sleep(1)
+    else:
+        # This waits for the user to close the browser window after submitting the bug
+        while True:
+            try:
+                current_url = driver.current_url
+            except WebDriverException:
+                break

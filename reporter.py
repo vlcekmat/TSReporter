@@ -1,5 +1,5 @@
 from batch import ask_for_prefix
-from chromedrivers import check_for_duplicates, WebDriver, log_into_mantis
+from chromedrivers import check_for_duplicates, DriverHandler, log_into_mantis
 from upload import upload_to_mantis
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowException, WebDriverException
 from information_compile import determine_bug_category, extract_asset_path
@@ -26,7 +26,7 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
 
     while True:
         try:
-            web_driver = WebDriver(browser=browser)
+            web_driver = DriverHandler(headless=False, browser=browser)
             if not tried_duplicates:
                 duplicate_found = check_for_duplicates(
                     username, password, bug_description=log_first,
@@ -55,7 +55,6 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
             print(error_message + ' TypeError')
         except NameError:
             print(error_message + ' NameError')
-    # TODO: test this, Mantis ded
     print("Bug reported successfully!\n")
 
 
@@ -65,9 +64,11 @@ def batch_report_bugs(project, bugs_stack, version, images_folder_path, username
     prefix = ask_for_prefix()
     if prefix == "":
         return False
-    # reporter_driver = WebDriver(browser, headless=True)
-    reporter_driver = WebDriver(browser)
-    log_into_mantis(reporter_driver.driver, username, password)
+    print("Starting headless browser instance...")
+    reporter_driver = DriverHandler(headless=True, browser=browser)
+    print("Logging in to Mantis...")
+    log_into_mantis(reporter_driver.get_driver(), username, password)
+    print("Logged in successfully!")
     while len(bugs_stack) > 0:
         current_bug = bugs_stack.popleft()
         split_bug = current_bug[0].split('_', maxsplit=1)

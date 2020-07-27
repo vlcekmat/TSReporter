@@ -8,7 +8,7 @@ from information_compile import extract_location_filter
 from information_compile import extract_asset_name
 
 
-class WebDriver:
+class DriverHandler:
     driver = None
 
     def __init__(self, browser='chrome', headless=False):
@@ -45,7 +45,7 @@ def check_for_duplicates(username, password, bug_description=None, asset_path=No
     print("Opening search for duplicates")
 
     if not web_driver.is_active():
-        driver = WebDriver(browser=browser).get_driver()
+        driver = DriverHandler(browser=browser).get_driver()
         log_into_mantis(driver, username, password)
 
     driver = web_driver.get_driver()
@@ -92,7 +92,7 @@ def log_into_tsreporter(test_login_username, browser='chrome'):
             print("No password entered, returning to menu")
             return ""
         print("Checking your login credentials")
-        driver = WebDriver(browser=browser, headless=True).get_driver()
+        driver = DriverHandler(browser=browser, headless=True).get_driver()
         try:
             log_into_mantis(driver, test_login_username, password)
             driver.find_element_by_id('sidebar-btn')
