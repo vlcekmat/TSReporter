@@ -63,7 +63,8 @@ class Application(Frame):
         def set_up_menu(self):
             ets_bugs_count = str(0)
             ats_bugs_count = str(0)
-            #documents_location = config.ConfigHandler.read('documents location')
+            config_handler = config.ConfigHandler()
+            documents_location = config_handler.read('documents location')
 
             background_frame = Frame(self, bg=Application.color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
