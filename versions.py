@@ -26,8 +26,9 @@ def get_project_from_user():
 # Uses a Regexp to find the line and then extracts the version
 # Returns -1 if no version is found (eg. when game crashes too soon)
 def find_game_version(log_path):
-    f = open(log_path, "r")
-    for _line in f:
+    with open(log_path, "r") as f:
+        f_lines = f.readlines()
+    for _line in f_lines:
         ver_line = re.search("00:\d\d:\d\d.\d\d\d : [^0]* Truck Simulator [2\s]*init ver.[\d.]+", _line)
         if ver_line is not None:
             version_0 = _line.split("ver.")[1]
