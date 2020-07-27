@@ -6,6 +6,18 @@ import ast
 class ConfigHandler:
     cfg_dict = {}
 
+    # This is the layout of the config.cfg file by lines. Use this to inform the user or validate config.cfg
+    # If a new config option needs to be added, add it here and validate_config() will automatically get it from user
+    @staticmethod
+    def get_config_layout():
+        return (
+            "trunk location",
+            "documents location",
+            "edited images location",
+            "mantis username",
+            "preferred browser",
+        )
+
     def __init__(self):
         if not os.path.isfile("./config.cfg"):
             ConfigHandler.config_setup()
@@ -16,14 +28,21 @@ class ConfigHandler:
                 cfg_lines[i[0]] = cfg_lines[i[0]][:-1]
             temp_dict = "{" + ", ".join(cfg_lines) + "}"
             ConfigHandler.cfg_dict = ast.literal_eval(temp_dict)
+            ConfigHandler.validate_config()
 
     @staticmethod
     def read(key):
         return ConfigHandler.cfg_dict[key]
 
-    #@staticmethod
-    #def validate_cfg():
-    #    config_layout = ConfigHandler.get_config_layout()
+    # Looks at the config_layout and checks if any config lines are missing. If so, asks for them and saves to config
+    @staticmethod
+    def validate_config():
+        config_layout = ConfigHandler.get_config_layout()
+        for layout_item in config_layout:
+            if layout_item not in ConfigHandler.cfg_dict.keys():
+                print("Your config.cfg is missing some lines!")
+                ConfigHandler.cfg_dict[layout_item] = ConfigHandler.ask_config_line(layout_item)
+        ConfigHandler.save_config()
 
     # Lists contents of config.cfg
     @staticmethod
@@ -33,17 +52,7 @@ class ConfigHandler:
             print(str(i) + ": " + key + ":\t\t" + ConfigHandler.cfg_dict[key])
             i += 1
 
-    # This is the layout of the config.cfg file by lines. Use this to inform the user or validate config.cfg
-    @staticmethod
-    def get_config_layout():
-        return (
-            "trunk location",
-            "documents location",
-            "edited images location",
-            "mantis username",
-            "preferred browser"
-        )
-
+    # Saves content of dictionary to config.cfg in correct format
     @staticmethod
     def save_config():
         cfg_file = open("./config.cfg", "w")

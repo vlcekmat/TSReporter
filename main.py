@@ -1,55 +1,45 @@
 import os
-from collections import deque
 import fnmatch
 
-from utils import is_int
-from reporter import report_bug
+from batch import check_batch_images, check_batch_formats
+from bugs import read_bugs_file, archive_bug, read_bug_lines
+from utils import ask_use_mode
+from reporter import report_bug, batch_report_bugs
 import versions as ver
 from sector_seek import find_assign_to
 from chromedrivers import log_into_tsreporter
 from config import ConfigHandler
 
 
-# Program happens here
 def main():
+    # Program happens here
     password = ""
     cfg_handler = ConfigHandler()
 
-    # Main program loop, ends by selecting mode 3
+    # Main program loop, ends by selecting mode 4
     while True:
         print('Select desired mode:')
         print('''    1: Report bugs
-    2: Change config
-    3: Exit
+    2: Batch report (WIP)
+    3: Change config
+    4: Exit
         ''')
 
         # Selects a valid use mode and breaks
-        while True:
-            use_mode = input('> ')
-            if not is_int(use_mode):
-                continue
-            if 1 <= int(use_mode) <= 3:
-                use_mode = int(use_mode)
-                break
+        use_mode = ask_use_mode()
 
-        # noinspection PyUnboundLocalVariable
-        if use_mode == 3:  # Quit use_mode
+        if use_mode == 4:  # Quit use_mode
             print("Ending")
             break
-        elif use_mode == 2:  # Edit configuration use_mode
+
+        elif use_mode == 3:  # Edit configuration use_mode
             cfg_handler.config_edit()
-        elif use_mode == 1:  # Report bugs use_mode
+
+        elif use_mode in [1, 2]:  # Report bugs use_mode
 
             # This section validates the edited pictures directory from config.cfg
-            pictures_folder = cfg_handler.read("edited images location")
-            if pictures_folder == "":
-                print("Edited pictures folder missing from config.cfg. Set it up before reporting.")
-                continue
-            for is_this_image in os.listdir(pictures_folder):
-                if fnmatch.fnmatch(is_this_image, "*.jpg") or fnmatch.fnmatch(is_this_image, "*.gif"):
-                    break
-            else:
-                print("Edited pictures folder doesn't contain any .jpg or .gif files. Did you select the right one?")
+            images_folder = validate_cfg_images(cfg_handler)
+            if images_folder == "":
                 continue
 
             mantis_username = cfg_handler.read("mantis username")
@@ -73,55 +63,61 @@ def main():
             else:
                 game_path = doc_path + "/Euro Truck Simulator 2"
 
-            # bugs.txt is found and read into bug_lines
-            if not os.path.isfile(game_path + "/bugs.txt"):
-                print(f"bugs.txt not found in {game_path}. Change config or report some bugs first.")
-                continue
-            bugs_file = open(game_path + "/bugs.txt", "r")
-            bug_lines = bugs_file.readlines()
-            bugs_file.close()
-            if len(bug_lines) == 0:
-                print("No bugs to report from bugs.txt")
+            bug_lines = read_bugs_file(game_path)  # bugs.txt is found and read into bug_lines
+            if not bug_lines:  # read_bugs_file() returns none if there is a problem
                 continue
 
-            version = ver.find_version(chosen_project[0], cfg_handler)
+            version = ver.find_version(chosen_project[0], cfg_handler)  # Returns -1 if it cant read version
             if version == -1:  # Version is not found, would result in invalid report
                 continue
             print(f"Reporting in project [{chosen_project}] at version {version}")
 
-            while '\n' in bug_lines:  # Cleanses bug_lines of empty lines to prevent later crash
-                bug_lines.remove('\n')
-
+            all_bugs = read_bug_lines(bug_lines)
             # Reporting occurs here
-            lines_to_report = deque()  # Implemented as a stack
-            lines_to_archive = deque()
-            try:
-                for line in reversed(bug_lines):
-                    lines_to_archive.append(line)  # These will be added to archive in finally: block
-                    if line[0] == '.':  # Reports beginning with '.' are added to the previous report
-                        lines_to_report.append(line)
-                        continue
-                    elif line[0] == '!' or line[0] == ';':  # Reports beginning with '!' or blank ones are ignored
-                        continue
-                    else:
-                        lines_to_report.append(line)
+            if use_mode == 1:  # Standard reporting use_mode
+                while len(all_bugs) > 0:
+                    current_bug = all_bugs.popleft()
+                    if current_bug[0][0] not in ['!', ';']:
+                        assign_to = find_assign_to(current_bug[0], chosen_project[0])
+                        report_bug(chosen_project, current_bug, version, images_folder, assign_to,
+                                   mantis_username, password, cfg_handler.read("preferred browser"))
+                    archive_bug(current_bug, game_path)
 
-                    assign_to = find_assign_to(line, chosen_project[0])
+            elif use_mode == 2:  # Batch reporting use_mode
+                print("WARNING: Batch reporting is still WIP!")
+                # Here, all bugs in bugs.txt are read and put into a list of stack of individual report lines
+                format_is_correct = check_batch_formats(bug_lines)
+                if not format_is_correct:
+                    continue
 
-                    report_bug(chosen_project, lines_to_report, version, pictures_folder, assign_to,
-                               mantis_username, password, cfg_handler.read("preferred browser"))
-                    lines_to_report.clear()
-                    print("Bug reported successfully!\n")
-            finally:
-                # All bugs that were reported during one reporting cycle will now be added to archive
-                archive = open(game_path + "/bugs_archive.txt", "a")
-                while len(lines_to_archive) > 0:
-                    archive_me = lines_to_archive.pop()
-                    archive.write(archive_me)
-                archive.close()
+                image_check = check_batch_images(all_bugs, images_folder)
+                if image_check:
+                    continue
 
-            bugs_file = open(game_path + "/bugs.txt", "w")  # Clear bugs.txt after use, all have been saved to archive
-            bugs_file.close()
+                reported = batch_report_bugs(
+                    chosen_project, all_bugs, version, images_folder,
+                    mantis_username, password, cfg_handler.read("preferred browser")
+                     )
+                if not reported:
+                    continue
+                with open(game_path + "/bugs_archive.txt", "a") as archive:
+                    archive.writelines(bug_lines)
+                with open(game_path + "/bugs.txt", "w"):
+                    pass
+
+
+def validate_cfg_images(cfg_handler):
+    # Gets edited image location from the config and checks that it exists and has at least one valid file
+    images_folder = cfg_handler.read("edited images location")
+    if images_folder == "":
+        print("Edited images folder missing from config.cfg. Set it up before reporting.")
+        return ""
+    for is_this_image in os.listdir(images_folder):
+        if fnmatch.fnmatch(is_this_image, "*.jpg") or fnmatch.fnmatch(is_this_image, "*.gif"):
+            return images_folder
+    else:
+        print("Edited pictures folder doesn't contain any .jpg or .gif files. Did you select the right one?")
+        return ""
 
 
 # The program begins here
