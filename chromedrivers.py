@@ -2,7 +2,6 @@ import os
 
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException, NoSuchElementException
-# import getpass
 
 from information_compile import extract_location_filter
 from information_compile import extract_asset_name
@@ -38,8 +37,6 @@ class DriverHandler:
             return True
 
 
-    # creates a new web driver session
-
 def check_for_duplicates(username, password, bug_description=None, asset_path=None, web_driver=None, browser=None):
     # opens mantis so the user can check for duplicates
     print("Opening search for duplicates")
@@ -65,16 +62,8 @@ def check_for_duplicates(username, password, bug_description=None, asset_path=No
     while True:
         answer = input('> ')
         if answer.upper() == 'N':
-            try:
-                pass
-            except WebDriverException:
-                pass
             return False
         elif answer.upper() == 'Y':
-            try:
-                pass
-            except WebDriverException:
-                pass
             return True
         else:
             print('Answer Y or N')

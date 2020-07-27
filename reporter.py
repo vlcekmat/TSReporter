@@ -26,22 +26,22 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
 
     while True:
         try:
-            web_driver = DriverHandler(headless=False, browser=browser)
+            driver_handler = DriverHandler(headless=False, browser=browser)
             if not tried_duplicates:
                 duplicate_found = check_for_duplicates(
                     username, password, bug_description=log_first,
-                    asset_path=a_path, web_driver=web_driver, browser=browser)
+                    asset_path=a_path, web_driver=driver_handler, browser=browser)
                 tried_duplicates = True
             if not duplicate_found:
                 use_log_lines = copy.deepcopy(log_lines)
                 upload_to_mantis(
                     version, images_folder_path, category, use_log_lines,
                     assign, project, username, password, browser,
-                    path_to_asset=a_path, debug_info=d_info, web_driver=web_driver
+                    path_to_asset=a_path, debug_info=d_info, web_driver=driver_handler
                 )
             else:
                 print('Reporting not needed')
-                web_driver.get_driver().quit()
+                driver_handler.get_driver().quit()
             break
         except SessionNotCreatedException:
             print(error_message + ' SessionNotCreatedException')
