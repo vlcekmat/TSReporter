@@ -2,7 +2,8 @@ from selenium.common.exceptions import WebDriverException
 from time import sleep
 
 from chromedrivers import DriverHandler, log_into_mantis
-from information_compile import generate_description, get_image, generate_no_version_des, extract_asset_name
+from information_compile import generate_description, get_image, generate_no_version_des, extract_asset_name, \
+    clean_debug_info
 
 
 def ask_for_missing_image(line_to_process, images_folder_path):
@@ -33,6 +34,7 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
     first_loop = True
 
     if debug_info is not None:
+        debug_info = clean_debug_info(debug_info)
         path_to_asset = f"{path_to_asset}\n{debug_info}"
     while len(log_lines) > 0:
         line_to_process = log_lines.popleft()

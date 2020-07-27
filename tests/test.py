@@ -80,6 +80,24 @@ class TestVersions(unittest.TestCase):
 
 
 class TestInformationCompile(unittest.TestCase):
+    def test_clean_debug_info_clean(self):
+        debug_info = "DEBUG INFO: Object ' 0x3302ADF8C04729A5 " \
+                     "'/model/vehicle/parked_cars_groups/static/parked_cars_5x1.pmd''  Position [" \
+                     "-63941.2;59.5;-32751.8]  sec-0016-0009 "
+        c_debug_info = information_compile.clean_debug_info(debug_info)
+        self.assertEqual(debug_info, c_debug_info)
+
+    def test_clean_debug_info_dirty(self):
+        debug_info = "06:27:26.460 : DEBUG INFO: Object ' 0x3302ADF8C04729A5 " \
+                     "'/model/vehicle/parked_cars_groups/static/parked_cars_5x1.pmd''  Position [" \
+                     "-63941.2;59.5;-32751.8]  sec-0016-0009 "
+        debug_info_good = "DEBUG INFO: Object ' 0x3302ADF8C04729A5 " \
+                     "'/model/vehicle/parked_cars_groups/static/parked_cars_5x1.pmd''  Position [" \
+                     "-63941.2;59.5;-32751.8]  sec-0016-0009 "
+        c_debug_info = information_compile.clean_debug_info(debug_info)
+        self.assertEqual(debug_info_good, c_debug_info)
+
+
     def test_determine_bug_category_good(self):
         log_line = "m_Idaho - I50 - collisions by road ;[03/07/2020 11:16] (sec-0020-0016)" \
                    ";-77652.6;66.7637;-62775.1;0.323015;-0.789071 "

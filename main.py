@@ -20,7 +20,7 @@ def main():
     while True:
         print('Select desired mode:')
         print('''    1: Report bugs
-    2: Batch report (WIP)
+    2: Batch report
     3: Change config
     4: Exit
         ''')
@@ -84,7 +84,6 @@ def main():
                     archive_bug(current_bug, game_path)
 
             elif use_mode == 2:  # Batch reporting use_mode
-                print("WARNING: Batch reporting is still WIP!")
                 # Here, all bugs in bugs.txt are read and put into a list of stack of individual report lines
                 format_is_correct = check_batch_formats(bug_lines)
                 if not format_is_correct:

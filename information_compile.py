@@ -88,3 +88,12 @@ def extract_asset_path(debug_info):
         if '/' in part:
             asset_path = part.split("'")[1]
     return asset_path
+
+
+def clean_debug_info(debug_info):
+    # Removes time from debug info line
+    if ' : ' not in debug_info:
+        return debug_info
+    else:
+        debug_info_out = debug_info.split(' : ', maxsplit=1)[1]
+        return debug_info_out
