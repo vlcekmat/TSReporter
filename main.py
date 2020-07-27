@@ -1,6 +1,3 @@
-import os
-import fnmatch
-
 from batch import check_batch_images, check_batch_formats
 from bugs import read_bugs_file, archive_bug, read_bug_lines
 from utils import ask_use_mode
@@ -8,7 +5,7 @@ from reporter import report_bug, batch_report_bugs
 import versions as ver
 from sector_seek import find_assign_to
 from chromedrivers import log_into_tsreporter
-from config import ConfigHandler
+from config import ConfigHandler, validate_cfg_images
 
 
 def main():
@@ -103,20 +100,6 @@ def main():
                     archive.writelines(bug_lines)
                 with open(game_path + "/bugs.txt", "w"):
                     pass
-
-
-def validate_cfg_images(cfg_handler):
-    # Gets edited image location from the config and checks that it exists and has at least one valid file
-    images_folder = cfg_handler.read("edited images location")
-    if images_folder == "":
-        print("Edited images folder missing from config.cfg. Set it up before reporting.")
-        return ""
-    for is_this_image in os.listdir(images_folder):
-        if fnmatch.fnmatch(is_this_image, "*.jpg") or fnmatch.fnmatch(is_this_image, "*.gif"):
-            return images_folder
-    else:
-        print("Edited pictures folder doesn't contain any .jpg or .gif files. Did you select the right one?")
-        return ""
 
 
 # Program begins here
