@@ -116,11 +116,15 @@ class ConfigHandler:
 def ask_preferred_browser():
     # Asks user for preferred browser
     while True:
-        pref_browser = input("Do you want to use Chrome or Firefox? Type C/F\n> ")
+        pref_browser = input("Do you want to use Chrome, Firefox (or Edge)? Type C/F/E\n> ")
         if pref_browser.upper() == 'C':
             return 'chrome'
         elif pref_browser.upper() == 'F':
             return 'firefox'
+        elif pref_browser.upper() == 'E':
+            print("Visit:")
+            print("\thttps://www.google.com/chrome/")
+            print("\thttps://www.mozilla.org/en-US/firefox/new/")
 
 
 def validate_cfg_images(cfg_handler):
