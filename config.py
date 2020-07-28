@@ -5,6 +5,19 @@ import os
 from ast import literal_eval
 
 
+def read_config(key):
+    return ConfigHandler.cfg_dict[key]
+
+
+def write_config(key, value):
+    try:
+        ConfigHandler.cfg_dict[key] = value
+        ConfigHandler.save_config()
+        return True
+    except KeyError:
+        return False
+
+
 class ConfigHandler:
     cfg_dict = {}
 
@@ -33,22 +46,29 @@ class ConfigHandler:
             ConfigHandler.validate_config()
 
     @staticmethod
-    def read(key):
-        return ConfigHandler.cfg_dict[key]
-
-    # Looks at the config_layout and checks if any config lines are missing. If so, asks for them and saves to config
-    @staticmethod
     def validate_config():
-        config_layout = ConfigHandler.get_config_layout()
-        for layout_item in config_layout:
+        # Looks at the config_layout and checks if any lines are missing. If so, asks for them and saves to config
+        config_layout = ConfigHandler.config_layout
+        config_wasnt_valid = False
+        for layout_item in config_layout.keys():
             if layout_item not in ConfigHandler.cfg_dict.keys():
+                if config_layout[layout_item] == "secret":
+                    ConfigHandler.cfg_dict[layout_item] = ""
+                    config_wasnt_valid = True
+                    continue
                 print("Your config.cfg is missing some lines!")
                 ConfigHandler.cfg_dict[layout_item] = ConfigHandler.ask_config_line(layout_item)
-        ConfigHandler.save_config()
+                config_wasnt_valid = True
+        if ConfigHandler.cfg_dict["save password"] == "False":
+            if ConfigHandler.cfg_dict["s_password"] != "":
+                config_wasnt_valid = True
+                ConfigHandler.cfg_dict["s_password"] = ""
+        if config_wasnt_valid:
+            ConfigHandler.save_config()
 
-    # Lists contents of config.cfg
     @staticmethod
     def list_config():
+        # Lists contents of config.cfg
         i = 1
         for key in ConfigHandler.cfg_dict:
             print(str(i) + ": " + key + ":\t\t" + ConfigHandler.cfg_dict[key])
@@ -60,13 +80,14 @@ class ConfigHandler:
         cfg_file = open("./config.cfg", "w")
         for key in ConfigHandler.cfg_dict:
             cfg_file.write(f'"{key}" : "{ConfigHandler.cfg_dict[key]}"\n')
+        print("Configuration changes saved")
 
     @staticmethod
     def config_edit():
         # Shows contents of config.cfg to the user and gives them the option to edit any of the configurations
         cfg_layout = ConfigHandler.get_config_layout()
         while True:
-            print("This is your current configuration, type the number of what you want to modify:")
+            print("These is your current configuration, type the number of what you want to modify:")
             print("0: Exit config")
             ConfigHandler.list_config()
             line_selection = input("> ")
@@ -86,13 +107,6 @@ class ConfigHandler:
                 continue
 
     @staticmethod
-    def gui_config_edit(index):
-        cfg_layout = ConfigHandler.get_config_layout()
-        line_selection = index
-        ConfigHandler.cfg_dict[cfg_layout[line_selection]] = ConfigHandler.ask_config_line(cfg_layout[line_selection])
-        ConfigHandler.save_config()
-
-    @staticmethod
     def config_setup():
         # Opens windows dialogue windows and has the user select their Trunk, Steam and edited pictures directories
         # Then reads Mantis username from user input
@@ -103,16 +117,23 @@ class ConfigHandler:
             ConfigHandler.cfg_dict[entry] = ConfigHandler.ask_config_line(entry)
         ConfigHandler.save_config()
 
-    # Asks user to select new configuration item based on the contents of the received token
     @staticmethod
     def ask_config_line(key_to_ask):
-        print(f"Select your {key_to_ask}")
-        if 'location' in key_to_ask:
-            new_value = find_path()
-        elif 'browser' in key_to_ask:
-            new_value = ask_preferred_browser()
+        # Asks user to select new configuration item based on the contents of the received token
+        cfg_type = ConfigHandler.config_layout[key_to_ask]
+        if cfg_type == "yn":
+            print(f"Would you like to {key_to_ask}")
+            new_value = ask_yes_no()
         else:
-            new_value = input("> ")
+            print(f"Select your {key_to_ask}")
+            new_value = ""
+            if cfg_type == "path":
+                new_value = find_path()
+            elif cfg_type == "browser":
+                new_value = ask_preferred_browser()
+            elif cfg_type == "text":
+                new_value = input("> ")
+
         return new_value
 
 

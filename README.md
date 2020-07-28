@@ -47,6 +47,9 @@ Now you have to BACK UP YOUR bugs.txt!! The program works by scanning that file,
 5. Preferred browser
 Select the browser you want TSReporter to open. If you don't have the selected browser installed, I have no idea what will happen.
 
+6. Save password
+If you want TSReporter to save your password, you can choose so here. The password is saved in an encrypted form with a pretty long encryption key so it's pretty safe, but it's not 100% safe.
+
 
 ### How to use TSReporter
 After you have set up the config, you can select mode 1 to report all the bugs from your bugs.txt. You will have to enter your Mantis password (don't worry, it's not saved or sent anywhere). If you want to upload images with your report, you will have to edit them and save them into the directory you selected in config. Make sure to save the image as either .jpg or .gif. It is important the edited image/gif is named exactly the same as the original screenshot, otherwise the program will not find it.

@@ -8,18 +8,18 @@ from utils import is_int
 def get_project_from_user():
     # Asks user which project they want their reports will go into and returns project name as string
     # All bugs will be reported into that project
-    projects = ['ATS - INTERNAL', 'ATS - PUBLIC', 'ATS - PUBLIC - SENIORS', 'ETS 2 - INTERNAL', 'ETS 2 - PUBLIC',
-                'ETS 2 - PUBLIC - SENIORS']
+    projects = ['Return to menu', 'ATS - INTERNAL', 'ATS - PUBLIC', 'ATS - PUBLIC - SENIORS', 'ETS 2 - INTERNAL',
+                'ETS 2 - PUBLIC', 'ETS 2 - PUBLIC - SENIORS']
     print('Choose a project')
     for i in range(len(projects)):
-        print(f"{i + 1}: {projects[i]}")
+        print(f"{i}: {projects[i]}")
     while True:
         project = input('> ')
-        if not (is_int(project) and 6 >= int(project) >= 1):
-            print('Invalid project, choose a number between 1 and 6')
+        if not (is_int(project) and 6 >= int(project) >= 0):
+            print('Invalid project, choose a number between 0 and 6')
             continue
         else:
-            return projects[int(project) - 1]
+            return projects[int(project)]
 
 
 def find_game_version(log_path):

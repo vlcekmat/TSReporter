@@ -5,6 +5,8 @@ from selenium.common.exceptions import WebDriverException, NoSuchElementExceptio
 
 from information_compile import extract_location_filter
 from information_compile import extract_asset_name
+from config import read_config
+from password import save_password
 
 
 class DriverHandler:
@@ -93,6 +95,8 @@ def log_into_tsreporter(test_login_username, browser='chrome'):
         else:
             print("Login successful!")
             driver.quit()
+            if read_config("save password") == "True":
+                save_password(password)
             return password
 
 
