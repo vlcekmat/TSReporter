@@ -237,7 +237,7 @@ class Application(Frame):
                 frame_text.pack(side=LEFT)
 
                 key_to_find = text.lower().split(':')[0]
-                directory_path = config.ConfigHandler.read(key_to_find)
+                directory_path = config.read_config(key_to_find)
 
                 directory_value_frame = Frame(value_frame, bg=Application.color_theme[3])
                 directory_value_frame.pack(fill=BOTH, side=TOP)
