@@ -213,7 +213,7 @@ class Application(Frame):
         class SettingsOption:
             # Instance of this class creates a new row (option)
             # What you enter in the "text" attribute will be analyzed to find the path in config.txt
-            def __init__(self, background, row, text, include_button=True, button_text='Change'):
+            def __init__(self, background, row, text, include_button=True, button_text='Change', command=None):
                 subtitle_font = Font(size=15)
                 minimized_font = Font(size=10)
                 super_minimized_font = Font(size=7)
@@ -276,8 +276,12 @@ class Application(Frame):
                     directory_button_frame.pack(fill=X, side=TOP)
                     directory_button = Button(directory_button_frame, text=button_text,
                                                     bg=Application.color_theme[1],
-                                                    activebackground=Application.color_theme[1]
-                                                    , command=lambda: self.ask_for_directory(row))
+                                                    activebackground=Application.color_theme[1])
+                    if command == None:
+                        directory_button['command'] = lambda: self.ask_for_directory(row)
+                    else:
+                        directory_button['command'] = command
+
                     directory_button.pack(side=RIGHT)
 
             def ask_for_directory(self, index):
@@ -290,6 +294,24 @@ class Application(Frame):
             self.pack_forget()
             app.main_menu = Application.MainMenu()
             self.destroy()
+
+        def submit(self, text_input, event=None):
+            username = text_input.get()
+            config.ConfigHandler.gui_config_edit(3, entered_text=username)
+            app.settings_menu.go_to_main_menu()
+            app.main_menu.go_to_settings()
+        text_input_activated = False
+        def show_text_input(self, master):
+            if not self.text_input_activated:
+                self.text_input_activated = True
+                text_input = Entry(master, bg=Application.color_theme[3], fg=Application.color_theme[2], width=25,
+                                   font=Font(size=20))
+                text_input.pack()
+                submit_button = Button(master, bg=Application.color_theme[3], fg=Application.color_theme[2], text='Submit',
+                                       command=lambda: self.submit(text_input))
+                root.bind('<Return>', lambda x: self.submit(text_input))
+                submit_button.pack(pady=5)
+
         # endregion
 
         def init_widgets(self):
@@ -300,17 +322,20 @@ class Application(Frame):
             background.pack(fill=BOTH, expand=True, padx=10, pady=10)
 
             subbackground = Frame(background, bg=Application.color_theme[4])
-            subbackground.pack(fill=BOTH, expand=True)
+            subbackground.pack(fill=Y, expand=False, padx=10, pady=10)
 
             grid_i = 0
             for setting in config.ConfigHandler.config_layout.keys():
                 if config.ConfigHandler.config_layout[setting] == "secret":
                     continue
+                elif config.ConfigHandler.config_layout[setting] == "text":
+                    self.SettingsOption(background=subbackground, row=grid_i, text=f'{setting.capitalize()}: ', command=lambda: self.show_text_input(background))
+                    grid_i += 1
                 else:
                     self.SettingsOption(background=subbackground, row=grid_i, text=f'{setting.capitalize()}: ')
                     grid_i += 1
 
-            button = Application.AppButton('BACK', frame=template_background, command=self.go_to_main_menu, side=LEFT)
+            button = Application.AppButton('Main Menu', frame=template_background, command=self.go_to_main_menu, side=LEFT)
 
     class SelectProject(Page):
         def __init__(self):
@@ -341,7 +366,7 @@ class Application(Frame):
             bottom_frame = Frame(background, bg=Application.color_theme[4])
             bottom_frame.pack(side=BOTTOM, fill=X)
 
-            back_button = Application.AppButton('BACK', frame=bottom_frame, command=self.go_to_main_menu, side=LEFT)
+            back_button = Application.AppButton('Main Menu', frame=bottom_frame, command=self.go_to_main_menu, side=LEFT)
 
             buttons_background = Frame(background, bg=Application.color_theme[2])
             buttons_background.pack(padx=10, pady=30, side=LEFT, fill=Y)
