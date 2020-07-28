@@ -1,15 +1,17 @@
+import fnmatch
+
 from utils import is_int, find_path
 import os
-import ast
+from ast import literal_eval
 
 
 class ConfigHandler:
     cfg_dict = {}
 
-    # This is the layout of the config.cfg file by lines. Use this to inform the user or validate config.cfg
-    # If a new config option needs to be added, add it here and validate_config() will automatically get it from user
     @staticmethod
     def get_config_layout():
+        # This is the layout of the config.cfg file by lines. Use this to inform the user or validate config.cfg
+        # If a new config option needs to be added, add it here and validate_config() will ask it from user
         return (
             "trunk location",
             "documents location",
@@ -27,7 +29,7 @@ class ConfigHandler:
             for i in enumerate(cfg_lines):
                 cfg_lines[i[0]] = cfg_lines[i[0]][:-1]
             temp_dict = "{" + ", ".join(cfg_lines) + "}"
-            ConfigHandler.cfg_dict = ast.literal_eval(temp_dict)
+            ConfigHandler.cfg_dict = literal_eval(temp_dict)
             ConfigHandler.validate_config()
 
     @staticmethod
@@ -52,16 +54,16 @@ class ConfigHandler:
             print(str(i) + ": " + key + ":\t\t" + ConfigHandler.cfg_dict[key])
             i += 1
 
-    # Saves content of dictionary to config.cfg in correct format
     @staticmethod
     def save_config():
+        # Saves content of dictionary to config.cfg in correct format
         cfg_file = open("./config.cfg", "w")
         for key in ConfigHandler.cfg_dict:
             cfg_file.write(f'"{key}" : "{ConfigHandler.cfg_dict[key]}"\n')
 
-    # Shows the contents of the config.cfg file to the user and gives them the option to edit any of the configurations
     @staticmethod
     def config_edit():
+        # Shows contents of config.cfg to the user and gives them the option to edit any of the configurations
         cfg_layout = ConfigHandler.get_config_layout()
         while True:
             print("This is your current configuration, type the number of what you want to modify:")
@@ -91,10 +93,10 @@ class ConfigHandler:
         ConfigHandler.save_config()
 
     @staticmethod
-    # Opens windows dialogue windows and has the user select their Trunk, Steam and edited pictures directories
-    # Then reads Mantis username from user input
-    # Saves the directories to './config.cfg'
     def config_setup():
+        # Opens windows dialogue windows and has the user select their Trunk, Steam and edited pictures directories
+        # Then reads Mantis username from user input
+        # Saves the directories to './config.cfg'
         print("No config.cfg file detected, running first time setup")
         cfg_layout = ConfigHandler.get_config_layout()
         for entry in cfg_layout:
@@ -114,11 +116,29 @@ class ConfigHandler:
         return new_value
 
 
-# Asks user for browser
 def ask_preferred_browser():
+    # Asks user for preferred browser
     while True:
-        pref_browser = input("Do you want to use Chrome or Firefox? Type C/F\n> ")
+        pref_browser = input("Do you want to use Chrome, Firefox (or Edge)? Type C/F/E\n> ")
         if pref_browser.upper() == 'C':
             return 'chrome'
         elif pref_browser.upper() == 'F':
             return 'firefox'
+        elif pref_browser.upper() == 'E':
+            print("Visit:")
+            print("\thttps://www.google.com/chrome/")
+            print("\thttps://www.mozilla.org/en-US/firefox/new/")
+
+
+def validate_cfg_images(cfg_handler):
+    # Gets edited image location from the config and checks that it exists and has at least one valid file
+    images_folder = cfg_handler.read("edited images location")
+    if images_folder == "":
+        print("Edited images folder missing from config.cfg. Set it up before reporting.")
+        return ""
+    for is_this_image in os.listdir(images_folder):
+        if fnmatch.fnmatch(is_this_image, "*.jpg") or fnmatch.fnmatch(is_this_image, "*.gif"):
+            return images_folder
+    else:
+        print("Edited pictures folder doesn't contain any .jpg or .gif files. Did you select the right one?")
+        return ""

@@ -5,9 +5,9 @@ import os
 from utils import is_int
 
 
-# Asks user which project they want their reports will go into and returns project name as string
-# All bugs will be reported into that project
 def get_project_from_user():
+    # Asks user which project they want their reports will go into and returns project name as string
+    # All bugs will be reported into that project
     projects = ['ATS - INTERNAL', 'ATS - PUBLIC', 'ATS - PUBLIC - SENIORS', 'ETS 2 - INTERNAL', 'ETS 2 - PUBLIC',
                 'ETS 2 - PUBLIC - SENIORS']
     print('Choose a project')
@@ -22,12 +22,13 @@ def get_project_from_user():
             return projects[int(project) - 1]
 
 
-# Finds the game version from game.log.txt and returns it
-# Uses a Regexp to find the line and then extracts the version
-# Returns -1 if no version is found (eg. when game crashes too soon)
 def find_game_version(log_path):
-    f = open(log_path, "r")
-    for _line in f:
+    # Finds the game version from game.log.txt and returns it
+    # Uses a Regexp to find the line and then extracts the version
+    # Returns -1 if no version is found (eg. when game crashes too soon)
+    with open(log_path, "r") as f:
+        f_lines = f.readlines()
+    for _line in f_lines:
         ver_line = re.search("00:\d\d:\d\d.\d\d\d : [^0]* Truck Simulator [2\s]*init ver.[\d.]+", _line)
         if ver_line is not None:
             version_0 = _line.split("ver.")[1]
@@ -37,8 +38,8 @@ def find_game_version(log_path):
     return -1
 
 
-# Finds the current version of the trunk from the trunk_path
 def find_trunk_version(game, trunk_path):
+    # Finds the current version of the trunk from the trunk_path
     if game == 'A':
         c_path = Path(trunk_path + "/ATS/CURRENT")
     else:
@@ -54,10 +55,10 @@ def find_trunk_version(game, trunk_path):
     return ver_out
 
 
-# Takes first letter of game as argument -- A or E for ATS or ETS2
-# Finds the game version in game.log.txt and if it is a trunk version, finds the version in CURRENT
-# returns -1 if game.log.txt is missing or game crashed before printing out game version
 def find_version(game, config_handler):
+    # Takes first letter of game as argument -- A or E for ATS or ETS2
+    # Finds the game version in game.log.txt and if it is a trunk version, finds the version in CURRENT
+    # returns -1 if game.log.txt is missing or game crashed before printing out game version
     if game == 'A':
         log_path = config_handler.read("documents location") + "/American Truck Simulator/game.log.txt"
     else:

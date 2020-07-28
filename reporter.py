@@ -1,5 +1,5 @@
 from batch import ask_for_prefix
-from chromedrivers import check_for_duplicates, WebDriver, log_into_mantis
+from chromedrivers import check_for_duplicates, DriverHandler, log_into_mantis
 from upload import upload_to_mantis
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowException, WebDriverException
 from information_compile import determine_bug_category, extract_asset_path
@@ -26,22 +26,25 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
 
     while True:
         try:
-            web_driver = WebDriver(browser=browser)
+            driver_handler = DriverHandler(headless=False, browser=browser)
             if not tried_duplicates:
                 duplicate_found = check_for_duplicates(
                     username, password, bug_description=log_first,
-                    asset_path=a_path, web_driver=web_driver, browser=browser)
+                    asset_path=a_path, web_driver=driver_handler, browser=browser)
                 tried_duplicates = True
-            if not duplicate_found:
+            if duplicate_found == -1:
+                return False  # For returning to menu during reporting
+            elif duplicate_found == 0:
                 use_log_lines = copy.deepcopy(log_lines)
                 upload_to_mantis(
                     version, images_folder_path, category, use_log_lines,
                     assign, project, username, password, browser,
-                    path_to_asset=a_path, debug_info=d_info, web_driver=web_driver
+                    path_to_asset=a_path, debug_info=d_info, web_driver=driver_handler
                 )
+                print("Bug reported successfully!\n")
             else:
                 print('Reporting not needed')
-                web_driver.get_driver().quit()
+                driver_handler.get_driver().quit()
             break
         except SessionNotCreatedException:
             print(error_message + ' SessionNotCreatedException')
@@ -55,8 +58,7 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
             print(error_message + ' TypeError')
         except NameError:
             print(error_message + ' NameError')
-    # TODO: test this, Mantis ded
-    print("Bug reported successfully!\n")
+    return True
 
 
 def batch_report_bugs(project, bugs_stack, version, images_folder_path, username, password, browser='chrome'):
@@ -65,9 +67,11 @@ def batch_report_bugs(project, bugs_stack, version, images_folder_path, username
     prefix = ask_for_prefix()
     if prefix == "":
         return False
-    # reporter_driver = WebDriver(browser, headless=True)
-    reporter_driver = WebDriver(browser)
-    log_into_mantis(reporter_driver.driver, username, password)
+    print("Starting headless browser instance...")
+    reporter_driver = DriverHandler(headless=True, browser=browser)
+    print("Logging in to Mantis...")
+    log_into_mantis(reporter_driver.get_driver(), username, password)
+    print("Logged in successfully!")
     while len(bugs_stack) > 0:
         current_bug = bugs_stack.popleft()
         split_bug = current_bug[0].split('_', maxsplit=1)

@@ -3,7 +3,7 @@
 ## For users
 
 ### What is TSReporter
-TSReporter is a utility tool that helps automate the process between making a screenshot in the game and inputing the information into Mantis. 
+TSReporter is a utility tool that helps automate the process between making a screenshot in the game and making a Mantis report. 
 
 ### How to install and set up
 Just copy the folder containing this README onto your computer. When you first launch it, it will run setup. You will have to input some paths to relevant folders.
@@ -37,7 +37,7 @@ Documents
 |	+--game_log.txt
 
 3. Edited images
-This is the folder where you save your edited images. They must be saved directly here, so if you have different folders for different games/dlcs/time periods, you will have to change it to the one where you want the program to get images from, otherwise the program will not find them! (you can just upload them manually as well)
+This is the folder where you save your edited images. They must be saved directly here, so if you have different folders for different games/dlcs/time periods, you will have to change it to the one where you want the program to get images from, otherwise the program will not find them! (you can just upload them manually as well).
 
 4. Mantis username
 What you use to log into Mantis (commonly in the format *firstName.lastName*). It is necessary because the session handler needs to log in every time during automated sessions.
@@ -54,25 +54,27 @@ After you have set up the config, you can select mode 1 to report all the bugs f
 TSReporter will now review each bug in bugs.txt and do the following:
 1. Open a browser window, log into mantis and search for bug duplicates, wait for your reply.
 2. Open a browser window and pre-fill a Mantis report. If you followed the convention outlined below, all you have to do now is change priority/severity and add any optional info to the description.
-3. Repeat the above for all bugs.
+3. Move the lines you just reported from bugs.txt to bugs_archive.txt
+4. Repeat the above for all bugs.
 
 #### Convention
 When using F11 or Shift+F11 in the game, you will have to fill in some additional information. 
 
 [m|a|av|ac|ar|aa]\_reportname  
-determines the category of the asset, as per the testing guide  
-- m: Map  
-- a: Asset - You will be asked to specify the type later!  
-- av: Vegetation asset  
-- ac: Animated character asset  
-- ar: Road asset  
-- aa: Other assets
+	determines the category of the asset, as per the testing guide  
+	- m: Map  
+	- a: Asset - You will be asked to specify the type later!  
+	- av: Vegetation asset  
+	- ac: Animated character asset  
+	- ar: Road asset  
+	- aa: Other assets
 
 .reportname  
-Attatches this coordinate/screenshot to the previous report. 
+	Attatches this coordinate/screenshot to the previous report. 
+	!!At the moment, adding more then 2 extra images to a report will not upload your images due to Mantis limitations!!
 
 !reportname  
-This will not be reported. You can also leave the report blank in order for the program to ignore it.
+	This will not be reported. You can also leave the report blank in order for the program to ignore it.
 
 reportname will be what is put into the Summary in Mantis, so you have to follow the testing guide in naming it.
 
@@ -86,26 +88,24 @@ av_Tree without collision
 This will create a map report with two images/coordinates attatched named: "[version] Idaho - Twin Falls - floating cow"
 and an asset-vegetation report with one image named: "[version] - assetname - tree without collision"
 
-### Batch reporting mode (WIP)
+### Batch reporting mode
 If you want to report multiple map bugs in the same area/city/road, you can use the batch report mode. In that case, you will have to use a slightly different convention and take more care before using this mode. Bugs reported using this mode will not be assigned to anyone, you have to do that afterwards. Duplicate bugs are not checked during batch reporting!
 
 Batch report will:
 1. Check if all bugs in bugs.txt follow the batch convention (below)
-2. Ask you to select a prefix (below)
-3. Report all bugs into Mantis
-4. IT DOES NOT ARCHIVE bugs.txt IN CURRENT BUILD!
+2. Check if all bugs have images and warns you if any are missing
+3. Ask you to select a prefix (below)
+4. Report all bugs into Mantis
+5. Archive all bugs into bugs_archive.txt
 
 #### Batch prefix
 When batch reporting, it is assumed your reports are from one area. When starting batch reporting, you will be asked to provide a prefix (leave blank to go back to menu). That prefix will be added to all your reports. For example, for the following reports:
-
-n_missing drain entrance ;[21/07/2020 14:44] (sec-0019+0016);-74905.4;24.6089;67573.6;-1.70735;-0.728455
-h_trees in concrete ;[21/07/2020 14:46] (sec-0019+0016);-74955.4;38.3;67418.4;1.47192;-0.411626
-n_sharp transition ;[21/07/2020 15:20] (sec-0019+0016);-75164.4;23.5271;67164.6;-0.0744675;-0.28806
+	n_missing drain entrance ;[21/07/2020 14:44] (sec-0019+0016);-74905.4;24.6089;67573.6;-1.70735;-0.728455
+	h_trees in concrete ;[21/07/2020 14:46] (sec-0019+0016);-74955.4;38.3;67418.4;1.47192;-0.411626
 
 you would select the prefix "Spain - Malaga - " and the generated bug names would be:
-"Spain - Malaga - missing drain entrance"
-"Spain - Malaga - trees in concrete"
-"Spain - Malaga - sharp transition"
+	"Spain - Malaga - missing drain entrance"
+	"Spain - Malaga - trees in concrete"
 
 #### Batch report convention
 All batch-reported bugs are map only. The option will determine the priority of the bug (severity is done automatically according to the Testing guide.

@@ -2,13 +2,12 @@ import os
 
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException, NoSuchElementException
-# import getpass
 
 from information_compile import extract_location_filter
 from information_compile import extract_asset_name
 
 
-class WebDriver:
+class DriverHandler:
     driver = None
 
     def __init__(self, browser='chrome', headless=False):
@@ -38,14 +37,12 @@ class WebDriver:
             return True
 
 
-    # creates a new web driver session
-
 def check_for_duplicates(username, password, bug_description=None, asset_path=None, web_driver=None, browser=None):
     # opens mantis so the user can check for duplicates
     print("Opening search for duplicates")
 
     if not web_driver.is_active():
-        driver = WebDriver(browser=browser).get_driver()
+        driver = DriverHandler(browser=browser).get_driver()
         log_into_mantis(driver, username, password)
 
     driver = web_driver.get_driver()
@@ -61,23 +58,17 @@ def check_for_duplicates(username, password, bug_description=None, asset_path=No
     driver.find_element_by_id('filter-search-txt').send_keys(final_filter)  # filter box
     driver.find_element_by_xpath("//input[@value='Apply Filter']").click()  # apply filter button
 
-    print('Did you find any duplicates? (Y/N)')
+    print('Did you find any duplicates? (Y/N/Q)')
     while True:
         answer = input('> ')
         if answer.upper() == 'N':
-            try:
-                pass
-            except WebDriverException:
-                pass
-            return False
+            return 0
         elif answer.upper() == 'Y':
-            try:
-                pass
-            except WebDriverException:
-                pass
-            return True
+            return 1
+        elif answer.upper() == 'Q':
+            return -1
         else:
-            print('Answer Y or N')
+            print('Answer Y/N/Q')
             pass
 
 
@@ -92,7 +83,7 @@ def log_into_tsreporter(test_login_username, browser='chrome'):
             print("No password entered, returning to menu")
             return ""
         print("Checking your login credentials")
-        driver = WebDriver(browser=browser, headless=True).get_driver()
+        driver = DriverHandler(browser=browser, headless=True).get_driver()
         try:
             log_into_mantis(driver, test_login_username, password)
             driver.find_element_by_id('sidebar-btn')

@@ -106,20 +106,6 @@ def main():
                     pass
 
 
-def validate_cfg_images(cfg_handler):
-    # Gets edited image location from the config and checks that it exists and has at least one valid file
-    images_folder = cfg_handler.read("edited images location")
-    if images_folder == "":
-        print("Edited images folder missing from config.cfg. Set it up before reporting.")
-        return ""
-    for is_this_image in os.listdir(images_folder):
-        if fnmatch.fnmatch(is_this_image, "*.jpg") or fnmatch.fnmatch(is_this_image, "*.gif"):
-            return images_folder
-    else:
-        print("Edited pictures folder doesn't contain any .jpg or .gif files. Did you select the right one?")
-        return ""
-
-
-# The program begins here
-print('Welcome to TSReporter!')
+# Program begins here
+print("Welcome to TSReporter")
 main()

@@ -5,13 +5,14 @@ def check_batch_images(all_bugs, image_folder_path):
     # Checks if all reports in bugs.txt have an image, asks user to check again if not
     # returns True if the user wants to stop batch reporting and return to menu, otherwise False
     try_again = True
-    img_missing = False
     while try_again:
+        img_missing = False
         for bug in all_bugs:  # Bug is stack of main bug line and all attached .report
-            img = get_image(bug[0], image_folder_path)
-            if not img:
-                print(f"Image not found for bug: {bug[0][:-1]}")
-                img_missing = True
+            if bug[0][0] not in [';', '!']:
+                img = get_image(bug[0], image_folder_path)
+                if not img:
+                    print(f"Image not found for bug: {bug[0][:-1]}")
+                    img_missing = True
         if img_missing:
             print("Would you like to try again or quit to menu? ")
             while True:
