@@ -59,7 +59,9 @@ class Application(Frame):
         element = None
         # The basic template that is used for most buttons in the app
         # Create an instance of this class to quickly create a new button
-        def __init__(self, text, frame, color1=None, color2=None, font_color='black', command=None, offx=10, offy=10, font_size=15, text_spacing=20, side=None, pady=10):
+
+        def __init__(self, text, frame, color1=None, color2=None, font_color='black', command=None,
+                     offx=10, offy=10, font_size=15, text_spacing=20, side=None, pady=10):
             if color1 is None:
                 color1 = Application.color_theme[1]
             if color2 is None:
@@ -300,11 +302,13 @@ class Application(Frame):
             subbackground = Frame(background, bg=Application.color_theme[4])
             subbackground.pack(fill=BOTH, expand=True)
 
-            self.SettingsOption(background=subbackground, row=0, text='Trunk Location: ')
-            self.SettingsOption(background=subbackground, row=1, text='Documents Location: ')
-            self.SettingsOption(background=subbackground, row=2, text='Edited Images Location: ')
-            self.SettingsOption(background=subbackground, row=3, text='Mantis Username: ')
-            self.SettingsOption(background=subbackground, row=4, text='Preferred Browser: ')
+            grid_i = 0
+            for setting in config.ConfigHandler.config_layout.keys():
+                if config.ConfigHandler.config_layout[setting] == "secret":
+                    continue
+                else:
+                    self.SettingsOption(background=subbackground, row=grid_i, text=f'{setting.capitalize()}: ')
+                    grid_i += 1
 
             button = Application.AppButton('BACK', frame=template_background, command=self.go_to_main_menu, side=LEFT)
 
