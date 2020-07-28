@@ -3,6 +3,7 @@ from tkinter.font import Font
 from threading import Thread
 import bugs
 import config
+from PIL import ImageTk, Image
 
 
 class ProgramThread(Thread):
@@ -27,7 +28,7 @@ class Application(Frame):
         self.main_menu = self.MainMenu()
 
     color_theme = {
-        1: '#2C7FDB',  # Regular Buttons
+        1: 'white',  # Regular Buttons
         2: '#ffa500',  # Quit Button
         3: '#484848',  # Integrated Frames
         4: '#2B2B2B'  # Background
@@ -88,6 +89,7 @@ class Application(Frame):
             background_frame = Frame(self, bg=Application.color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
 
+
             top_frame = Frame(background_frame, bg=Application.color_theme[4])
             top_frame.pack(side=TOP, fill=X)
 
@@ -123,6 +125,12 @@ class Application(Frame):
 
             bottom_frame = Frame(background_frame, bg=Application.color_theme[4])
             bottom_frame.pack(side=BOTTOM, fill=X)
+
+            img = ImageTk.PhotoImage(Image.open("./resources/logo.png"))
+            img_panel = Label(top_frame, image=img, bg=Application.color_theme[4])
+            img_panel.image = img
+            img_panel.place(x=5, y=0)
+            img_panel.pack(pady=100, side=BOTTOM)
 
             version = 'v 0.2.3'
             version_label = Label(bottom_frame, text=version,
