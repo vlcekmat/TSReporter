@@ -115,6 +115,17 @@ class ConfigHandler:
             write_config("s_password", "")
 
     @staticmethod
+    def gui_config_edit(index):
+        cfg_layout = []
+        for key in ConfigHandler.config_layout.keys():
+            if ConfigHandler.config_layout[key] != "secret":
+                cfg_layout.append(key)
+
+        line_selection = index
+        ConfigHandler.cfg_dict[cfg_layout[line_selection]] = ConfigHandler.ask_config_line(cfg_layout[line_selection])
+        ConfigHandler.save_config()
+
+    @staticmethod
     def config_setup():
         # Opens windows dialogue windows and has the user select their Trunk, Steam and edited pictures directories
         # Then reads Mantis username from user input
