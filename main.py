@@ -8,7 +8,7 @@ from reporter import report_bug, batch_report_bugs
 import versions as ver
 from sector_seek import find_assign_to
 from chromedrivers import log_into_tsreporter
-from config import ConfigHandler, validate_cfg_images
+from config import ConfigHandler, validate_cfg_images, read_config
 
 
 def main():
@@ -36,7 +36,7 @@ def main():
             cfg_handler.config_edit()
 
         elif use_mode in [1, 2]:  # Report bugs use_mode
-            report_option(use_mode, cfg_handler, password)
+            report_option(use_mode,cfg_handler, password)
 
 
 def report_option(use_mode, cfg_handler, password):
@@ -45,18 +45,18 @@ def report_option(use_mode, cfg_handler, password):
     if images_folder == "":
         return None
 
-    mantis_username = cfg_handler.read("mantis username")
+    mantis_username = read_config("mantis username")
     if mantis_username == "":
         print("Mantis username not found in config.cfg")
         return None
 
     # If password was not entered successfully this session, it happens here
     if password == "":
-        password = log_into_tsreporter(mantis_username, cfg_handler.read("preferred browser"))
+        password = log_into_tsreporter(mantis_username, read_config("preferred browser"))
         if password == "":
             return None
 
-    doc_path = cfg_handler.read("documents location")  # Path to documents
+    doc_path = read_config("documents location")  # Path to documents
 
     # Here,the user selects which project to report into
     # This is important because it determines which game's files and versions will be accessed
@@ -84,7 +84,7 @@ def report_option(use_mode, cfg_handler, password):
             if current_bug[0][0] not in ['!', ';']:
                 assign_to = find_assign_to(current_bug[0], chosen_project[0])
                 report_bug(chosen_project, current_bug, version, images_folder, assign_to,
-                           mantis_username, password, cfg_handler.read("preferred browser"))
+                           mantis_username, password, read_config("preferred browser"))
             archive_bug(current_bug, game_path)
 
     elif use_mode == 2:  # Batch reporting use_mode
@@ -100,7 +100,7 @@ def report_option(use_mode, cfg_handler, password):
 
         reported = batch_report_bugs(
             chosen_project, all_bugs, version, images_folder,
-            mantis_username, password, cfg_handler.read("preferred browser")
+            mantis_username, password, read_config("preferred browser")
         )
         if not reported:
             return None
