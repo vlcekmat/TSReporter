@@ -108,8 +108,3 @@ def report_option(use_mode, cfg_handler, password):
             archive.writelines(bug_lines)
         with open(game_path + "/bugs.txt", "w"):
             pass
-
-
-# Program begins here
-print("Welcome to TSReporter")
-main()
