@@ -8,7 +8,7 @@ from reporter import report_bug, batch_report_bugs
 import versions as ver
 from sector_seek import find_assign_to
 from chromedrivers import log_into_tsreporter
-from config import ConfigHandler
+from config import ConfigHandler, validate_cfg_images
 
 
 def main():
@@ -104,8 +104,3 @@ def main():
                     archive.writelines(bug_lines)
                 with open(game_path + "/bugs.txt", "w"):
                     pass
-
-
-# Program begins here
-print("Welcome to TSReporter")
-main()
