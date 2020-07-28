@@ -132,7 +132,8 @@ class Application(Frame):
             img_panel.place(x=5, y=0)
             img_panel.pack(pady=100, side=BOTTOM)
 
-            version = 'v 0.2.3'
+            with open('version.txt', 'r') as version_file:
+                version = version_file.readline()
             version_label = Label(bottom_frame, text=version,
                                   bg=Application.color_theme[4],
                                   fg=Application.color_theme[2])
