@@ -70,8 +70,8 @@ def read_bug_lines(bug_lines):
 def count_bugs():
     ets_bugs_count = 0
     ats_bugs_count = 0
-    config_handler = config.ConfigHandler()
-    documents_location = config_handler.read('documents location')
+    cfg_handler = config.ConfigHandler()
+    documents_location = config.read_config('documents location')
     ats_bugs_path = f"{documents_location}/American Truck Simulator/bugs.txt"
     ets_bugs_path = f"{documents_location}/Euro Truck Simulator 2/bugs.txt"
     ats_bugs = open(ats_bugs_path)
