@@ -5,13 +5,14 @@ from reporter import report_bug, batch_report_bugs
 import versions as ver
 from sector_seek import find_assign_to
 from chromedrivers import log_into_tsreporter
-from config import ConfigHandler, validate_cfg_images
+from config import ConfigHandler, validate_cfg_images, read_config
+from password import get_password
 
 
 def main():
     # Program happens here
-    password = ""
     cfg_handler = ConfigHandler()
+    password = get_password()
 
     # Main program loop, ends by selecting mode 4
     while True:
@@ -35,26 +36,28 @@ def main():
         elif use_mode in [1, 2]:  # Report bugs use_mode
 
             # This section validates the edited pictures directory from config.cfg
-            images_folder = validate_cfg_images(cfg_handler)
+            images_folder = validate_cfg_images()
             if images_folder == "":
                 continue
 
-            mantis_username = cfg_handler.read("mantis username")
+            mantis_username = read_config("mantis username")
             if mantis_username == "":
                 print("Mantis username not found in config.cfg")
                 continue
 
             # If password was not entered successfully this session, it happens here
             if password == "":
-                password = log_into_tsreporter(mantis_username, cfg_handler.read("preferred browser"))
+                password = log_into_tsreporter(mantis_username, read_config("preferred browser"))
                 if password == "":
                     continue
 
-            doc_path = cfg_handler.read("documents location")  # Path to documents
+            doc_path = read_config("documents location")  # Path to documents
 
             # Here,the user selects which project to report into
             # This is important because it determines which game's files and versions will be accessed
             chosen_project = ver.get_project_from_user()
+            if chosen_project == 'Return to menu':
+                continue
             if chosen_project[0] == 'A':
                 game_path = doc_path + "/American Truck Simulator"
             else:
@@ -77,7 +80,7 @@ def main():
                     if current_bug[0][0] not in ['!', ';']:
                         assign_to = find_assign_to(current_bug[0], chosen_project[0])
                         keep_reporting = report_bug(chosen_project, current_bug, version, images_folder, assign_to,
-                                                    mantis_username, password, cfg_handler.read("preferred browser"))
+                                                    mantis_username, password, read_config("preferred browser"))
                         if not keep_reporting:
                             break
                     archive_bug(current_bug, game_path)
@@ -94,7 +97,7 @@ def main():
 
                 reported = batch_report_bugs(
                     chosen_project, all_bugs, version, images_folder,
-                    mantis_username, password, cfg_handler.read("preferred browser")
+                    mantis_username, password, read_config("preferred browser")
                 )
                 if not reported:
                     continue
