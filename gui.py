@@ -7,6 +7,7 @@ import main
 from versions import find_version
 import bugs
 import config
+from gui_bughandler import BugHandler
 
 
 class ProgramThread(Thread):
@@ -19,7 +20,8 @@ class ProgramThread(Thread):
         if ProgramThread.instance_created is not True:
             ProgramThread.instance_created = False
             password = 'CrYVhn7FSM'
-            main.report_option(use_mode=1, cfg_handler=config.ConfigHandler(), password=password)
+            config.ConfigHandler()
+            main.report_option(use_mode=1, password=password)
 
     @staticmethod
     def set_instance_created(self):
@@ -358,9 +360,9 @@ class Application(Frame):
             app.main_menu = Application.MainMenu()
             self.destroy()
 
-        def go_to_duplicates(self, project):
+        def go_to_duplicates(self, project, bug_handler):
             self.pack_forget()
-            app.duplicates = Application.Duplicates(project)
+            app.duplicates = Application.Duplicates(project, bug_handler=bug_handler)
             self.destroy()
 
         def go_to_batch(self, project):
@@ -368,11 +370,24 @@ class Application(Frame):
             app.batch = Application.Batch(project)
             self.destroy()
 
+        def try_going_duplicates(self, project, frame):
+            bug_handler = BugHandler(project[0])
+            if not bug_handler.get_current():
+                make_error_textbox(bug_handler.message, frame)
+            else:
+                self.go_to_duplicates(project, bug_handler)
+
         # endregion
 
         def init_widgets(self):
             background = Frame(self, bg=Application.color_theme[4])
             background.pack(fill=BOTH, expand=True)
+
+            error_frame = Frame(background, bg=Application.color_theme[4])
+            error_frame.pack(side=TOP, anchor="n")
+            error_textbox = Text(error_frame, height=1, width=80, bg=Application.color_theme[4],
+                                 fg=Application.color_theme[2], bd=0, font="Helvetica 12")
+            error_textbox.pack(pady=0, padx=0, side=TOP, anchor='n')
 
             bottom_frame = Frame(background, bg=Application.color_theme[4])
             bottom_frame.pack(side=BOTTOM, anchor="sw")
@@ -381,7 +396,7 @@ class Application(Frame):
                                                 anchor="sw")
 
             middle_frame = Frame(background, bg=Application.color_theme[4])
-            middle_frame.pack(anchor="center", pady=80)
+            middle_frame.pack(anchor="center", pady=70)
 
             buttons_ats_background = Frame(middle_frame, bg=Application.color_theme[2])
             buttons_ats_background.pack(padx=30, pady=30, side=LEFT)
@@ -405,7 +420,8 @@ class Application(Frame):
                 if self.use_mode == "batch":
                     this_button.get_element()['command'] = lambda c=i: self.go_to_batch(ats_projects[c])
                 else:
-                    this_button.get_element()['command'] = lambda c=i: self.go_to_duplicates(ats_projects[c])
+                    this_button.get_element()['command'] = lambda c=i: self.try_going_duplicates(ats_projects[c],
+                                                                                                 error_textbox)
                 buttons.append(this_button)
 
             for i in range(len(ets_projects)):
@@ -414,15 +430,23 @@ class Application(Frame):
                 if self.use_mode == "batch":
                     this_button.get_element()['command'] = lambda c=i: self.go_to_batch(ets_projects[c])
                 else:
-                    this_button.get_element()['command'] = lambda c=i: self.go_to_duplicates(ets_projects[c])
+                    this_button.get_element()['command'] = lambda c=i: self.try_going_duplicates(ets_projects[c],
+                                                                                                 error_textbox)
                 buttons.append(this_button)
 
     class Duplicates(Page):
-        # selected_project = None
+        selected_project = None
         already_reported = None
+        bug_handler = None
 
-        def __init__(self, project, reported=False):
+        def __init__(self, project, bug_handler, reported=False):
             super().__init__()
+
+            if not bug_handler:
+                raise ValueError
+            else:
+                self.bug_handler = bug_handler
+
             self.already_reported = reported
             self.selected_project = project
             self.pack(fill=BOTH, expand=True)
@@ -439,34 +463,70 @@ class Application(Frame):
             app.projects_page.open_page()
             self.destroy()
 
+        def show_next_report(self):
+            self.bug_handler.read_next()
+            if not self.bug_handler.get_current():
+                self.go_to_main_menu()
+                return
+            self.pack_forget()
+            app.duplicates = Application.Duplicates(self.selected_project, self.bug_handler, reported=True)
+            self.destroy()
+
         def init_widgets(self):
             background_frame = Frame(master=self, bg=Application.color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
             version = find_version(self.selected_project[0])
             version_line = f"Reporting in project [{self.selected_project}] at version {version}"
 
+            version_info_text = Text(background_frame, height=1, width=60, bg=Application.color_theme[4],
+                                     fg=Application.color_theme[2], bd=0, font="Helvetica 12")
+            version_info_text.pack(anchor="nw", pady=5, padx=5, side=TOP)
+            version_info_text.insert(END, version_line)
+
+            bug_bg_frame = Frame(background_frame, bg=Application.color_theme[3])
+            bug_bg_frame.pack(anchor="center", pady=5, padx=15)
+
             bottom_frame = Frame(background_frame, bg=Application.color_theme[4])
-            bottom_frame.pack(side=BOTTOM, anchor="sw")
+            bottom_frame.pack(side=BOTTOM, fill=X)
 
             if self.already_reported:
                 # If a report has been made already, it is not possible to go back to project selection
                 # instead, this button will take the user to the main menu
                 back_button = Application.AppButton(
-                    'Main Menu', frame=bottom_frame, command=self.go_to_main_menu, anchor="sw")
+                    'Main Menu', frame=bottom_frame, command=self.go_to_main_menu, side=LEFT)
             else:
                 back_button = Application.AppButton(
-                    'BACK', frame=bottom_frame, command=self.go_to_projects, anchor="sw")
+                    'BACK', frame=bottom_frame, command=self.go_to_projects, side=LEFT)
 
-            version_info_text = Text(background_frame, height=1, bg=Application.color_theme[4],
-                                     fg=Application.color_theme[2], bd=0, font="Helvetica 14")
-            version_info_text.pack(anchor="n", fill=X, pady=5, padx=5)
-            version_info_text.insert(END, version_line)
+            current_bug_summary = self.bug_handler.get_current()[0][:-1]
+            current_bug_text = Text(bug_bg_frame, height=1, bg=Application.color_theme[3],
+                                    fg=Application.color_theme[1], bd=0, font="Helvetica 14")
+            current_bug_text.pack(side=TOP, fill=X, pady=5, padx=5)
+            current_bug_text.insert(END, current_bug_summary)
 
-            buttons_frame = Frame(background_frame, bg=Application.color_theme[4])
-            buttons_frame.pack(side=BOTTOM)
+            # img = ImageTk.PhotoImage(Image.open("./resources/logo.png"))
+            # img_panel = Label(top_frame, image=img, bg=Application.color_theme[4])
+            # img_panel.image = img
+            # img_panel.place(x=0, y=0)
+            # img_panel.pack(pady=100, side=BOTTOM)
+            image_location = self.bug_handler.try_get_image()
+            if image_location:
+                image = Image.open(image_location)
+                image.thumbnail((520, 520))
+                img_to_show = ImageTk.PhotoImage(image)
+                img_panel = Label(bug_bg_frame, image=img_to_show, bg=Application.color_theme[3])
+                img_panel.image = img_to_show
+                img_panel.place(x=0, y=0)
+                img_panel.pack(pady=5, side=TOP)
 
-            button_is_duplicate = Application.AppButton("Don't report", buttons_frame, side=LEFT)
-            button_is_unique = Application.AppButton("Report", buttons_frame)
+            image_location_text = Text(bug_bg_frame, height=1, width=60, bg=Application.color_theme[3],
+                                       fg=Application.color_theme[1], bd=0, font="Helvetica 10")
+            image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
+            image_location_text.insert(END, image_location)
+
+            button_find_duplicates = Application.AppButton("Find duplicates", bottom_frame, side=RIGHT)
+            button_skip_report = Application.AppButton("Don't report", bottom_frame, side=RIGHT,
+                                                       command=self.show_next_report)
 
     class Batch(Page):
         def __init__(self, project):
@@ -487,6 +547,14 @@ class Application(Frame):
             bottom_frame = Frame(background_frame, bg=Application.color_theme[4])
             bottom_frame.pack(side=BOTTOM, anchor="sw")
             back_button = Application.AppButton('BACK', frame=bottom_frame, command=self.go_to_projects, anchor="sw")
+
+
+def make_error_textbox(message, error_textbox):
+    # error_textbox = Text(frame, height=1, width=80, bg=Application.color_theme[4],
+    #                      fg=Application.color_theme[2], bd=0, font="Helvetica 12")
+    # error_textbox.pack(pady=5, padx=5, side=TOP, anchor='n')
+    error_textbox.delete("1.0", END)
+    error_textbox.insert(END, message)
 
 
 # Creates the basic "box" in which you can put all of the GUI elements

@@ -1,5 +1,6 @@
 import unittest
 import io
+import sys
 import os
 from unittest import mock
 from collections import deque
@@ -28,14 +29,14 @@ class TestReadBugsFile(unittest.TestCase):
         with mock.patch('sys.stdout', new_callable=io.StringIO) as fake_stdout:
             if os.path.isfile("bugs.txt"):
                 os.remove("bugs.txt")
-            bug_lines = bugs.read_bugs_file('.')
+            bug_lines = bugs.read_bugs_file('.', sys.stdout)
             self.assertIsNone(bug_lines)
 
     def test_read_bugs_file_empty(self):
         with mock.patch('sys.stdout', new_callable=io.StringIO) as fake_stdout:
             with open("bugs.txt", "w"):
                 pass
-            bug_lines = bugs.read_bugs_file('.')
+            bug_lines = bugs.read_bugs_file('.', sys.stdout)
             os.remove("bugs.txt")
             self.assertIsNone(bug_lines)
             self.assertEqual(fake_stdout.getvalue(), "No bugs to report from bugs.txt\n")
@@ -44,14 +45,14 @@ class TestReadBugsFile(unittest.TestCase):
         with mock.patch('sys.stdout', new_callable=io.StringIO) as fake_stdout:
             with open("bugs.txt", "w") as bugs_file:
                 bugs_file.write(".report")
-            bug_lines = bugs.read_bugs_file('.')
+            bug_lines = bugs.read_bugs_file('.', sys.stdout)
             os.remove("bugs.txt")
             self.assertIsNone(bug_lines)
 
     def test_read_bugs_file_good(self):
         with open("bugs.txt", "w") as bugs_file:
             bugs_file.write("report0\nreport1\n")
-        bug_lines = bugs.read_bugs_file('.')
+        bug_lines = bugs.read_bugs_file('.', sys.stdout)
         os.remove("bugs.txt")
         self.assertEqual(bug_lines[0], "report0\n")
         self.assertEqual(bug_lines[1], "report1\n")
