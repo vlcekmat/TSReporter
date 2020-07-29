@@ -219,23 +219,23 @@ class Application(Frame):
                 super_minimized_font = Font(size=7)
 
                 setting_name_frame = Frame(background, bg=Application.color_theme[3])
-                setting_name_frame.grid(row=row, column=0, sticky=W+E+N+S, pady=5)
+                setting_name_frame.grid(row=row, column=0, sticky=W + E + N + S, pady=5)
 
                 value_frame = Frame(background, bg=Application.color_theme[3])
-                value_frame.grid(row=row, column=1, sticky=W+E+N+S, pady=5, padx=10)
+                value_frame.grid(row=row, column=1, sticky=W + E + N + S, pady=5, padx=10)
 
                 button_frame = Frame(background, bg=Application.color_theme[4])
-                button_frame.grid(row=row, column=2, padx=10, sticky=W+E+N+S, pady=10)
+                button_frame.grid(row=row, column=2, padx=10, sticky=W + E + N + S, pady=10)
 
                 setting_name_frame_packed = Frame(setting_name_frame)
 
                 left_frame = Frame(setting_name_frame, bg=Application.color_theme[3])
                 left_frame.pack(fill=X, side=TOP)
                 frame_text = Label(left_frame, text=text,
-                                             font=subtitle_font,
-                                             fg=Application.color_theme[2],
-                                             bg=Application.color_theme[3],
-                                             pady=5, padx=10)
+                                   font=subtitle_font,
+                                   fg=Application.color_theme[2],
+                                   bg=Application.color_theme[3],
+                                   pady=5, padx=10)
                 frame_text.pack(side=LEFT)
 
                 key_to_find = text.lower().split(':')[0]
@@ -246,10 +246,10 @@ class Application(Frame):
 
                 if len(directory_path) <= 48:
                     directory_value = Label(directory_value_frame, text=f'{directory_path}',
-                                                  font=subtitle_font,
-                                                  fg=Application.color_theme[2],
-                                                  bg=Application.color_theme[3],
-                                                  pady=5, padx=10)
+                                            font=subtitle_font,
+                                            fg=Application.color_theme[2],
+                                            bg=Application.color_theme[3],
+                                            pady=5, padx=10)
                 elif len(directory_path) <= 75:
                     directory_value = Label(directory_value_frame, text=f'{directory_path}',
                                             font=minimized_font,
@@ -275,8 +275,9 @@ class Application(Frame):
                     directory_button_frame = Frame(button_frame, bg=Application.color_theme[3])
                     directory_button_frame.pack(fill=X, side=TOP)
                     directory_button = Button(directory_button_frame, text=button_text,
-                                                    bg=Application.color_theme[1],
-                                                    activebackground=Application.color_theme[1])
+                                              bg=Application.color_theme[1],
+                                              activebackground=Application.color_theme[1],
+                                              command=lambda: self.ask_for_directory(row))
                     if command == None:
                         directory_button['command'] = lambda: self.ask_for_directory(row)
                     else:
@@ -323,20 +324,17 @@ class Application(Frame):
             background.pack(fill=BOTH, expand=True, padx=10, pady=10)
 
             subbackground = Frame(background, bg=Application.color_theme[4])
-            subbackground.pack(fill=Y, expand=False, padx=10, pady=10)
+            subbackground.pack(fill=BOTH, expand=True)
 
             grid_i = 0
             for setting in config.ConfigHandler.config_layout.keys():
                 if config.ConfigHandler.config_layout[setting] == "secret":
                     continue
-                elif config.ConfigHandler.config_layout[setting] == "text":
-                    self.SettingsOption(background=subbackground, row=grid_i, text=f'{setting.capitalize()}: ', command=lambda: self.show_text_input(background))
-                    grid_i += 1
                 else:
                     self.SettingsOption(background=subbackground, row=grid_i, text=f'{setting.capitalize()}: ')
                     grid_i += 1
 
-            button = Application.AppButton('Main Menu', frame=template_background, command=self.go_to_main_menu, side=LEFT)
+            button = Application.AppButton('BACK', frame=template_background, command=self.go_to_main_menu, side=LEFT)
 
     class SelectProject(Page):
         def __init__(self):
@@ -367,37 +365,32 @@ class Application(Frame):
             bottom_frame = Frame(background, bg=Application.color_theme[4])
             bottom_frame.pack(side=BOTTOM, fill=X)
 
-            back_button = Application.AppButton('Main Menu', frame=bottom_frame, command=self.go_to_main_menu, side=LEFT)
+            back_button = Application.AppButton('BACK', frame=bottom_frame, command=self.go_to_main_menu, side=LEFT)
 
             buttons_background = Frame(background, bg=Application.color_theme[2])
             buttons_background.pack(padx=10, pady=30, side=LEFT, fill=Y)
 
             buttons_frame = Frame(buttons_background, bg=Application.color_theme[3])
             buttons_frame.pack(side=LEFT, padx=10, pady=10, fill=Y)
-            ats_internal_button = Application.AppButton(text='ATS - INTERNAL', frame=buttons_frame, font_size=10,
-                                                        text_spacing=52, pady=5)
-            ats_public_button = Application.AppButton(text='ATS - PUBLIC', frame=buttons_frame, font_size=10,
-                                                      text_spacing=52, pady=5)
-            ats_public_seniors_button = Application.AppButton(text='ATS - PUBLIC - SENIORS', frame=buttons_frame,
-                                                              font_size=10, text_spacing=52, pady=5)
+
+            buttons = []
+            ats_projects = ['ATS - INTERNAL', 'ATS - PUBLIC', 'ATS - PUBLIC - SENIORS']
+            for ats_project in ats_projects:
+                buttons.append(
+                    Application.AppButton(text=ats_project, frame=buttons_frame, font_size=10,text_spacing=52, pady=5)
+                )
+
             gap = Frame(buttons_frame, bg=Application.color_theme[3])
             gap.pack(fill=Y, pady=20)
-            ets_internal_button = Application.AppButton(text='ETS 2 - INTERNAL', frame=buttons_frame, font_size=10,
-                                                        text_spacing=52, pady=5)
-            ets_public_button = Application.AppButton(text='ETS 2 - PUBLIC', frame=buttons_frame, font_size=10,
-                                                      text_spacing=52, pady=5)
-            ets_public_seniors_button = Application.AppButton(text='ETS 2 - PUBLIC - SENIORS', frame=buttons_frame,
-                                                              font_size=10, text_spacing=52, pady=5)
 
-            buttons = [ats_internal_button, ats_public_button, ats_public_seniors_button,
-                       ets_internal_button, ets_public_button, ets_public_seniors_button]
+            ets_projects = ['ETS2 - INTERNAL', 'ETS2 - PUBLIC', 'ETS2 - PUBLIC - SENIORS']
+            for ets_project in ets_projects:
+                buttons.append(
+                    Application.AppButton(text=ets_project, frame=buttons_frame, font_size=10, text_spacing=52, pady=5)
+                )
 
-            ats_internal_button.get_element()['command'] = lambda: self.select_project(ats_internal_button)
-            ats_public_button.get_element()['command'] = lambda: self.select_project(ats_public_button)
-            ats_public_seniors_button.get_element()['command'] = lambda: self.select_project(ats_public_seniors_button)
-            ets_internal_button.get_element()['command'] = lambda: self.select_project(ets_internal_button)
-            ets_public_button.get_element()['command'] = lambda: self.select_project(ets_public_button)
-            ets_public_seniors_button.get_element()['command'] = lambda: self.select_project(ets_public_seniors_button)
+            for button in buttons:
+                button.get_element()['command'] = lambda: self.select_project(button)
 
     class Duplicates(Page):
         selected_project = None
