@@ -301,6 +301,7 @@ class Application(Frame):
             app.settings_menu.go_to_main_menu()
             app.main_menu.go_to_settings()
         text_input_activated = False
+
         def show_text_input(self, master):
             if not self.text_input_activated:
                 self.text_input_activated = True
@@ -406,12 +407,17 @@ class Application(Frame):
             self.selected_project = project
             self.init_widgets()
 
+        def go_to_main_menu(self):
+            self.pack_forget()
+            app.main_menu = Application.MainMenu()
+            self.destroy()
+
         def init_widgets(self):
-            background_frame = Frame(master=app.duplicates, bg=Application.color_theme[4])
+            background_frame = Frame(master=self, bg=Application.color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
             print(self.selected_project)
-
-
+            button = Application.AppButton('Main Menu', frame=background_frame, command=self.go_to_main_menu,
+                                           side=LEFT)
 
 # Creates the basic "box" in which you can put all of the GUI elements
 # It also takes care of misc stuff, s.a. fixed window size, title on the app window and the icon
