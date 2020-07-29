@@ -134,6 +134,8 @@ class ConfigHandler:
         print("No config.cfg file detected, running first time setup")
         cfg_layout = ConfigHandler.config_layout.keys()
         for entry in cfg_layout:
+            if ConfigHandler.config_layout[entry] == "secret":
+                continue
             ConfigHandler.cfg_dict[entry] = ConfigHandler.ask_config_line(entry)
         ConfigHandler.save_config()
 

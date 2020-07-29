@@ -3,6 +3,7 @@ import re
 import os
 
 from utils import is_int
+from config import read_config
 
 
 def get_project_from_user():
@@ -60,9 +61,9 @@ def find_version(game, config_handler):
     # Finds the game version in game.log.txt and if it is a trunk version, finds the version in CURRENT
     # returns -1 if game.log.txt is missing or game crashed before printing out game version
     if game == 'A':
-        log_path = config_handler.read("documents location") + "/American Truck Simulator/game.log.txt"
+        log_path = read_config("documents location") + "/American Truck Simulator/game.log.txt"
     else:
-        log_path = config_handler.read("documents location") + "/Euro Truck Simulator 2/game.log.txt"
+        log_path = read_config("documents location") + "/Euro Truck Simulator 2/game.log.txt"
     if not os.path.isfile(log_path):
         print(f"game.log.txt not found in path {log_path}")
         return -1
@@ -71,9 +72,9 @@ def find_version(game, config_handler):
         return -1
 
     if game == 'A' and found_version == "0.1.3":
-        version_out = find_trunk_version(game, config_handler.read("trunk location"))
+        version_out = find_trunk_version(game, read_config("trunk location"))
     elif game == 'E' and found_version == "1.11":
-        version_out = find_trunk_version(game, config_handler.read("trunk location"))
+        version_out = find_trunk_version(game, read_config("trunk location"))
     else:
         version_out = "[" + found_version + "]"
 
