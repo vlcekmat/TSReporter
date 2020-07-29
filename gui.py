@@ -5,6 +5,7 @@ import bugs
 import config
 from PIL import ImageTk, Image
 import main
+import copy
 
 
 class ProgramThread(Thread):
@@ -19,6 +20,7 @@ class ProgramThread(Thread):
             password = 'CrYVhn7FSM'
             main.report_option(use_mode=1, cfg_handler=config.ConfigHandler(), password=password)
 
+    @staticmethod
     def set_instance_created(self):
         # This is needed for singleton, we do not want to run multiple reporting threads at the same time... yet
         ProgramThread.instance_created = True
@@ -110,6 +112,7 @@ class Application(Frame):
             app.settings_menu.open_page()
             self.destroy()
 
+        @staticmethod
         def start_reporting(self):
             # Here we create a new thread on which the reporting loop is running
             ProgramThread().start()
@@ -244,31 +247,21 @@ class Application(Frame):
                 directory_value_frame = Frame(value_frame, bg=Application.color_theme[3])
                 directory_value_frame.pack(fill=BOTH, side=TOP)
 
+                selected_text = f'{directory_path}'
                 if len(directory_path) <= 48:
-                    directory_value = Label(directory_value_frame, text=f'{directory_path}',
-                                                  font=subtitle_font,
-                                                  fg=Application.color_theme[2],
-                                                  bg=Application.color_theme[3],
-                                                  pady=5, padx=10)
+                    selected_font = subtitle_font
                 elif len(directory_path) <= 75:
-                    directory_value = Label(directory_value_frame, text=f'{directory_path}',
-                                            font=minimized_font,
-                                            fg=Application.color_theme[2],
-                                            bg=Application.color_theme[3],
-                                            pady=5, padx=10)
+                    selected_font = minimized_font
                 elif len(directory_path) <= 107:
-                    directory_value = Label(directory_value_frame, text=f'{directory_path}',
-                                            font=super_minimized_font,
-                                            fg=Application.color_theme[2],
-                                            bg=Application.color_theme[3],
-                                            pady=5, padx=10)
+                    selected_font = super_minimized_font
                 else:
-                    directory_value = Label(directory_value_frame, text=f'...',
-                                            font=subtitle_font,
-                                            fg=Application.color_theme[2],
-                                            bg=Application.color_theme[3],
-                                            pady=5, padx=10)
-
+                    selected_font = subtitle_font
+                    selected_text = '...'
+                directory_value = Label(directory_value_frame, text=selected_text,
+                                        font=selected_font,
+                                        fg=Application.color_theme[2],
+                                        bg=Application.color_theme[3],
+                                        pady=5, padx=10)
 
                 directory_value.pack(side=LEFT, fill=BOTH)
                 if include_button:
@@ -351,11 +344,12 @@ class Application(Frame):
 
         def go_to_duplicates(self, project):
             self.pack_forget()
-            app.duplicates = Application.Duplicates(project=project)
+            app.duplicates = Application.Duplicates(project)
             self.destroy()
 
-        def select_project(self, button):
-            selected_project = button.get_text()
+        def select_project(self, selected_project):
+            #print(button)
+            #selected_project = button.get_text()
             self.go_to_duplicates(selected_project)
 
         # endregion
@@ -374,37 +368,26 @@ class Application(Frame):
 
             buttons_frame = Frame(buttons_background, bg=Application.color_theme[3])
             buttons_frame.pack(side=LEFT, padx=10, pady=10, fill=Y)
-            ats_internal_button = Application.AppButton(text='ATS - INTERNAL', frame=buttons_frame, font_size=10,
-                                                        text_spacing=52, pady=5)
-            ats_public_button = Application.AppButton(text='ATS - PUBLIC', frame=buttons_frame, font_size=10,
-                                                      text_spacing=52, pady=5)
-            ats_public_seniors_button = Application.AppButton(text='ATS - PUBLIC - SENIORS', frame=buttons_frame,
-                                                              font_size=10, text_spacing=52, pady=5)
-            gap = Frame(buttons_frame, bg=Application.color_theme[3])
-            gap.pack(fill=Y, pady=20)
-            ets_internal_button = Application.AppButton(text='ETS 2 - INTERNAL', frame=buttons_frame, font_size=10,
-                                                        text_spacing=52, pady=5)
-            ets_public_button = Application.AppButton(text='ETS 2 - PUBLIC', frame=buttons_frame, font_size=10,
-                                                      text_spacing=52, pady=5)
-            ets_public_seniors_button = Application.AppButton(text='ETS 2 - PUBLIC - SENIORS', frame=buttons_frame,
-                                                              font_size=10, text_spacing=52, pady=5)
 
-            buttons = [ats_internal_button, ats_public_button, ats_public_seniors_button,
-                       ets_internal_button, ets_public_button, ets_public_seniors_button]
-
-            ats_internal_button.get_element()['command'] = lambda: self.select_project(ats_internal_button)
-            ats_public_button.get_element()['command'] = lambda: self.select_project(ats_public_button)
-            ats_public_seniors_button.get_element()['command'] = lambda: self.select_project(ats_public_seniors_button)
-            ets_internal_button.get_element()['command'] = lambda: self.select_project(ets_internal_button)
-            ets_public_button.get_element()['command'] = lambda: self.select_project(ets_public_button)
-            ets_public_seniors_button.get_element()['command'] = lambda: self.select_project(ets_public_seniors_button)
+            buttons = []
+            ats_projects = ['ATS - INTERNAL', 'ATS - PUBLIC', 'ATS - PUBLIC - SENIORS']
+            ets_projects = ['ETS2 - INTERNAL', 'ETS2 - PUBLIC', 'ETS2 - PUBLIC - SENIORS']
+            all_projects = ats_projects + ets_projects
+            for i in range(len(all_projects)):
+                buttons.append(Application.AppButton(text=all_projects[i], frame=buttons_frame,
+                                                     font_size=10, text_spacing=52, pady=5,
+                                                     command=lambda c=i: self.select_project(all_projects[c])))
+                if i == 2:
+                    gap = Frame(buttons_frame, bg=Application.color_theme[3])
+                    gap.pack(fill=Y, pady=20)
 
     class Duplicates(Page):
-        selected_project = None
+        # selected_project = None
 
         def __init__(self, project):
             super().__init__()
             self.selected_project = project
+            self.pack(fill=BOTH, expand=True)
             self.init_widgets()
 
         def go_to_main_menu(self):
@@ -416,8 +399,18 @@ class Application(Frame):
             background_frame = Frame(master=self, bg=Application.color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
             print(self.selected_project)
-            button = Application.AppButton('Main Menu', frame=background_frame, command=self.go_to_main_menu,
-                                           side=LEFT)
+
+            bottom_frame = Frame(background_frame, bg=Application.color_theme[4])
+            bottom_frame.pack(side=BOTTOM, fill=X)
+
+            back_button = Application.AppButton('BACK', frame=bottom_frame, command=self.go_to_projects, side=LEFT)
+
+        def go_to_projects(self):
+            self.pack_forget()
+            app.projects_page = Application.SelectProject()
+            app.projects_page.open_page()
+            self.destroy()
+
 
 # Creates the basic "box" in which you can put all of the GUI elements
 # It also takes care of misc stuff, s.a. fixed window size, title on the app window and the icon
