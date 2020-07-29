@@ -36,12 +36,12 @@ def main():
             cfg_handler.config_edit()
 
         elif use_mode in [1, 2]:  # Report bugs use_mode
-            report_option(use_mode,cfg_handler, password)
+            report_option(use_mode, password)
 
 
-def report_option(use_mode, cfg_handler, password):
+def report_option(use_mode, password):
     # This section validates the edited pictures directory from config.cfg
-    images_folder = validate_cfg_images(cfg_handler)
+    images_folder = validate_cfg_images()
     if images_folder == "":
         return None
 
@@ -70,7 +70,7 @@ def report_option(use_mode, cfg_handler, password):
     if not bug_lines:  # read_bugs_file() returns none if there is a problem
         return None
 
-    version = ver.find_version(chosen_project[0], cfg_handler)  # Returns -1 if it cant read version
+    version = ver.find_version(chosen_project[0])  # Returns -1 if it cant read version
     if version == -1:  # Version is not found, would result in invalid report
         return None
     print(f"Reporting in project [{chosen_project}] at version {version}")

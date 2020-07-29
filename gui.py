@@ -1,11 +1,12 @@
 from tkinter import *
 from tkinter.font import Font
 from threading import Thread
+from PIL import ImageTk, Image
+
+import main
+from versions import find_version
 import bugs
 import config
-from PIL import ImageTk, Image
-import main
-import copy
 
 
 class ProgramThread(Thread):
@@ -32,6 +33,8 @@ class Application(Frame):
     settings_menu = None
     projects_page = None
     duplicates = None
+    batch = None
+
     # It's important to keep in mind the class instances above,
     # when gui is active, exactly one has to have a non Null value, cuz having more than one pages active
     # at the same time is BS
@@ -59,11 +62,12 @@ class Application(Frame):
     class AppButton:
         text = None
         element = None
+
         # The basic template that is used for most buttons in the app
         # Create an instance of this class to quickly create a new button
 
         def __init__(self, text, frame, color1=None, color2=None, font_color='black', command=None,
-                     offx=10, offy=10, font_size=15, text_spacing=20, side=None, pady=10):
+                     offx=10, offy=10, font_size=15, text_spacing=20, side=None, pady=10, anchor=None):
             if color1 is None:
                 color1 = Application.color_theme[1]
             if color2 is None:
@@ -79,7 +83,7 @@ class Application(Frame):
             if command is not None:
                 button['command'] = command
             button['font'] = my_font
-            button.pack(padx=offx, pady=offy, side=side)
+            button.pack(padx=offx, pady=offy, side=side, anchor=anchor)
 
         def set_sunken(self):
             self.element['relief'] = SUNKEN
@@ -117,9 +121,9 @@ class Application(Frame):
             # Here we create a new thread on which the reporting loop is running
             ProgramThread().start()
 
-        def go_to_projects(self):
+        def go_to_projects(self, use_mode):
             self.pack_forget()
-            app.projects_page = Application.SelectProject()
+            app.projects_page = Application.SelectProject(use_mode)
             app.projects_page.open_page()
             self.destroy()
 
@@ -153,15 +157,18 @@ class Application(Frame):
 
             # From now on the variable names are pretty self-explanatory
 
-            title_font = Font(size=20)
+            # title_font = Font(size=20)
+            title_font = "Helvetica 20 bold"
 
             title = Label(left_frame, text='TSReporter',
-                          bg=Application.color_theme[4], font=title_font, padx=17, pady=5, fg=Application.color_theme[2])
+                          bg=Application.color_theme[4], font=title_font, padx=17, pady=5,
+                          fg=Application.color_theme[2])
             title.pack(side=TOP)
 
             report_button = Application.AppButton('Report Bugs', frame=left_frame,
-                                                  command=self.go_to_projects)
-            batch_report_button = Application.AppButton('Batch Report', frame=left_frame)
+                                                  command=lambda: self.go_to_projects("normal"))
+            batch_report_button = Application.AppButton('Batch Report', frame=left_frame,
+                                                        command=lambda: self.go_to_projects("batch"))
             settings_button = Application.AppButton('Settings', frame=left_frame,
                                                     command=self.go_to_settings)
 
@@ -169,20 +176,22 @@ class Application(Frame):
             placeholder_frame.pack(fill=BOTH, pady=70)
             # This is only for creating the gap between regular buttons and the quit button
 
-            quit_button = Application.AppButton('QUIT', color1=Application.color_theme[2], color2=Application.color_theme[2],
+            quit_button = Application.AppButton('QUIT', color1=Application.color_theme[2],
+                                                color2=Application.color_theme[2],
                                                 frame=left_frame, font_color='white', command=quit)
 
             # region BUG COUNTER
             bugs_count_frame = Frame(top_frame, bg=Application.color_theme[3])
             bugs_count_frame.pack(side=TOP, pady=10)
             subtitle_font = Font(size=15)
-            reports_count_text = Label(bugs_count_frame, text=f'Number of bugs in bugs.txt', bg=Application.color_theme[4], fg=Application.color_theme[2], font=subtitle_font)
+            reports_count_text = Label(bugs_count_frame, text=f'Number of bugs in bugs.txt',
+                                       bg=Application.color_theme[4], fg=Application.color_theme[2], font=subtitle_font)
             reports_count_text.pack()
             ETS2_bugs_count = Label(bugs_count_frame, text=f'ETS 2: {ets_bugs_count}',
-                                       bg=Application.color_theme[3], fg=Application.color_theme[1], font=subtitle_font)
+                                    bg=Application.color_theme[3], fg=Application.color_theme[1], font=subtitle_font)
             ETS2_bugs_count.pack()
             ATS_bugs_count = Label(bugs_count_frame, text=f'ATS: {ats_bugs_count}',
-                                       bg=Application.color_theme[3], fg=Application.color_theme[1], font=subtitle_font)
+                                   bg=Application.color_theme[3], fg=Application.color_theme[1], font=subtitle_font)
             ATS_bugs_count.pack()
             # endregion
 
@@ -222,23 +231,23 @@ class Application(Frame):
                 super_minimized_font = Font(size=7)
 
                 setting_name_frame = Frame(background, bg=Application.color_theme[3])
-                setting_name_frame.grid(row=row, column=0, sticky=W+E+N+S, pady=5)
+                setting_name_frame.grid(row=row, column=0, sticky=W + E + N + S, pady=5)
 
                 value_frame = Frame(background, bg=Application.color_theme[3])
-                value_frame.grid(row=row, column=1, sticky=W+E+N+S, pady=5, padx=10)
+                value_frame.grid(row=row, column=1, sticky=W + E + N + S, pady=5, padx=10)
 
                 button_frame = Frame(background, bg=Application.color_theme[4])
-                button_frame.grid(row=row, column=2, padx=10, sticky=W+E+N+S, pady=10)
+                button_frame.grid(row=row, column=2, padx=10, sticky=W + E + N + S, pady=10)
 
                 setting_name_frame_packed = Frame(setting_name_frame)
 
                 left_frame = Frame(setting_name_frame, bg=Application.color_theme[3])
                 left_frame.pack(fill=X, side=TOP)
                 frame_text = Label(left_frame, text=text,
-                                             font=subtitle_font,
-                                             fg=Application.color_theme[2],
-                                             bg=Application.color_theme[3],
-                                             pady=5, padx=10)
+                                   font=subtitle_font,
+                                   fg=Application.color_theme[2],
+                                   bg=Application.color_theme[3],
+                                   pady=5, padx=10)
                 frame_text.pack(side=LEFT)
 
                 key_to_find = text.lower().split(':')[0]
@@ -268,9 +277,9 @@ class Application(Frame):
                     directory_button_frame = Frame(button_frame, bg=Application.color_theme[3])
                     directory_button_frame.pack(fill=X, side=TOP)
                     directory_button = Button(directory_button_frame, text=button_text,
-                                                    bg=Application.color_theme[1],
-                                                    activebackground=Application.color_theme[1])
-                    if command == None:
+                                              bg=Application.color_theme[1],
+                                              activebackground=Application.color_theme[1])
+                    if command is None:
                         directory_button['command'] = lambda: self.ask_for_directory(row)
                     else:
                         directory_button['command'] = command
@@ -293,6 +302,7 @@ class Application(Frame):
             config.ConfigHandler.gui_config_edit(3, entered_text=username)
             app.settings_menu.go_to_main_menu()
             app.main_menu.go_to_settings()
+
         text_input_activated = False
 
         def show_text_input(self, master):
@@ -301,7 +311,8 @@ class Application(Frame):
                 text_input = Entry(master, bg=Application.color_theme[3], fg=Application.color_theme[2], width=25,
                                    font=Font(size=20))
                 text_input.pack()
-                submit_button = Button(master, bg=Application.color_theme[3], fg=Application.color_theme[2], text='Submit',
+                submit_button = Button(master, bg=Application.color_theme[3], fg=Application.color_theme[2],
+                                       text='Submit',
                                        command=lambda: self.submit(text_input))
                 root.bind('<Return>', lambda x: self.submit(text_input))
                 submit_button.pack(pady=5)
@@ -323,17 +334,22 @@ class Application(Frame):
                 if config.ConfigHandler.config_layout[setting] == "secret":
                     continue
                 elif config.ConfigHandler.config_layout[setting] == "text":
-                    self.SettingsOption(background=subbackground, row=grid_i, text=f'{setting.capitalize()}: ', command=lambda: self.show_text_input(background))
+                    self.SettingsOption(background=subbackground, row=grid_i, text=f'{setting.capitalize()}: ',
+                                        command=lambda: self.show_text_input(background))
                     grid_i += 1
                 else:
                     self.SettingsOption(background=subbackground, row=grid_i, text=f'{setting.capitalize()}: ')
                     grid_i += 1
 
-            button = Application.AppButton('Main Menu', frame=template_background, command=self.go_to_main_menu, side=LEFT)
+            button = Application.AppButton('Main Menu', frame=template_background, command=self.go_to_main_menu,
+                                           side=LEFT)
 
     class SelectProject(Page):
-        def __init__(self):
+        use_mode = None
+
+        def __init__(self, use_mode):
             super().__init__()
+            self.use_mode = use_mode
             self.init_widgets()
 
         # region COMMANDS
@@ -347,10 +363,10 @@ class Application(Frame):
             app.duplicates = Application.Duplicates(project)
             self.destroy()
 
-        def select_project(self, selected_project):
-            #print(button)
-            #selected_project = button.get_text()
-            self.go_to_duplicates(selected_project)
+        def go_to_batch(self, project):
+            self.pack_forget()
+            app.batch = Application.Batch(project)
+            self.destroy()
 
         # endregion
 
@@ -359,33 +375,55 @@ class Application(Frame):
             background.pack(fill=BOTH, expand=True)
 
             bottom_frame = Frame(background, bg=Application.color_theme[4])
-            bottom_frame.pack(side=BOTTOM, fill=X)
+            bottom_frame.pack(side=BOTTOM, anchor="sw")
 
-            back_button = Application.AppButton('Main Menu', frame=bottom_frame, command=self.go_to_main_menu, side=LEFT)
+            back_button = Application.AppButton('Main Menu', frame=bottom_frame, command=self.go_to_main_menu,
+                                                anchor="sw")
 
-            buttons_background = Frame(background, bg=Application.color_theme[2])
-            buttons_background.pack(padx=10, pady=30, side=LEFT, fill=Y)
+            middle_frame = Frame(background, bg=Application.color_theme[4])
+            middle_frame.pack(anchor="center", pady=80)
 
-            buttons_frame = Frame(buttons_background, bg=Application.color_theme[3])
-            buttons_frame.pack(side=LEFT, padx=10, pady=10, fill=Y)
+            buttons_ats_background = Frame(middle_frame, bg=Application.color_theme[2])
+            buttons_ats_background.pack(padx=30, pady=30, side=LEFT)
+
+            buttons_ats_frame = Frame(buttons_ats_background, bg=Application.color_theme[3])
+            buttons_ats_frame.pack(side=LEFT, padx=10, pady=10)
+
+            buttons_ets_background = Frame(middle_frame, bg=Application.color_theme[2])
+            buttons_ets_background.pack(padx=30, pady=30, side=RIGHT)
+
+            buttons_ets_frame = Frame(buttons_ets_background, bg=Application.color_theme[3])
+            buttons_ets_frame.pack(side=LEFT, padx=10, pady=10)
 
             buttons = []
             ats_projects = ['ATS - INTERNAL', 'ATS - PUBLIC', 'ATS - PUBLIC - SENIORS']
             ets_projects = ['ETS2 - INTERNAL', 'ETS2 - PUBLIC', 'ETS2 - PUBLIC - SENIORS']
-            all_projects = ats_projects + ets_projects
-            for i in range(len(all_projects)):
-                buttons.append(Application.AppButton(text=all_projects[i], frame=buttons_frame,
-                                                     font_size=10, text_spacing=52, pady=5,
-                                                     command=lambda c=i: self.select_project(all_projects[c])))
-                if i == 2:
-                    gap = Frame(buttons_frame, bg=Application.color_theme[3])
-                    gap.pack(fill=Y, pady=20)
+
+            for i in range(len(ats_projects)):
+                this_button = Application.AppButton(text=ats_projects[i], frame=buttons_ats_frame,
+                                                    font_size=15, text_spacing=85, pady=5)
+                if self.use_mode == "batch":
+                    this_button.get_element()['command'] = lambda c=i: self.go_to_batch(ats_projects[c])
+                else:
+                    this_button.get_element()['command'] = lambda c=i: self.go_to_duplicates(ats_projects[c])
+                buttons.append(this_button)
+
+            for i in range(len(ets_projects)):
+                this_button = Application.AppButton(text=ets_projects[i], frame=buttons_ets_frame,
+                                                    font_size=15, text_spacing=85, pady=5)
+                if self.use_mode == "batch":
+                    this_button.get_element()['command'] = lambda c=i: self.go_to_batch(ets_projects[c])
+                else:
+                    this_button.get_element()['command'] = lambda c=i: self.go_to_duplicates(ets_projects[c])
+                buttons.append(this_button)
 
     class Duplicates(Page):
         # selected_project = None
+        already_reported = None
 
-        def __init__(self, project):
+        def __init__(self, project, reported=False):
             super().__init__()
+            self.already_reported = reported
             self.selected_project = project
             self.pack(fill=BOTH, expand=True)
             self.init_widgets()
@@ -395,21 +433,60 @@ class Application(Frame):
             app.main_menu = Application.MainMenu()
             self.destroy()
 
+        def go_to_projects(self):
+            self.pack_forget()
+            app.projects_page = Application.SelectProject("normal")
+            app.projects_page.open_page()
+            self.destroy()
+
         def init_widgets(self):
             background_frame = Frame(master=self, bg=Application.color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
-            print(self.selected_project)
+            version = find_version(self.selected_project[0])
+            version_line = f"Reporting in project [{self.selected_project}] at version {version}"
 
             bottom_frame = Frame(background_frame, bg=Application.color_theme[4])
-            bottom_frame.pack(side=BOTTOM, fill=X)
+            bottom_frame.pack(side=BOTTOM, anchor="sw")
 
-            back_button = Application.AppButton('BACK', frame=bottom_frame, command=self.go_to_projects, side=LEFT)
+            if self.already_reported:
+                # If a report has been made already, it is not possible to go back to project selection
+                # instead, this button will take the user to the main menu
+                back_button = Application.AppButton(
+                    'Main Menu', frame=bottom_frame, command=self.go_to_main_menu, anchor="sw")
+            else:
+                back_button = Application.AppButton(
+                    'BACK', frame=bottom_frame, command=self.go_to_projects, anchor="sw")
+
+            version_info_text = Text(background_frame, height=1, bg=Application.color_theme[4],
+                                     fg=Application.color_theme[2], bd=0, font="Helvetica 14")
+            version_info_text.pack(anchor="n", fill=X, pady=5, padx=5)
+            version_info_text.insert(END, version_line)
+
+            buttons_frame = Frame(background_frame, bg=Application.color_theme[4])
+            buttons_frame.pack(side=BOTTOM)
+
+            button_is_duplicate = Application.AppButton("Don't report", buttons_frame, side=LEFT)
+            button_is_unique = Application.AppButton("Report", buttons_frame)
+
+    class Batch(Page):
+        def __init__(self, project):
+            super().__init__()
+            self.pack(fill=BOTH, expand=True)
+            self.init_widgets()
 
         def go_to_projects(self):
             self.pack_forget()
-            app.projects_page = Application.SelectProject()
+            app.projects_page = Application.SelectProject("batch")
             app.projects_page.open_page()
             self.destroy()
+
+        def init_widgets(self):
+            background_frame = Frame(master=self, bg=Application.color_theme[4])
+            background_frame.pack(fill=BOTH, expand=True)
+
+            bottom_frame = Frame(background_frame, bg=Application.color_theme[4])
+            bottom_frame.pack(side=BOTTOM, anchor="sw")
+            back_button = Application.AppButton('BACK', frame=bottom_frame, command=self.go_to_projects, anchor="sw")
 
 
 # Creates the basic "box" in which you can put all of the GUI elements

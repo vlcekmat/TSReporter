@@ -56,7 +56,7 @@ def find_trunk_version(game, trunk_path):
     return ver_out
 
 
-def find_version(game, config_handler):
+def find_version(game):
     # Takes first letter of game as argument -- A or E for ATS or ETS2
     # Finds the game version in game.log.txt and if it is a trunk version, finds the version in CURRENT
     # returns -1 if game.log.txt is missing or game crashed before printing out game version

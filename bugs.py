@@ -78,9 +78,9 @@ def count_bugs():
     ets_bugs = open(ets_bugs_path)
 
     for line in ats_bugs:
-        if ';' in line and line[0] not in ['!', ';']:
+        if ';' in line and line[0] not in ['!', ';', '.']:
             ats_bugs_count += 1
     for line in ets_bugs:
-        if ';' in line and line[0] not in ['!', ';']:
+        if ';' in line and line[0] not in ['!', ';', '.']:
             ets_bugs_count += 1
     return [ats_bugs_count, ets_bugs_count]
