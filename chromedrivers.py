@@ -39,15 +39,16 @@ class DriverHandler:
             return True
 
 
-def check_for_duplicates(username, password, bug_description=None, asset_path=None, web_driver=None, browser=None):
+def check_for_duplicates(username, password, bug_description=None,
+                         asset_path=None, driver_handler=None, ask_input=False):
     # opens mantis so the user can check for duplicates
     print("Opening search for duplicates")
 
-    if not web_driver.is_active():
-        driver = DriverHandler(browser=browser).get_driver()
+    if not driver_handler.is_active():
+        driver = DriverHandler(browser=read_config("preferred browser")).get_driver()
         log_into_mantis(driver, username, password)
 
-    driver = web_driver.get_driver()
+    driver = driver_handler.get_driver()
     log_into_mantis(driver, username, password)
     if asset_path is not None:
         final_filter = extract_asset_name(asset_path)
@@ -60,18 +61,19 @@ def check_for_duplicates(username, password, bug_description=None, asset_path=No
     driver.find_element_by_id('filter-search-txt').send_keys(final_filter)  # filter box
     driver.find_element_by_xpath("//input[@value='Apply Filter']").click()  # apply filter button
 
-    print('Did you find any duplicates? (Y/N/Q)')
-    while True:
-        answer = input('> ')
-        if answer.upper() == 'N':
-            return 0
-        elif answer.upper() == 'Y':
-            return 1
-        elif answer.upper() == 'Q':
-            return -1
-        else:
-            print('Answer Y/N/Q')
-            pass
+    if ask_input:
+        print('Did you find any duplicates? (Y/N/Q)')
+        while True:
+            answer = input('> ')
+            if answer.upper() == 'N':
+                return 0
+            elif answer.upper() == 'Y':
+                return 1
+            elif answer.upper() == 'Q':
+                return -1
+            else:
+                print('Answer Y/N/Q')
+                pass
 
 
 def log_into_tsreporter(test_login_username, browser='chrome'):

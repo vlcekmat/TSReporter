@@ -29,8 +29,8 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
             driver_handler = DriverHandler(headless=False, browser=browser)
             if not tried_duplicates:
                 duplicate_found = check_for_duplicates(
-                    username, password, bug_description=log_first,
-                    asset_path=a_path, web_driver=driver_handler, browser=browser)
+                    username, password, bug_description=log_first, asset_path=a_path,
+                    driver_handler=driver_handler, ask_input=True)
                 tried_duplicates = True
             if duplicate_found == -1:
                 return False  # For returning to menu during reporting

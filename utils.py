@@ -10,6 +10,24 @@ def find_path():
     return dir_path
 
 
+def find_image_path():
+    # Opens dialogue window and returns the selected jpg or gif
+    # If filedialog us closed manually, returns None
+    root = Tk()
+    root.withdraw()
+    file_path = filedialog.askopenfile(
+        filetypes=[
+            ("image", ".jpeg"),
+            ("image", ".jpg"),
+            ("gif", ".gif")
+        ]
+    )
+    if not file_path:
+        return None
+    else:
+        return file_path.name
+
+
 def is_int(s):
     # Tests if string is a valid int
     try:

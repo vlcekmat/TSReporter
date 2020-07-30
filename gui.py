@@ -8,6 +8,9 @@ from versions import find_version
 import bugs
 import config
 from gui_bughandler import BugHandler
+from chromedrivers import DriverHandler
+import utils
+import reporter
 
 
 class ProgramThread(Thread):
@@ -34,7 +37,7 @@ class Application(Frame):
     main_menu = None
     settings_menu = None
     projects_page = None
-    duplicates = None
+    reporting = None
     batch = None
 
     # It's important to keep in mind the class instances above,
@@ -362,7 +365,7 @@ class Application(Frame):
 
         def go_to_duplicates(self, project, bug_handler):
             self.pack_forget()
-            app.duplicates = Application.Duplicates(project, bug_handler=bug_handler)
+            app.reporting = Application.Reporting(project, bug_handler=bug_handler)
             self.destroy()
 
         def go_to_batch(self, project):
@@ -434,10 +437,12 @@ class Application(Frame):
                                                                                                  error_textbox)
                 buttons.append(this_button)
 
-    class Duplicates(Page):
+    class Reporting(Page):
         selected_project = None
         already_reported = None
         bug_handler = None
+        image_location = None
+        driver_handler = None
 
         def __init__(self, project, bug_handler, reported=False):
             super().__init__()
@@ -469,8 +474,41 @@ class Application(Frame):
                 self.go_to_main_menu()
                 return
             self.pack_forget()
-            app.duplicates = Application.Duplicates(self.selected_project, self.bug_handler, reported=True)
+            app.reporting = Application.Reporting(self.selected_project, self.bug_handler, reported=True)
             self.destroy()
+
+        def find_missing_image(self, mode, image_label, buttons_frame, image_location_text):
+            if mode == 0:
+                self.image_location = utils.find_image_path()
+            else:
+                self.image_location = self.bug_handler.try_get_image()
+            if self.image_location:
+                img_to_show = self.get_displayable_image()
+                image_label.configure(image=img_to_show)
+                image_label.image = img_to_show
+                buttons_frame.pack_forget()
+                buttons_frame.destroy()
+                image_location_text.insert(END, self.image_location)
+
+        def get_displayable_image(self):
+            image = Image.open(self.image_location)
+            image.thumbnail((520, 520))
+            img_to_show = ImageTk.PhotoImage(image)
+            return img_to_show
+
+        def open_duplicates(self, bug_line, report_button):
+            if not self.driver_handler:
+                self.driver_handler = DriverHandler(config.read_config("preferred browser"))
+            reporter.check_for_duplicates(
+                config.read_config("mantis username"), "CrYVhn7FSM", bug_line,
+                driver_handler=self.driver_handler
+            )
+            report_button.get_element()['text'] = "REPORT"
+            report_button.get_element()['command'] = lambda: self.open_report(bug_line)
+
+        def open_report(self, bug_line):
+            print(f"Reporting: {bug_line}")
+            self.show_next_report()
 
         def init_widgets(self):
             background_frame = Frame(master=self, bg=Application.color_theme[4])
@@ -504,29 +542,41 @@ class Application(Frame):
             current_bug_text.pack(side=TOP, fill=X, pady=5, padx=5)
             current_bug_text.insert(END, current_bug_summary)
 
-            # img = ImageTk.PhotoImage(Image.open("./resources/logo.png"))
-            # img_panel = Label(top_frame, image=img, bg=Application.color_theme[4])
-            # img_panel.image = img
-            # img_panel.place(x=0, y=0)
-            # img_panel.pack(pady=100, side=BOTTOM)
-            image_location = self.bug_handler.try_get_image()
-            if image_location:
-                image = Image.open(image_location)
-                image.thumbnail((520, 520))
-                img_to_show = ImageTk.PhotoImage(image)
-                img_panel = Label(bug_bg_frame, image=img_to_show, bg=Application.color_theme[3])
-                img_panel.image = img_to_show
-                img_panel.place(x=0, y=0)
-                img_panel.pack(pady=5, side=TOP)
-
+            if not self.image_location:
+                self.image_location = self.bug_handler.try_get_image()
+            img_label = Label(bug_bg_frame, bg=Application.color_theme[3])
+            img_label.place(x=0, y=0)
+            img_label.pack(pady=5, side=TOP)
             image_location_text = Text(bug_bg_frame, height=1, width=60, bg=Application.color_theme[3],
                                        fg=Application.color_theme[1], bd=0, font="Helvetica 10")
             image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
-            image_location_text.insert(END, image_location)
+            if self.image_location:
+                img_to_show = self.get_displayable_image()
+                img_label.configure(image=img_to_show)
+                img_label.image = img_to_show
+                image_location_text.insert(END, self.image_location)
+            else:
+                img_to_show = ImageTk.PhotoImage(Image.open("./resources/image_not_found.png"))
+                img_label.configure(image=img_to_show)
+                img_label.image = img_to_show
+                image_buttons_frame = Frame(bug_bg_frame, bg=Application.color_theme[3])
+                image_buttons_frame.pack(side=BOTTOM, padx=10, pady=10)
+                try_again_button = Application.AppButton(
+                    "Try again", image_buttons_frame, side=LEFT,
+                    command=lambda: self.find_missing_image(1, img_label, image_buttons_frame, image_location_text)
+                )
+                image_path_button = Application.AppButton(
+                    "Locate image", image_buttons_frame, side=LEFT,
+                    command=lambda: self.find_missing_image(0, img_label, image_buttons_frame, image_location_text)
+                )
 
-            button_find_duplicates = Application.AppButton("Find duplicates", bottom_frame, side=RIGHT)
-            button_skip_report = Application.AppButton("Don't report", bottom_frame, side=RIGHT,
-                                                       command=self.show_next_report)
+            button_find_duplicates = Application.AppButton(
+                "Find duplicates", bottom_frame, side=RIGHT,
+                command=lambda: self.open_duplicates(current_bug_summary, button_find_duplicates)
+            )
+            button_skip_report = Application.AppButton(
+                "Don't report", bottom_frame, side=RIGHT, command=self.show_next_report
+            )
 
     class Batch(Page):
         def __init__(self, project):
