@@ -464,7 +464,7 @@ class Application(Frame):
         bug_handler = None
         driver_handler = None
 
-        small_img_size = (120, 120)
+        small_img_size = (120, 80)
         img_size = (530, 530)
 
         def __init__(self, project, bug_handler, reported=False):
