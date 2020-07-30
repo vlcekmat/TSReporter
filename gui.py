@@ -38,6 +38,7 @@ class Application(Frame):
     settings_menu = None
     projects_page = None
     reporting = None
+    reported = None
     batch = None
 
     # It's important to keep in mind the class instances above,
@@ -308,11 +309,11 @@ class Application(Frame):
             app.settings_menu.go_to_main_menu()
             app.main_menu.go_to_settings()
 
-        text_input_activated = False
+        input_activated = False
 
         def show_text_input(self, master):
-            if not self.text_input_activated:
-                self.text_input_activated = True
+            if not self.input_activated:
+                self.input_activated = True
                 text_input = Entry(master, bg=Application.color_theme[3], fg=Application.color_theme[2], width=25,
                                    font=Font(size=20))
                 text_input.pack()
@@ -321,6 +322,24 @@ class Application(Frame):
                                        command=lambda: self.submit(text_input))
                 root.bind('<Return>', lambda x: self.submit(text_input))
                 submit_button.pack(pady=5)
+
+        def ask_yes_no(self, master, setting):
+            if not self.input_activated:
+                self.input_activated = True
+                buttons_frame = Frame(master, bg=Application.color_theme[3])
+                buttons_frame.pack(pady=10)
+
+                reported_text = Entry(buttons_frame, bg=Application.color_theme[3],
+                                      fg=Application.color_theme[1], bd=0, font="Helvetica 14", justify=CENTER)
+                reported_text.pack(anchor="n", pady=5, padx=5, side=TOP)
+                reported_text.insert(0, setting.capitalize() + "?")
+
+                yes_button = Application.AppButton(
+                    "Yes", buttons_frame, side=LEFT, text_spacing=0, pady=0, font_size=12
+                )
+                no_button = Application.AppButton(
+                    "No", buttons_frame, side=RIGHT, text_spacing=0, pady=0, font_size=12
+                )
 
         # endregion
 
@@ -341,10 +360,14 @@ class Application(Frame):
                 elif config.ConfigHandler.config_layout[setting] == "text":
                     self.SettingsOption(background=subbackground, row=grid_i, text=f'{setting.capitalize()}: ',
                                         command=lambda: self.show_text_input(background))
-                    grid_i += 1
+                elif config.ConfigHandler.config_layout[setting] == "yn":
+                    self.SettingsOption(
+                        background=subbackground, row=grid_i, text=f'{setting.capitalize()}: ',
+                        command=lambda s=setting: self.ask_yes_no(background, s)
+                    )
                 else:
                     self.SettingsOption(background=subbackground, row=grid_i, text=f'{setting.capitalize()}: ')
-                    grid_i += 1
+                grid_i += 1
 
             button = Application.AppButton('Main Menu', frame=template_background, command=self.go_to_main_menu,
                                            side=LEFT)
@@ -363,7 +386,7 @@ class Application(Frame):
             app.main_menu = Application.MainMenu()
             self.destroy()
 
-        def go_to_duplicates(self, project, bug_handler):
+        def go_to_reporting(self, project, bug_handler):
             self.pack_forget()
             app.reporting = Application.Reporting(project, bug_handler=bug_handler)
             self.destroy()
@@ -378,7 +401,7 @@ class Application(Frame):
             if not bug_handler.get_current():
                 make_error_textbox(bug_handler.message, frame)
             else:
-                self.go_to_duplicates(project, bug_handler)
+                self.go_to_reporting(project, bug_handler)
 
         # endregion
 
@@ -451,9 +474,12 @@ class Application(Frame):
                 raise ValueError
             else:
                 self.bug_handler = bug_handler
+            if not project and not Application.Reporting.selected_project:
+                raise ValueError
+            elif project:
+                Application.Reporting.selected_project = project
 
             self.already_reported = reported
-            self.selected_project = project
             self.pack(fill=BOTH, expand=True)
             self.init_widgets()
 
@@ -468,13 +494,20 @@ class Application(Frame):
             app.projects_page.open_page()
             self.destroy()
 
+        def go_to_reported(self):
+            self.pack_forget()
+            app.reported = Application.ReportedScreen(self.bug_handler)
+            self.destroy()
+
         def show_next_report(self):
             self.bug_handler.read_next()
             if not self.bug_handler.get_current():
                 self.go_to_main_menu()
                 return
             self.pack_forget()
-            app.reporting = Application.Reporting(self.selected_project, self.bug_handler, reported=True)
+            app.reporting = Application.Reporting(
+                Application.Reporting.selected_project, self.bug_handler, reported=True
+            )
             self.destroy()
 
         def find_missing_image(self, mode, image_label, buttons_frame, image_location_text):
@@ -492,29 +525,30 @@ class Application(Frame):
 
         def get_displayable_image(self):
             image = Image.open(self.image_location)
-            image.thumbnail((520, 520))
+            image.thumbnail((530, 530))
             img_to_show = ImageTk.PhotoImage(image)
             return img_to_show
 
         def open_duplicates(self, bug_line, report_button):
-            if not self.driver_handler:
-                self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-            reporter.check_for_duplicates(
-                config.read_config("mantis username"), "CrYVhn7FSM", bug_line,
-                driver_handler=self.driver_handler
-            )
+            # if not self.driver_handler:
+            #     self.driver_handler = DriverHandler(config.read_config("preferred browser"))
+            # reporter.check_for_duplicates(
+            #     config.read_config("mantis username"), "CrYVhn7FSM", bug_line,
+            #     driver_handler=self.driver_handler
+            # )
             report_button.get_element()['text'] = "REPORT"
-            report_button.get_element()['command'] = lambda: self.open_report(bug_line)
+            report_button.get_element()['command'] = self.go_to_reported
+            #report_button.get_element()['command'] = lambda: self.open_report(bug_line, report_button)
 
-        def open_report(self, bug_line):
+        def open_report(self, bug_line, report_button):
             print(f"Reporting: {bug_line}")
             self.show_next_report()
 
         def init_widgets(self):
             background_frame = Frame(master=self, bg=Application.color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
-            version = find_version(self.selected_project[0])
-            version_line = f"Reporting in project [{self.selected_project}] at version {version}"
+            version = find_version(Application.Reporting.selected_project[0])
+            version_line = f"Reporting in project [{Application.Reporting.selected_project}] at version {version}"
 
             version_info_text = Text(background_frame, height=1, width=60, bg=Application.color_theme[4],
                                      fg=Application.color_theme[2], bd=0, font="Helvetica 12")
@@ -537,16 +571,16 @@ class Application(Frame):
                     'BACK', frame=bottom_frame, command=self.go_to_projects, side=LEFT)
 
             current_bug_summary = self.bug_handler.get_current()[0][:-1]
-            current_bug_text = Text(bug_bg_frame, height=1, bg=Application.color_theme[3],
-                                    fg=Application.color_theme[1], bd=0, font="Helvetica 14")
+            current_bug_text = Text(bug_bg_frame, height=1, width=100, bg=Application.color_theme[3],
+                                    fg=Application.color_theme[1], bd=0, font="Helvetica 13")
             current_bug_text.pack(side=TOP, fill=X, pady=5, padx=5)
             current_bug_text.insert(END, current_bug_summary)
 
             if not self.image_location:
                 self.image_location = self.bug_handler.try_get_image()
             img_label = Label(bug_bg_frame, bg=Application.color_theme[3])
-            img_label.place(x=0, y=0)
-            img_label.pack(pady=5, side=TOP)
+            img_label.place(x=0, y=30)
+            img_label.pack(pady=10, side=TOP)
             image_location_text = Text(bug_bg_frame, height=1, width=60, bg=Application.color_theme[3],
                                        fg=Application.color_theme[1], bd=0, font="Helvetica 10")
             image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
@@ -560,7 +594,7 @@ class Application(Frame):
                 img_label.configure(image=img_to_show)
                 img_label.image = img_to_show
                 image_buttons_frame = Frame(bug_bg_frame, bg=Application.color_theme[3])
-                image_buttons_frame.pack(side=BOTTOM, padx=10, pady=10)
+                image_buttons_frame.pack(side=BOTTOM, padx=10, pady=0)
                 try_again_button = Application.AppButton(
                     "Try again", image_buttons_frame, side=LEFT,
                     command=lambda: self.find_missing_image(1, img_label, image_buttons_frame, image_location_text)
@@ -571,11 +605,55 @@ class Application(Frame):
                 )
 
             button_find_duplicates = Application.AppButton(
-                "Find duplicates", bottom_frame, side=RIGHT,
+                "Find\nduplicates", bottom_frame, side=RIGHT,
                 command=lambda: self.open_duplicates(current_bug_summary, button_find_duplicates)
             )
             button_skip_report = Application.AppButton(
                 "Don't report", bottom_frame, side=RIGHT, command=self.show_next_report
+            )
+
+    class ReportedScreen(Page):
+        bug_handler = None
+
+        def __init__(self, bug_handler):
+            super().__init__()
+
+            self.bug_handler = bug_handler
+            self.pack(fill=BOTH, expand=True)
+            self.init_widgets()
+
+        def go_to_reporting(self):
+            self.pack_forget()
+            self.bug_handler.read_next()
+            app.reporting = Application.Reporting(None, bug_handler=self.bug_handler, reported=True)
+            self.destroy()
+
+        def init_widgets(self):
+            background_frame = Frame(master=self, bg=Application.color_theme[4])
+            background_frame.pack(fill=BOTH, expand=True)
+            bottom_frame = Frame(background_frame, bg=Application.color_theme[4])
+            bottom_frame.pack(side=BOTTOM, fill=X)
+
+            middle_frame = Frame(background_frame, bg=Application.color_theme[3])
+            middle_frame.pack(anchor="center", pady=85, padx=15)
+
+            current_bug_summary = self.bug_handler.get_current()[0][:-1]
+            current_bug_text = Text(middle_frame, height=1, width=100, bg=Application.color_theme[3],
+                                    fg=Application.color_theme[1], bd=0, font="Helvetica 13")
+            current_bug_text.pack(side=TOP, pady=10, padx=10)
+            current_bug_text.insert(END, current_bug_summary)
+
+            reported_text = Entry(middle_frame, bg=Application.color_theme[3],
+                                  fg=Application.color_theme[1], bd=0, font="Helvetica 30", justify=CENTER)
+            reported_text.pack(anchor="n", pady=35, padx=35, side=TOP)
+            reported_text.insert(0, f"Opened Mantis report")
+
+            menu_button = Application.AppButton(
+                'Main Menu', frame=bottom_frame, command=lambda: go_to_main_menu(self), side=LEFT)
+
+            next_report_button = Application.AppButton(
+                'Next Report', frame=middle_frame, command=self.go_to_reporting, side=TOP, font_size=20,
+                offx=40, offy=30, text_spacing=25, color1=Application.color_theme[2]
             )
 
     class Batch(Page):
@@ -599,10 +677,13 @@ class Application(Frame):
             back_button = Application.AppButton('BACK', frame=bottom_frame, command=self.go_to_projects, anchor="sw")
 
 
+def go_to_main_menu(frame):
+    frame.pack_forget()
+    app.main_menu = Application.MainMenu()
+    frame.destroy()
+
+
 def make_error_textbox(message, error_textbox):
-    # error_textbox = Text(frame, height=1, width=80, bg=Application.color_theme[4],
-    #                      fg=Application.color_theme[2], bd=0, font="Helvetica 12")
-    # error_textbox.pack(pady=5, padx=5, side=TOP, anchor='n')
     error_textbox.delete("1.0", END)
     error_textbox.insert(END, message)
 

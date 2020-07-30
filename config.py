@@ -3,6 +3,7 @@ import fnmatch
 from utils import is_int, find_path, ask_yes_no
 import os
 from ast import literal_eval
+from sys import stdout
 
 
 def read_config(key):
@@ -76,12 +77,13 @@ class ConfigHandler:
                 i += 1
 
     @staticmethod
-    def save_config():
+    def save_config(o_stream=None):
         # Saves content of dictionary to config.cfg in correct format
         cfg_file = open("./config.cfg", "w")
         for key in ConfigHandler.cfg_dict:
             cfg_file.write(f'"{key}" : "{ConfigHandler.cfg_dict[key]}"\n')
-        print("Configuration changes saved")
+        if o_stream:
+            o_stream.write("Configuration changes saved")
 
     @staticmethod
     def config_edit():
@@ -109,7 +111,7 @@ class ConfigHandler:
             else:
                 ls -= 1
                 ConfigHandler.cfg_dict[cfg_layout[ls]] = ConfigHandler.ask_config_line(cfg_layout[ls])
-                ConfigHandler.save_config()
+                ConfigHandler.save_config(stdout)
                 continue
         if read_config("save password") == "False":
             write_config("s_password", "")
@@ -137,7 +139,7 @@ class ConfigHandler:
             if ConfigHandler.config_layout[entry] == "secret":
                 continue
             ConfigHandler.cfg_dict[entry] = ConfigHandler.ask_config_line(entry)
-        ConfigHandler.save_config()
+        ConfigHandler.save_config(stdout)
 
     @staticmethod
     def ask_config_line(key_to_ask, entered_text=None):
