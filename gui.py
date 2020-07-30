@@ -1,3 +1,4 @@
+import copy
 from tkinter import *
 from tkinter.font import Font
 from threading import Thread
@@ -298,10 +299,6 @@ class Application(Frame):
                 app.main_menu.go_to_settings()
 
         # region COMMANDS
-        def go_to_main_menu(self):
-            self.pack_forget()
-            app.main_menu = Application.MainMenu()
-            self.destroy()
 
         def submit(self, text_input, event=None):
             username = text_input.get()
@@ -369,8 +366,8 @@ class Application(Frame):
                     self.SettingsOption(background=subbackground, row=grid_i, text=f'{setting.capitalize()}: ')
                 grid_i += 1
 
-            button = Application.AppButton('Main Menu', frame=template_background, command=self.go_to_main_menu,
-                                           side=LEFT)
+            button = Application.AppButton('Main Menu', frame=template_background,
+                                           command=lambda: go_to_main_menu(self), side=LEFT)
 
     class SelectProject(Page):
         use_mode = None
@@ -463,9 +460,12 @@ class Application(Frame):
     class Reporting(Page):
         selected_project = None
         already_reported = None
+
         bug_handler = None
-        image_location = None
         driver_handler = None
+
+        small_img_size = (120, 120)
+        img_size = (530, 530)
 
         def __init__(self, project, bug_handler, reported=False):
             super().__init__()
@@ -479,20 +479,15 @@ class Application(Frame):
             elif project:
                 Application.Reporting.selected_project = project
 
+            # Creates an instance of BugEntry for each line of the current bug
+            current_bug = []
+            for bug_line in self.bug_handler.get_current():
+                current_bug.append(self.BugEntry(bug_line, self.bug_handler.try_get_image(bug_line)))
+            #self.look_for_images_again(current_bug)
+
             self.already_reported = reported
             self.pack(fill=BOTH, expand=True)
-            self.init_widgets()
-
-        def go_to_main_menu(self):
-            self.pack_forget()
-            app.main_menu = Application.MainMenu()
-            self.destroy()
-
-        def go_to_projects(self):
-            self.pack_forget()
-            app.projects_page = Application.SelectProject("normal")
-            app.projects_page.open_page()
-            self.destroy()
+            self.init_widgets(current_bug)
 
         def go_to_reported(self):
             self.pack_forget()
@@ -502,7 +497,7 @@ class Application(Frame):
         def show_next_report(self):
             self.bug_handler.read_next()
             if not self.bug_handler.get_current():
-                self.go_to_main_menu()
+                go_to_main_menu(self)
                 return
             self.pack_forget()
             app.reporting = Application.Reporting(
@@ -510,24 +505,24 @@ class Application(Frame):
             )
             self.destroy()
 
-        def find_missing_image(self, mode, image_label, buttons_frame, image_location_text):
-            if mode == 0:
-                self.image_location = utils.find_image_path()
-            else:
-                self.image_location = self.bug_handler.try_get_image()
-            if self.image_location:
-                img_to_show = self.get_displayable_image()
-                image_label.configure(image=img_to_show)
-                image_label.image = img_to_show
-                buttons_frame.pack_forget()
-                buttons_frame.destroy()
-                image_location_text.insert(END, self.image_location)
-
-        def get_displayable_image(self):
-            image = Image.open(self.image_location)
-            image.thumbnail((530, 530))
-            img_to_show = ImageTk.PhotoImage(image)
-            return img_to_show
+        def find_missing_image(self, image_label, bug_entry, try_again_button, find_img_button=None,
+                               image_location_text=None):
+            new_image_path = utils.find_image_path()
+            bug_entry.image_location = new_image_path
+            bug_entry.reload_image(self.bug_handler)
+            if image_location_text:
+                image_location_text.insert(END, new_image_path)
+            if find_img_button:
+                find_img_button.get_element().pack_forget()
+                find_img_button.get_element().destroy()
+            image_retrieved = bug_entry.get_image()
+            image_retrieved.thumbnail(Application.Reporting.img_size)
+            image_to_show = ImageTk.PhotoImage(image_retrieved)
+            image_label.configure(image=image_to_show)
+            image_label.image = image_to_show
+            if try_again_button:
+                try_again_button.get_element().pack_forget()
+                try_again_button.get_element().destroy()
 
         def open_duplicates(self, bug_line, report_button):
             # if not self.driver_handler:
@@ -538,13 +533,64 @@ class Application(Frame):
             # )
             report_button.get_element()['text'] = "REPORT"
             report_button.get_element()['command'] = self.go_to_reported
-            #report_button.get_element()['command'] = lambda: self.open_report(bug_line, report_button)
+            # report_button.get_element()['command'] = lambda: self.open_report(bug_line)
 
-        def open_report(self, bug_line, report_button):
+        def open_report(self, bug_line):
             print(f"Reporting: {bug_line}")
             self.show_next_report()
 
-        def init_widgets(self):
+        def look_for_images_again(self, current_bug):
+            self.bug_handler.try_images_again()
+            for bug in current_bug:
+                bug.reload_image(self.bug_handler)
+
+        def update_image_thumbnails(self, current_bug, thumbnails, image_location_text, find_img_button,
+                                    try_again_button):
+            self.look_for_images_again(current_bug)
+            for i in range(len(current_bug)):
+                if i == 0:
+                    image_to_show = ImageTk.PhotoImage(current_bug[i].get_image())
+                else:
+                    image_to_show = ImageTk.PhotoImage(current_bug[i].get_small_image())
+                thumbnails[i].configure(image=image_to_show)
+                thumbnails[i].image = image_to_show
+            if current_bug[0].image_location:
+                if find_img_button:
+                    find_img_button.get_element().pack_forget()
+                    find_img_button.get_element().destroy()
+                image_location_text.insert(END, current_bug[0].image_location)
+            if self.bug_handler.images_good() and try_again_button:
+                try_again_button.get_element().pack_forget()
+                try_again_button.get_element().destroy()
+
+        class BugEntry:
+            # Each line of current bug is represented by a line and an image as instances of this class
+            line = None
+            image = None
+            image_location = None
+
+            def __init__(self, line, image_location):
+                self.line = line
+                self.image = Image.open("./resources/image_not_found.png")
+                self.image_location = image_location
+
+            def get_image(self):
+                temp_image = self.image
+                temp_image.thumbnail(Application.Reporting.img_size)
+                return temp_image
+
+            def get_small_image(self):
+                temp_image = copy.deepcopy(self.image)
+                temp_image.thumbnail(Application.Reporting.small_img_size)
+                return temp_image
+
+            def reload_image(self, bug_handler):
+                self.image_location = bug_handler.try_get_image(self.line)
+                if self.image_location:
+                    self.image = Image.open(self.image_location)
+
+        def init_widgets(self, current_bug):
+            # region Frames
             background_frame = Frame(master=self, bg=Application.color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
             version = find_version(Application.Reporting.selected_project[0])
@@ -555,55 +601,81 @@ class Application(Frame):
             version_info_text.pack(anchor="nw", pady=5, padx=5, side=TOP)
             version_info_text.insert(END, version_line)
 
-            bug_bg_frame = Frame(background_frame, bg=Application.color_theme[3])
-            bug_bg_frame.pack(anchor="center", pady=5, padx=15)
+            middle_frame = Frame(background_frame, bg=Application.color_theme[3])
+            middle_frame.pack(anchor="center", pady=5, padx=15)
 
+            current_bug_summary = self.bug_handler.get_current()[0][:-1]
+            current_bug_text = Text(middle_frame, height=1, width=100, bg=Application.color_theme[3],
+                                    fg=Application.color_theme[1], bd=0, font="Helvetica 13")
+            current_bug_text.pack(side=TOP, fill=X, pady=5, padx=5)
+            current_bug_text.insert(END, current_bug_summary)
+
+            left_frame = Frame(middle_frame, bg=Application.color_theme[3])
+            left_frame.pack(anchor="w", side=LEFT, pady=0, padx=0)
+            right_frame = Frame(middle_frame, bg=Application.color_theme[3])
+            right_frame.pack(anchor="e", side=RIGHT, fill=Y)
+            right_top_frame = Frame(right_frame, bg=Application.color_theme[3])
+            right_top_frame.pack(anchor="ne", side=TOP, pady=0, padx=0)
+            right_buttons_frame = Frame(right_frame, bg=Application.color_theme[3])
+            right_buttons_frame.pack(side=BOTTOM, fill=X)
             bottom_frame = Frame(background_frame, bg=Application.color_theme[4])
             bottom_frame.pack(side=BOTTOM, fill=X)
+            # endregion Frames
 
             if self.already_reported:
                 # If a report has been made already, it is not possible to go back to project selection
                 # instead, this button will take the user to the main menu
                 back_button = Application.AppButton(
-                    'Main Menu', frame=bottom_frame, command=self.go_to_main_menu, side=LEFT)
+                    'Main Menu', frame=bottom_frame, command=lambda: go_to_main_menu(self), side=LEFT)
             else:
                 back_button = Application.AppButton(
-                    'BACK', frame=bottom_frame, command=self.go_to_projects, side=LEFT)
+                    'BACK', frame=bottom_frame, side=LEFT, command=lambda: go_to_projects(self, "normal")
+                )
 
-            current_bug_summary = self.bug_handler.get_current()[0][:-1]
-            current_bug_text = Text(bug_bg_frame, height=1, width=100, bg=Application.color_theme[3],
-                                    fg=Application.color_theme[1], bd=0, font="Helvetica 13")
-            current_bug_text.pack(side=TOP, fill=X, pady=5, padx=5)
-            current_bug_text.insert(END, current_bug_summary)
-
-            if not self.image_location:
-                self.image_location = self.bug_handler.try_get_image()
-            img_label = Label(bug_bg_frame, bg=Application.color_theme[3])
-            img_label.place(x=0, y=30)
-            img_label.pack(pady=10, side=TOP)
-            image_location_text = Text(bug_bg_frame, height=1, width=60, bg=Application.color_theme[3],
+            image_labels = []
+            head_img_label = Label(left_frame, bg=Application.color_theme[3])
+            head_img_label.place(x=0, y=0)
+            head_img_label.pack(pady=5, padx=5, side=TOP)
+            image_labels.append(head_img_label)
+            image_location_text = Text(left_frame, height=1, width=60, bg=Application.color_theme[3],
                                        fg=Application.color_theme[1], bd=0, font="Helvetica 10")
             image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
-            if self.image_location:
-                img_to_show = self.get_displayable_image()
-                img_label.configure(image=img_to_show)
-                img_label.image = img_to_show
-                image_location_text.insert(END, self.image_location)
+
+            if len(current_bug) > 4:
+                sc = Scrollbar(right_top_frame)
+                sc.pack(side=RIGHT, fill=Y)
+
+            for bug_line in range(len(current_bug) - 1):
+                temp_img_label = Label(right_top_frame, bg=Application.color_theme[3])
+                temp_img_label.place(x=0, y=0)
+                temp_img_label.pack(pady=5, padx=5)
+                image_labels.append(temp_img_label)
+
+            report_options_button = Application.AppButton("Report\noptions", right_buttons_frame, side=RIGHT)
+
+            if not current_bug[0].image_location:
+                image_path_button = Application.AppButton("Find image", left_frame, side=BOTTOM)
             else:
-                img_to_show = ImageTk.PhotoImage(Image.open("./resources/image_not_found.png"))
-                img_label.configure(image=img_to_show)
-                img_label.image = img_to_show
-                image_buttons_frame = Frame(bug_bg_frame, bg=Application.color_theme[3])
-                image_buttons_frame.pack(side=BOTTOM, padx=10, pady=0)
+                image_path_button = None
+
+            if not self.bug_handler.images_good():
                 try_again_button = Application.AppButton(
-                    "Try again", image_buttons_frame, side=LEFT,
-                    command=lambda: self.find_missing_image(1, img_label, image_buttons_frame, image_location_text)
+                    "Try again", right_buttons_frame, side=RIGHT,
+                    command=lambda: self.update_image_thumbnails(current_bug, image_labels, image_location_text,
+                                                                 image_path_button, try_again_button)
                 )
-                image_path_button = Application.AppButton(
-                    "Locate image", image_buttons_frame, side=LEFT,
-                    command=lambda: self.find_missing_image(0, img_label, image_buttons_frame, image_location_text)
+            else:
+                try_again_button = None
+
+            if image_path_button:
+                image_path_button.get_element()['command'] = lambda: self.find_missing_image(
+                    head_img_label, current_bug[0], try_again_button, image_path_button, image_location_text
                 )
 
+            self.update_image_thumbnails(current_bug, image_labels, image_location_text, image_path_button,
+                                         try_again_button)
+
+            # region Bottom
             button_find_duplicates = Application.AppButton(
                 "Find\nduplicates", bottom_frame, side=RIGHT,
                 command=lambda: self.open_duplicates(current_bug_summary, button_find_duplicates)
@@ -611,6 +683,10 @@ class Application(Frame):
             button_skip_report = Application.AppButton(
                 "Don't report", bottom_frame, side=RIGHT, command=self.show_next_report
             )
+            button_skip_report = Application.AppButton(
+                "Skip report", bottom_frame, side=RIGHT, command=self.show_next_report
+            )
+            # endregion Bottom
 
     class ReportedScreen(Page):
         bug_handler = None
@@ -625,7 +701,10 @@ class Application(Frame):
         def go_to_reporting(self):
             self.pack_forget()
             self.bug_handler.read_next()
-            app.reporting = Application.Reporting(None, bug_handler=self.bug_handler, reported=True)
+            if self.bug_handler.get_current():
+                app.reporting = Application.Reporting(None, bug_handler=self.bug_handler, reported=True)
+            else:
+                app.main_menu = Application.MainMenu()
             self.destroy()
 
         def init_widgets(self):
@@ -662,19 +741,28 @@ class Application(Frame):
             self.pack(fill=BOTH, expand=True)
             self.init_widgets()
 
-        def go_to_projects(self):
-            self.pack_forget()
-            app.projects_page = Application.SelectProject("batch")
-            app.projects_page.open_page()
-            self.destroy()
-
         def init_widgets(self):
             background_frame = Frame(master=self, bg=Application.color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
 
             bottom_frame = Frame(background_frame, bg=Application.color_theme[4])
             bottom_frame.pack(side=BOTTOM, anchor="sw")
-            back_button = Application.AppButton('BACK', frame=bottom_frame, command=self.go_to_projects, anchor="sw")
+            back_button = Application.AppButton('BACK', frame=bottom_frame, anchor="sw",
+                                                command=lambda: go_to_projects(self, "normal"))
+
+
+def get_displayable_image(image_location):
+    image = Image.open(image_location)
+    image.thumbnail((530, 530))
+    img_to_show = ImageTk.PhotoImage(image)
+    return img_to_show
+
+
+def go_to_projects(frame, use_mode):
+    frame.pack_forget()
+    app.projects_page = Application.SelectProject(use_mode)
+    app.projects_page.open_page()
+    frame.destroy()
 
 
 def go_to_main_menu(frame):

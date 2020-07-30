@@ -9,6 +9,7 @@ from information_compile import get_image
 class BugHandler:
     _all_bugs = deque()  # Queue of bugs read from the bugs file, each bug is a stack of lines, the bug head on top
     current = deque()  # The current bug popped from the above queue
+    image_locations = {}
     message = None
 
     def __init__(self, game):
@@ -20,7 +21,8 @@ class BugHandler:
         bug_lines = read_bugs_file(game_path, out_string)
         if out_string.getvalue() == "":
             self._all_bugs = read_bug_lines(bug_lines)
-            self.current = self._all_bugs.popleft()
+            self.read_next()
+
         else:
             self._all_bugs = None
             self.current = None
@@ -31,19 +33,26 @@ class BugHandler:
 
     def read_next(self):
         if len(self._all_bugs) > 0:
+            self.image_locations.clear()
             self.current = self._all_bugs.popleft()
+            for line in self.current:
+                self.image_locations[line] = get_image(line, read_config("edited images location"))
         else:
             self.current = None
+
+    def try_images_again(self):
+        for line in self.current:
+            if not self.image_locations[line]:
+                self.image_locations[line] = get_image(line, read_config("edited images location"))
 
     def get_current(self):
         return self.current
 
-    def try_get_image(self):
-        images_folder_path = read_config("edited images location")
-        my_image = get_image(self.current[0], images_folder_path)
-        if my_image == "":
-            return None
-        else:
-            return my_image
+    def try_get_image(self, line):
+        return self.image_locations[line]
 
-
+    def images_good(self):
+        for location in self.image_locations.values():
+            if location == "":
+                return False
+        return True
