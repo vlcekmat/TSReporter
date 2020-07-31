@@ -659,6 +659,9 @@ class Application(Frame):
             Label(frame, text="Priority", bg=Application.color_theme[3], fg=Application.color_theme[1],
                   font="Helvetica 13 bold").grid(row=0, column=0)
             priority_menu.grid(row=0, column=1)
+            priority_menu.config(bg=Application.color_theme[3])
+            priority_menu.config(fg=Application.color_theme[1])
+            priority_menu.config(font="Helvetica 10")
             self.priority_var.trace("w", self.priority_callback)  # This binds the callback to the write event
 
             severity_choices = ['Minor', 'Major']
@@ -669,21 +672,30 @@ class Application(Frame):
             Label(frame, text="Severity", bg=Application.color_theme[3], fg=Application.color_theme[1],
                   font="Helvetica 13 bold").grid(row=1, column=0)
             severity_menu.grid(row=1, column=1)
+            severity_menu.config(bg=Application.color_theme[3])
+            severity_menu.config(fg=Application.color_theme[1])
+            severity_menu.config(font="Helvetica 10")
             self.severity_var.trace("w", self.severity_callback)
+
+            for col in range(frame.grid_size()[0]):
+                frame.grid_columnconfigure(col, minsize=120)
+            for row in range(frame.grid_size()[0]):
+                frame.grid_rowconfigure(row, minsize=40)
 
         def severity_callback(self, *args):
             # These callback methods are called when the value of the OptionMenu changes
             # https://www.delftstack.com/howto/python-tkinter/how-to-create-dropdown-menu-in-tkinter/
-            print(self.severity_var.get())
+            print(self.severity_var.get())  # Placeholder functionality
 
         def priority_callback(self, *args):
             # See severity_callback()
-            # Below code is how it should look like for map bugs, not others
+            # Below code is how automatic severity should work for map bugs
             if self.priority_var.get() == "Low" and self.severity_var.get() == "Major":
                 self.severity_var.set("Minor")
             elif self.priority_var.get() != "Low" and self.severity_var.get() == "Minor":
                 self.severity_var.set("Major")
-            print(self.priority_var.get())
+
+            print(self.priority_var.get())  # Placeholder functionality
 
         def show_canvas(self, thumbnails_frame, options_frame, this_button, current_bug, image_labels,
                         image_location_text, image_path_button, try_again_button):
