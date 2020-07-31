@@ -381,6 +381,8 @@ class Application(Frame):
 
         def __init__(self, use_mode):
             super().__init__()
+
+            # use_mode determines if this screen will take the user to normal or batch reporting screen
             self.use_mode = use_mode
             self.init_widgets()
 
@@ -446,7 +448,7 @@ class Application(Frame):
 
             for i in range(len(ats_projects)):
                 this_button = Application.AppButton(text=ats_projects[i], frame=buttons_ats_frame,
-                                                    font_size=15, text_spacing=85, pady=5)
+                                                    font_size=15, text_spacing=85, pady=7)
                 if self.use_mode == "batch":
                     this_button.get_element()['command'] = lambda c=i: self.go_to_batch(ats_projects[c])
                 else:
@@ -456,7 +458,7 @@ class Application(Frame):
 
             for i in range(len(ets_projects)):
                 this_button = Application.AppButton(text=ets_projects[i], frame=buttons_ets_frame,
-                                                    font_size=15, text_spacing=85, pady=5)
+                                                    font_size=15, text_spacing=85, pady=7)
                 if self.use_mode == "batch":
                     this_button.get_element()['command'] = lambda c=i: self.go_to_batch(ets_projects[c])
                 else:
@@ -466,12 +468,16 @@ class Application(Frame):
 
     class Reporting(Page):
         selected_project = None
-        already_reported = None
+        already_reported = None  # decides if button is 'BACK' or 'Main menu'
 
         bug_handler = None
         driver_handler = None
 
-        small_img_size = (170, 130)
+        # These are used for the menus in report options
+        severity_var = None
+        priority_var = None
+
+        small_img_size = (170, 130)  # Size, to which the BugEntry thumbnails its images
         img_size = (515, 530)
 
         def __init__(self, project, bug_handler, reported=False):
@@ -498,7 +504,7 @@ class Application(Frame):
         def go_to_reported(self):
             self.pack_forget()
             last_bug = self.bug_handler.get_current()
-            self.bug_handler.archive()
+            self.bug_handler.archive()  # Must archive before moving on to next screen
             app.reported = Application.ReportedScreen(self.bug_handler, last_bug)
             self.destroy()
 
@@ -548,16 +554,22 @@ class Application(Frame):
             # report_button.get_element()['command'] = lambda: self.open_report(bug_line)
 
         def open_report(self, bug_line):
+            # This is called when the 'Report' button is pressed, reporting will happen starting here
+            # TODO: add reporting here
+            # TODO: also maybe make it use a new thread?
             print(f"Reporting: {bug_line}")
             self.go_to_reported()
 
         def look_for_images_again(self, current_bug):
+            # Handles mass looking for images and updates them
             self.bug_handler.try_images_again()
             for bug in current_bug:
                 bug.reload_image(self.bug_handler)
 
         def update_image_thumbnails(self, current_bug, thumbnails, image_location_text, find_img_button,
                                     try_again_button):
+            # This method takes all Labels in thumbnails[] and tries to update them to the BugEntry's image
+            # It also checks if all images are selected and if so, cleans up the buttons
             self.look_for_images_again(current_bug)
             for i in range(len(current_bug)):
                 if i == 0:
@@ -577,6 +589,7 @@ class Application(Frame):
 
         class BugEntry:
             # Each line of current bug is represented by a line and an image as instances of this class
+            # This class is used to represent the current bug and its images in the Reporting screen
             line = None
             image = None
             image_location = None
@@ -587,21 +600,25 @@ class Application(Frame):
                 self.image_location = image_location
 
             def get_image(self):
+                # Returns the image scaled to the large view
                 temp_image = self.image
                 temp_image.thumbnail(Application.Reporting.img_size)
                 return temp_image
 
             def get_small_image(self):
+                # Returns the image scaled to a small thumbnail view
                 temp_image = copy.deepcopy(self.image)
                 temp_image.thumbnail(Application.Reporting.small_img_size)
                 return temp_image
 
             def reload_image(self, bug_handler):
+                # Tries to get image location from the bug_handler and if it does, gets its image as well
                 self.image_location = bug_handler.try_get_image(self.line)
                 if self.image_location:
                     self.image = Image.open(self.image_location)
 
-        def make_scrollable_canvas(self, frame, bug_len):
+        @staticmethod
+        def make_scrollable_canvas(frame, bug_len):
             # Here, a canvas is created to display the image thumbnails and allow for scrolling
             # Taken from https://stackoverflow.com/questions/43731784/tkinter-canvas-scrollbar-with-grid
             thumbnail_canvas = Canvas(frame, bg=Application.color_theme[3], highlightthickness=0)
@@ -630,11 +647,47 @@ class Application(Frame):
             return image_labels
 
         def make_options_sidebar(self, frame):
-            # Make some widgets for the sidebar here
-            pass
+            # The report options sidebar is created here.
+            # It is not displayed at first, only when show_sidebar() is called
+
+            # TODO: Make some widgets for the sidebar here
+            priority_choices = ['Low', 'Normal', 'High', 'Urgent', 'Immediate']
+            self.priority_var = StringVar(frame)
+            self.priority_var.set(priority_choices[0])
+
+            priority_menu = OptionMenu(frame, self.priority_var, *priority_choices)
+            Label(frame, text="Priority", bg=Application.color_theme[3], fg=Application.color_theme[1],
+                  font="Helvetica 13 bold").grid(row=0, column=0)
+            priority_menu.grid(row=0, column=1)
+            self.priority_var.trace("w", self.priority_callback)  # This binds the callback to the write event
+
+            severity_choices = ['Minor', 'Major']
+            self.severity_var = StringVar(frame)
+            self.severity_var.set(severity_choices[0])
+
+            severity_menu = OptionMenu(frame, self.severity_var, *severity_choices)
+            Label(frame, text="Severity", bg=Application.color_theme[3], fg=Application.color_theme[1],
+                  font="Helvetica 13 bold").grid(row=1, column=0)
+            severity_menu.grid(row=1, column=1)
+            self.severity_var.trace("w", self.severity_callback)
+
+        def severity_callback(self, *args):
+            # These callback methods are called when the value of the OptionMenu changes
+            # https://www.delftstack.com/howto/python-tkinter/how-to-create-dropdown-menu-in-tkinter/
+            print(self.severity_var.get())
+
+        def priority_callback(self, *args):
+            # See severity_callback()
+            # Below code is how it should look like for map bugs, not others
+            if self.priority_var.get() == "Low" and self.severity_var.get() == "Major":
+                self.severity_var.set("Minor")
+            elif self.priority_var.get() != "Low" and self.severity_var.get() == "Minor":
+                self.severity_var.set("Major")
+            print(self.priority_var.get())
 
         def show_canvas(self, thumbnails_frame, options_frame, this_button, current_bug, image_labels,
                         image_location_text, image_path_button, try_again_button):
+            # This switches the frame to the thumbnails_frame and updates all thumbnails and buttons
             options_frame.pack_forget()
             thumbnails_frame.pack()
             # This method oversees the transfer from bug options to image thumbnail preview
@@ -652,6 +705,7 @@ class Application(Frame):
 
         def show_sidebar(self, thumbnails_frame, options_frame, this_button, current_bug, image_labels,
                          image_location_text, image_path_button, try_again_button):
+            # This switches to the report options frame and updates buttons
             thumbnails_frame.pack_forget()
             options_frame.pack()
             if try_again_button:
@@ -738,7 +792,7 @@ class Application(Frame):
                                                                  image_path_button, try_again_button)
                 )
             else:
-                try_again_button = None
+                try_again_button = None  # Why try again if you have everything
 
             report_options_button.get_element()['command'] = lambda: self.show_sidebar(
                 frame_for_canvas, frame_for_sidebar, report_options_button, current_bug, image_labels,
@@ -748,7 +802,7 @@ class Application(Frame):
             if image_path_button:
                 image_path_button.get_element()['command'] = lambda: self.find_missing_image(
                     head_img_label, current_bug[0], try_again_button, image_path_button, image_location_text
-                )
+                )  # Ignore the warning, this works!
 
             self.update_image_thumbnails(current_bug, image_labels, image_location_text, image_path_button,
                                          try_again_button)
@@ -822,6 +876,7 @@ class Application(Frame):
             self.init_widgets()
 
         def init_widgets(self):
+            # Placeholder screen to make app clickier lol
             background_frame = Frame(master=self, bg=Application.color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
 
@@ -830,12 +885,6 @@ class Application(Frame):
             back_button = Application.AppButton('BACK', frame=bottom_frame, anchor="sw",
                                                 command=lambda: go_to_projects(self, "normal"))
 
-
-def get_displayable_image(image_location):
-    image = Image.open(image_location)
-    image.thumbnail((530, 530))
-    img_to_show = ImageTk.PhotoImage(image)
-    return img_to_show
 
 
 def go_to_projects(frame, use_mode):
@@ -852,6 +901,7 @@ def go_to_main_menu(frame):
 
 
 def make_error_textbox(message, error_textbox):
+    # use this to clear a textbox and display a message
     error_textbox.delete("1.0", END)
     error_textbox.insert(END, message)
 

@@ -9,8 +9,13 @@ from information_compile import get_image
 class BugHandler:
     _all_bugs = deque()  # Queue of bugs read from the bugs file, each bug is a stack of lines, the bug head on top
     current = deque()  # The current bug popped from the above queue
+
+    # The current bug has its images stored here
+    # The dictionary is "line": "image path", accessed by try_get_image()
     image_locations = {}
+
     game_path = None
+    # Message is used to catch output from console-based methods to be able to show them
     message = None
 
     def __init__(self, game):
@@ -37,6 +42,7 @@ class BugHandler:
             self.image_locations.clear()
             self.current = self._all_bugs.popleft()
             while self.current[0][0] in ['!', ';']:
+                self.archive()
                 self.current = self._all_bugs.popleft()
             for line in self.current:
                 self.image_locations[line] = get_image(line)
@@ -55,6 +61,7 @@ class BugHandler:
         return self.image_locations[line]
 
     def images_good(self):
+        # Checks if all images have a path, if so, returns True
         for location in self.image_locations.values():
             if location == "":
                 return False
@@ -62,5 +69,3 @@ class BugHandler:
 
     def set_image(self, line, path):
         self.image_locations[line] = path
-
-
