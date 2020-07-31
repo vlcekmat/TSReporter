@@ -6,12 +6,12 @@ from information_compile import generate_description, get_image, generate_no_ver
     clean_debug_info
 
 
-def ask_for_missing_image(line_to_process, images_folder_path):
+def ask_for_missing_image(line_to_process):
     while True:
         print('No image found, try again? (Y/N)')
         answer = input('> ')
         if answer.upper() == 'Y':
-            image_to_return = get_image(line_to_process, images_folder_path)
+            image_to_return = get_image(line_to_process)
         elif answer.upper() == 'N':
             return ""
         else:
@@ -21,7 +21,7 @@ def ask_for_missing_image(line_to_process, images_folder_path):
             return image_to_return
 
 
-def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to, project, username, password,
+def upload_to_mantis(version, category, log_lines, assign_to, project, username, password,
                      browser, path_to_asset=None, debug_info=None, web_driver=None, priority=None):
     # Opens chrome browser, connects to mantis and uploads all of the gathered information
     # If priority is not None, it will treat the report as a batch report = will not as for image if its missing and
@@ -50,11 +50,11 @@ def upload_to_mantis(version, images_folder_path, category, log_lines, assign_to
                 generate_description(line_to_process, version, category, first_time=False)
             )
 
-        image_to_append = get_image(line_to_process, images_folder_path)
+        image_to_append = get_image(line_to_process)
 
         # If an image is not found, gives the user the option to check for it again
         if not image_to_append and not priority:
-            image_to_append = ask_for_missing_image(line_to_process, images_folder_path)
+            image_to_append = ask_for_missing_image(line_to_process)
         elif not image_to_append and priority:
             print(f"No image added to bug: {line_to_process}")
         if image_to_append:

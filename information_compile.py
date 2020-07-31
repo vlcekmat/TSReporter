@@ -1,9 +1,11 @@
 from pathlib import Path
 from decimal import Decimal
+from config import read_config
 
 
-def get_image(log, images_folder_path):
+def get_image(log):
     # returns a Path() of the particular image file based on date, time and coordinates
+    images_folder_path = read_config("edited images location")
     split_log = log.split(';')
 
     raw_date_time = split_log[1][1: 17]

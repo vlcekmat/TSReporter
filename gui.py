@@ -232,7 +232,11 @@ class Application(Frame):
         class SettingsOption:
             # Instance of this class creates a new row (option)
             # What you enter in the "text" attribute will be analyzed to find the path in config.txt
-            def __init__(self, background, row, text, include_button=True, button_text='Change', command=None):
+            parent_frame = None
+
+            def __init__(self, background, row, text, parent_frame,
+                         include_button=True, button_text='Change', command=None):
+                self.parent_frame = parent_frame
                 subtitle_font = Font(size=15)
                 minimized_font = Font(size=10)
                 super_minimized_font = Font(size=7)
@@ -295,7 +299,7 @@ class Application(Frame):
 
             def ask_for_directory(self, index):
                 config.ConfigHandler.gui_config_edit(index)
-                app.settings_menu.go_to_main_menu()
+                go_to_main_menu(self.parent_frame)
                 app.main_menu.go_to_settings()
 
         # region COMMANDS
@@ -303,7 +307,7 @@ class Application(Frame):
         def submit(self, text_input, event=None):
             username = text_input.get()
             config.ConfigHandler.gui_config_edit(3, entered_text=username)
-            app.settings_menu.go_to_main_menu()
+            go_to_main_menu(self)
             app.main_menu.go_to_settings()
 
         input_activated = False
@@ -356,15 +360,17 @@ class Application(Frame):
                 if config.ConfigHandler.config_layout[setting] == "secret":
                     continue
                 elif config.ConfigHandler.config_layout[setting] == "text":
-                    self.SettingsOption(background=subbackground, row=grid_i, text=f'{setting.capitalize()}: ',
+                    self.SettingsOption(subbackground, parent_frame=self, row=grid_i, text=f'{setting.capitalize()}: ',
                                         command=lambda: self.show_text_input(background))
                 elif config.ConfigHandler.config_layout[setting] == "yn":
                     self.SettingsOption(
-                        background=subbackground, row=grid_i, text=f'{setting.capitalize()}: ',
+                        background=subbackground, parent_frame=self, row=grid_i, text=f'{setting.capitalize()}: ',
                         command=lambda s=setting: self.ask_yes_no(background, s)
                     )
                 else:
-                    self.SettingsOption(background=subbackground, row=grid_i, text=f'{setting.capitalize()}: ')
+                    self.SettingsOption(
+                        parent_frame=self, background=subbackground, row=grid_i, text=f'{setting.capitalize()}: '
+                    )
                 grid_i += 1
 
             button = Application.AppButton('Main Menu', frame=template_background,
@@ -543,7 +549,7 @@ class Application(Frame):
 
         def open_report(self, bug_line):
             print(f"Reporting: {bug_line}")
-            self.show_next_report(False)
+            self.go_to_reported()
 
         def look_for_images_again(self, current_bug):
             self.bug_handler.try_images_again()
@@ -749,6 +755,7 @@ class Application(Frame):
             # region Bottom
             button_find_duplicates = Application.AppButton(
                 "Find\nduplicates", bottom_frame, side=RIGHT,
+                # TODO: make new thread here? Else program is 'not responding' until search is complete
                 command=lambda: self.open_duplicates(current_bug_summary, button_find_duplicates)
             )
             button_skip_report = Application.AppButton(

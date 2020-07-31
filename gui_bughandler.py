@@ -39,14 +39,14 @@ class BugHandler:
             while self.current[0][0] in ['!', ';']:
                 self.current = self._all_bugs.popleft()
             for line in self.current:
-                self.image_locations[line] = get_image(line, read_config("edited images location"))
+                self.image_locations[line] = get_image(line)
         else:
             self.current = None
 
     def try_images_again(self):
         for line in self.current:
             if not self.image_locations[line]:
-                self.image_locations[line] = get_image(line, read_config("edited images location"))
+                self.image_locations[line] = get_image(line)
 
     def get_current(self):
         return self.current

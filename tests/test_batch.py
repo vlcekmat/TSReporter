@@ -6,6 +6,7 @@ from collections import deque
 
 
 import batch
+from config import ConfigHandler
 
 
 class TestBatch(unittest.TestCase):
@@ -64,10 +65,15 @@ class TestBatch(unittest.TestCase):
         temp_bug.append("m_missing col on pylon ;[02/07/2020 10:18] ("
                               "sec-0021-0008);-80950.5;78.7729;-30575.7;2.74347;-0.419274")
         all_bugs.append(temp_bug)
-        with open("bug_20200702_101838_-80950_79_-30576.jpg", "w"):
+        with open("tests/bug_20200702_101838_-80950_79_-30576.jpg", "w"):
             pass
-        images_missing = batch.check_batch_images(all_bugs, '.')
-        os.remove("bug_20200702_101838_-80950_79_-30576.jpg")
+        with open("tests/config.cfg", "w") as cfg_file:
+            cfg_file.write('"edited images location" : "tests"')
+        ConfigHandler(debug=True)
+
+        images_missing = batch.check_batch_images(all_bugs)
+        os.remove("tests/bug_20200702_101838_-80950_79_-30576.jpg")
+        os.remove("tests/config.cfg")
         self.assertFalse(images_missing)
 
     @mock.patch('builtins.input', side_effect=["q"])
@@ -78,10 +84,15 @@ class TestBatch(unittest.TestCase):
             temp_bug.append("m_missing col on pylon ;[02/07/2020 10:18] ("
                             "sec-0021-0008);-80950.5;78.7729;-30575.7;2.74347;-0.419274")
             all_bugs.append(temp_bug)
-            with open("temp_image.jpg", "w"):
+            with open("tests/temp_image.jpg", "w"):
                 pass
-            images_missing = batch.check_batch_images(all_bugs, '.')
-            os.remove("temp_image.jpg")
+            with open("tests/config.cfg", "w") as cfg_file:
+                cfg_file.write('"edited images location" : "tests"')
+            ConfigHandler(debug=True)
+
+            images_missing = batch.check_batch_images(all_bugs)
+            os.remove("tests/temp_image.jpg")
+            os.remove("tests/config.cfg")
             self.assertTrue(images_missing)
 
     @mock.patch('builtins.input', side_effect=["y", "y", "n"])
@@ -92,9 +103,15 @@ class TestBatch(unittest.TestCase):
             temp_bug.append("m_missing col on pylon ;[02/07/2020 10:18] ("
                             "sec-0021-0008);-80950.5;78.7729;-30575.7;2.74347;-0.419274")
             all_bugs.append(temp_bug)
-            with open("temp_image.jpg", "w"):
+
+            with open("tests/config.cfg", "w") as cfg_file:
+                cfg_file.write('"edited images location" : "tests"')
+            ConfigHandler(debug=True)
+
+            with open("tests/temp_image.jpg", "w"):
                 pass
-            images_missing = batch.check_batch_images(all_bugs, '.')
+            images_missing = batch.check_batch_images(all_bugs)
             os.remove("temp_image.jpg")
+            os.remove("tests/config.cfg")
             self.assertFalse(images_missing)
 

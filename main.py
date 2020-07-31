@@ -94,7 +94,7 @@ def report_option(use_mode, password):
         if not format_is_correct:
             return None
 
-        image_check = check_batch_images(all_bugs, images_folder)
+        image_check = check_batch_images(all_bugs)
         if image_check:
             return None
 

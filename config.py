@@ -34,11 +34,15 @@ class ConfigHandler:
             "s_password": "secret"
     }
 
-    def __init__(self):
-        if not os.path.isfile("./config.cfg"):
+    def __init__(self, debug=False):
+        if debug:
+            config_path = "tests/config.cfg"
+        else:
+            config_path = "./config.cfg"
+        if not os.path.isfile(config_path):
             ConfigHandler.config_setup()
         else:
-            cfg_file = open("./config.cfg", "r")
+            cfg_file = open(config_path, "r")
             cfg_lines = cfg_file.readlines()
             for i in enumerate(cfg_lines):
                 cfg_lines[i[0]] = cfg_lines[i[0]][:-1]

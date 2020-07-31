@@ -37,7 +37,7 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
             elif duplicate_found == 0:
                 use_log_lines = copy.deepcopy(log_lines)
                 upload_to_mantis(
-                    version, images_folder_path, category, use_log_lines,
+                    version, category, use_log_lines,
                     assign, project, username, password, browser,
                     path_to_asset=a_path, debug_info=d_info, web_driver=driver_handler
                 )
@@ -79,13 +79,13 @@ def batch_report_bugs(project, bugs_stack, version, images_folder_path, username
         current_bug[0] = prefix + ''.join(split_bug[1:])
         use_log_lines = copy.deepcopy(current_bug)
         upload_to_mantis(
-            version, images_folder_path, 'm', use_log_lines, "", project,
+            version, 'm', use_log_lines, "", project,
             username, password, browser, web_driver=reporter_driver, priority=priority
         )
     return True
 
 
-def get_full_priority(prio):
+def get_full_priority(priority):
     # List of legal priorities
     prio_dict = {
         "l": "low",
@@ -94,4 +94,4 @@ def get_full_priority(prio):
         "u": "urgent",
         "i": "immediate"
     }
-    return prio_dict[prio]
+    return prio_dict[priority]
