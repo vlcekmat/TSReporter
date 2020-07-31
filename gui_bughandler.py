@@ -35,6 +35,8 @@ class BugHandler:
         if len(self._all_bugs) > 0:
             self.image_locations.clear()
             self.current = self._all_bugs.popleft()
+            while self.current[0][0] in ['!', ';']:
+                self.current = self._all_bugs.popleft()
             for line in self.current:
                 self.image_locations[line] = get_image(line, read_config("edited images location"))
         else:
@@ -56,3 +58,6 @@ class BugHandler:
             if location == "":
                 return False
         return True
+
+    def set_image(self, line, path):
+        self.image_locations[line] = path

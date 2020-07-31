@@ -337,6 +337,7 @@ class Application(Frame):
                 no_button = Application.AppButton(
                     "No", buttons_frame, side=RIGHT, text_spacing=0, pady=0, font_size=12
                 )
+                # TODO: make these buttons do stuff
 
         # endregion
 
@@ -464,8 +465,8 @@ class Application(Frame):
         bug_handler = None
         driver_handler = None
 
-        small_img_size = (120, 80)
-        img_size = (530, 530)
+        small_img_size = (170, 130)
+        img_size = (515, 530)
 
         def __init__(self, project, bug_handler, reported=False):
             super().__init__()
@@ -483,7 +484,6 @@ class Application(Frame):
             current_bug = []
             for bug_line in self.bug_handler.get_current():
                 current_bug.append(self.BugEntry(bug_line, self.bug_handler.try_get_image(bug_line)))
-            #self.look_for_images_again(current_bug)
 
             self.already_reported = reported
             self.pack(fill=BOTH, expand=True)
@@ -508,14 +508,16 @@ class Application(Frame):
         def find_missing_image(self, image_label, bug_entry, try_again_button, find_img_button=None,
                                image_location_text=None):
             new_image_path = utils.find_image_path()
-            bug_entry.image_location = new_image_path
+            self.bug_handler.set_image(bug_entry.line, new_image_path)
             bug_entry.reload_image(self.bug_handler)
             if image_location_text:
                 image_location_text.insert(END, new_image_path)
             if find_img_button:
                 find_img_button.get_element().pack_forget()
                 find_img_button.get_element().destroy()
-            image_retrieved = bug_entry.get_image()
+                image_retrieved = bug_entry.get_image()
+            else:
+                image_retrieved = bug_entry.get_small_image()
             image_retrieved.thumbnail(Application.Reporting.img_size)
             image_to_show = ImageTk.PhotoImage(image_retrieved)
             image_label.configure(image=image_to_show)
@@ -611,15 +613,55 @@ class Application(Frame):
             current_bug_text.insert(END, current_bug_summary)
 
             left_frame = Frame(middle_frame, bg=Application.color_theme[3])
-            left_frame.pack(anchor="w", side=LEFT, pady=0, padx=0)
+            left_frame.pack(anchor="w", side=LEFT, pady=0, padx=10)
             right_frame = Frame(middle_frame, bg=Application.color_theme[3])
-            right_frame.pack(anchor="e", side=RIGHT, fill=Y)
-            right_top_frame = Frame(right_frame, bg=Application.color_theme[3])
-            right_top_frame.pack(anchor="ne", side=TOP, pady=0, padx=0)
+            right_frame.pack(anchor="e", side=RIGHT, fill=Y, padx=10)
+
+            right_top_frame = Frame(right_frame, bg=Application.color_theme[3])  # Frame for the canvas
+            right_top_frame.pack(side=TOP, pady=0, padx=0)
+            right_top_frame.grid_columnconfigure(0, weight=1)
+
             right_buttons_frame = Frame(right_frame, bg=Application.color_theme[3])
             right_buttons_frame.pack(side=BOTTOM, fill=X)
             bottom_frame = Frame(background_frame, bg=Application.color_theme[4])
             bottom_frame.pack(side=BOTTOM, fill=X)
+
+            # Here, a canvas is created to display the image thumbnails and allow for scrolling
+            # Taken from https://stackoverflow.com/questions/43731784/tkinter-canvas-scrollbar-with-grid
+            thumbnail_canvas = Canvas(right_top_frame, bg=Application.color_theme[3], highlightthickness=0)
+            thumbnail_canvas.grid(row=0, column=0, sticky="news")
+
+            # Make a Scrollbar if there are more than 5 images (bug head and 4 extra)
+            # TODO: Fix this, it doesn't want to scroll
+            if len(current_bug) > 5:
+                sb = Scrollbar(right_top_frame, orient="vertical")
+                sb.grid(row=0, column=1, sticky="ns")
+                thumbnail_canvas.config(yscrollcommand=sb.set)
+                sb.config(command=thumbnail_canvas.yview)
+
+            # Use this thumbnail_frame to insert image thumbnails
+            thumbnail_frame = Frame(thumbnail_canvas, bg=Application.color_theme[3])
+            thumbnail_canvas.create_window((0, 0), window=thumbnail_frame, anchor="nw")
+
+            # All image labels are created here, they will be grid-placed into the thumbnail_frame
+            # Except the first one, that is the bug head and gets the big preview
+            image_labels = []  # Use this array to reference the labels and update them
+            head_img_label = Label(left_frame, bg=Application.color_theme[3])
+            head_img_label.place(x=0, y=0)
+            head_img_label.pack(pady=0, padx=0, side=TOP)
+            image_labels.append(head_img_label)
+            image_location_text = Text(left_frame, height=1, width=60, bg=Application.color_theme[3],
+                                       fg=Application.color_theme[1], bd=0, font="Helvetica 10")
+            image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
+
+            for line_no in range(len(current_bug) - 1):
+                temp_img_label = Label(thumbnail_frame, bg=Application.color_theme[3])
+                temp_img_label.place(x=0, y=0)
+                temp_img_label.grid(row=line_no // 2, column=line_no % 2, sticky="news")
+                image_labels.append(temp_img_label)
+
+            # thumbnail_frame.update_idletasks()
+            # thumbnail_frame.config(width=380, height=100)
             # endregion Frames
 
             if self.already_reported:
@@ -631,26 +673,6 @@ class Application(Frame):
                 back_button = Application.AppButton(
                     'BACK', frame=bottom_frame, side=LEFT, command=lambda: go_to_projects(self, "normal")
                 )
-
-            image_labels = []
-            head_img_label = Label(left_frame, bg=Application.color_theme[3])
-            head_img_label.place(x=0, y=0)
-            head_img_label.pack(pady=5, padx=5, side=TOP)
-            image_labels.append(head_img_label)
-            image_location_text = Text(left_frame, height=1, width=60, bg=Application.color_theme[3],
-                                       fg=Application.color_theme[1], bd=0, font="Helvetica 10")
-            image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
-
-            if len(current_bug) > 4:
-                sc = Scrollbar(right_top_frame)
-                sc.pack(side=RIGHT, fill=Y)
-
-            for bug_line in range(len(current_bug) - 1):
-                temp_img_label = Label(right_top_frame, bg=Application.color_theme[3])
-                temp_img_label.place(x=0, y=0)
-                temp_img_label.pack(pady=5, padx=5)
-                image_labels.append(temp_img_label)
-
             report_options_button = Application.AppButton("Report\noptions", right_buttons_frame, side=RIGHT)
 
             if not current_bug[0].image_location:
@@ -687,6 +709,8 @@ class Application(Frame):
                 "Skip report", bottom_frame, side=RIGHT, command=self.show_next_report
             )
             # endregion Bottom
+
+            thumbnail_canvas.config(scrollregion=thumbnail_frame.bbox("all"))
 
     class ReportedScreen(Page):
         bug_handler = None
