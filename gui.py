@@ -491,10 +491,14 @@ class Application(Frame):
 
         def go_to_reported(self):
             self.pack_forget()
-            app.reported = Application.ReportedScreen(self.bug_handler)
+            last_bug = self.bug_handler.get_current()
+            self.bug_handler.archive()
+            app.reported = Application.ReportedScreen(self.bug_handler, last_bug)
             self.destroy()
 
-        def show_next_report(self):
+        def show_next_report(self, archive):
+            if archive:
+                self.bug_handler.archive()
             self.bug_handler.read_next()
             if not self.bug_handler.get_current():
                 go_to_main_menu(self)
@@ -539,7 +543,7 @@ class Application(Frame):
 
         def open_report(self, bug_line):
             print(f"Reporting: {bug_line}")
-            self.show_next_report()
+            self.show_next_report(False)
 
         def look_for_images_again(self, current_bug):
             self.bug_handler.try_images_again()
@@ -591,6 +595,67 @@ class Application(Frame):
                 if self.image_location:
                     self.image = Image.open(self.image_location)
 
+        def make_scrollable_canvas(self, frame, bug_len):
+            # Here, a canvas is created to display the image thumbnails and allow for scrolling
+            # Taken from https://stackoverflow.com/questions/43731784/tkinter-canvas-scrollbar-with-grid
+            thumbnail_canvas = Canvas(frame, bg=Application.color_theme[3], highlightthickness=0)
+            thumbnail_canvas.grid(row=0, column=0, sticky="news")
+
+            # Make a Scrollbar if there are more than 5 images (bug head and 4 extra)
+            # TODO: Fix this, it doesn't want to scroll
+            if bug_len > 5:
+                sb = Scrollbar(frame, orient="vertical")
+                sb.grid(row=0, column=1, sticky="ns")
+                thumbnail_canvas.config(yscrollcommand=sb.set)
+                sb.config(command=thumbnail_canvas.yview)
+
+            # Use this thumbnail_frame to insert image thumbnails
+            thumbnail_frame = Frame(thumbnail_canvas, bg=Application.color_theme[3])
+            thumbnail_canvas.create_window((0, 0), window=thumbnail_frame, anchor="nw")
+
+            image_labels = []
+            for line_no in range(bug_len - 1):
+                temp_img_label = Label(thumbnail_frame, bg=Application.color_theme[3])
+                temp_img_label.place(x=0, y=0)
+                temp_img_label.grid(row=line_no // 2, column=line_no % 2, sticky="news")
+                image_labels.append(temp_img_label)
+
+            thumbnail_canvas.config(scrollregion=thumbnail_frame.bbox("all"))
+            return image_labels
+
+        def make_options_sidebar(self, frame):
+            # Make some widgets for the sidebar here
+            pass
+
+        def show_canvas(self, thumbnails_frame, options_frame, this_button, current_bug, image_labels,
+                        image_location_text, image_path_button, try_again_button):
+            options_frame.pack_forget()
+            thumbnails_frame.pack()
+            # This method oversees the transfer from bug options to image thumbnail preview
+            if not self.bug_handler.images_good():
+                try_again_button.get_element().pack(padx=10, pady=10, side=RIGHT)
+
+            self.update_image_thumbnails(current_bug, image_labels, image_location_text, image_path_button,
+                                         try_again_button)
+
+            this_button.get_element()['text'] = "Report\noptions"
+            this_button.get_element()['command'] = lambda: self.show_sidebar(
+                    thumbnails_frame, options_frame, this_button, current_bug, image_labels, image_location_text,
+                    image_path_button, try_again_button
+                )
+
+        def show_sidebar(self, thumbnails_frame, options_frame, this_button, current_bug, image_labels,
+                         image_location_text, image_path_button, try_again_button):
+            thumbnails_frame.pack_forget()
+            options_frame.pack()
+            if try_again_button:
+                try_again_button.get_element().pack_forget()
+            this_button.get_element()['text'] = "Image\npreview"
+            this_button.get_element()['command'] = lambda: self.show_canvas(
+                thumbnails_frame, options_frame, this_button, current_bug, image_labels, image_location_text,
+                image_path_button, try_again_button
+            )
+
         def init_widgets(self, current_bug):
             # region Frames
             background_frame = Frame(master=self, bg=Application.color_theme[4])
@@ -617,31 +682,16 @@ class Application(Frame):
             right_frame = Frame(middle_frame, bg=Application.color_theme[3])
             right_frame.pack(anchor="e", side=RIGHT, fill=Y, padx=10)
 
-            right_top_frame = Frame(right_frame, bg=Application.color_theme[3])  # Frame for the canvas
-            right_top_frame.pack(side=TOP, pady=0, padx=0)
-            right_top_frame.grid_columnconfigure(0, weight=1)
+            frame_for_canvas = Frame(right_frame, bg=Application.color_theme[3])  # Frame for the canvas
+            frame_for_canvas.pack(side=TOP, pady=0, padx=0)
+            frame_for_canvas.grid_columnconfigure(0, weight=1)
+            frame_for_sidebar = Frame(right_frame, bg=Application.color_theme[3])  # Frame for the sidebar
+            # These two frames will be filled and then alternated between in show_canvas and show_sidebar
 
             right_buttons_frame = Frame(right_frame, bg=Application.color_theme[3])
             right_buttons_frame.pack(side=BOTTOM, fill=X)
             bottom_frame = Frame(background_frame, bg=Application.color_theme[4])
             bottom_frame.pack(side=BOTTOM, fill=X)
-
-            # Here, a canvas is created to display the image thumbnails and allow for scrolling
-            # Taken from https://stackoverflow.com/questions/43731784/tkinter-canvas-scrollbar-with-grid
-            thumbnail_canvas = Canvas(right_top_frame, bg=Application.color_theme[3], highlightthickness=0)
-            thumbnail_canvas.grid(row=0, column=0, sticky="news")
-
-            # Make a Scrollbar if there are more than 5 images (bug head and 4 extra)
-            # TODO: Fix this, it doesn't want to scroll
-            if len(current_bug) > 5:
-                sb = Scrollbar(right_top_frame, orient="vertical")
-                sb.grid(row=0, column=1, sticky="ns")
-                thumbnail_canvas.config(yscrollcommand=sb.set)
-                sb.config(command=thumbnail_canvas.yview)
-
-            # Use this thumbnail_frame to insert image thumbnails
-            thumbnail_frame = Frame(thumbnail_canvas, bg=Application.color_theme[3])
-            thumbnail_canvas.create_window((0, 0), window=thumbnail_frame, anchor="nw")
 
             # All image labels are created here, they will be grid-placed into the thumbnail_frame
             # Except the first one, that is the bug head and gets the big preview
@@ -653,17 +703,12 @@ class Application(Frame):
             image_location_text = Text(left_frame, height=1, width=60, bg=Application.color_theme[3],
                                        fg=Application.color_theme[1], bd=0, font="Helvetica 10")
             image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
+            # The scrollable canvas is created here
+            image_labels += self.make_scrollable_canvas(frame_for_canvas, len(current_bug))
 
-            for line_no in range(len(current_bug) - 1):
-                temp_img_label = Label(thumbnail_frame, bg=Application.color_theme[3])
-                temp_img_label.place(x=0, y=0)
-                temp_img_label.grid(row=line_no // 2, column=line_no % 2, sticky="news")
-                image_labels.append(temp_img_label)
+            self.make_options_sidebar(frame_for_sidebar)
 
-            # thumbnail_frame.update_idletasks()
-            # thumbnail_frame.config(width=380, height=100)
             # endregion Frames
-
             if self.already_reported:
                 # If a report has been made already, it is not possible to go back to project selection
                 # instead, this button will take the user to the main menu
@@ -689,6 +734,11 @@ class Application(Frame):
             else:
                 try_again_button = None
 
+            report_options_button.get_element()['command'] = lambda: self.show_sidebar(
+                frame_for_canvas, frame_for_sidebar, report_options_button, current_bug, image_labels,
+                image_location_text, image_path_button, try_again_button
+            )
+
             if image_path_button:
                 image_path_button.get_element()['command'] = lambda: self.find_missing_image(
                     head_img_label, current_bug[0], try_again_button, image_path_button, image_location_text
@@ -696,28 +746,27 @@ class Application(Frame):
 
             self.update_image_thumbnails(current_bug, image_labels, image_location_text, image_path_button,
                                          try_again_button)
-
             # region Bottom
             button_find_duplicates = Application.AppButton(
                 "Find\nduplicates", bottom_frame, side=RIGHT,
                 command=lambda: self.open_duplicates(current_bug_summary, button_find_duplicates)
             )
             button_skip_report = Application.AppButton(
-                "Don't report", bottom_frame, side=RIGHT, command=self.show_next_report
+                "Don't report", bottom_frame, side=RIGHT, command=lambda: self.show_next_report(True)
             )
             button_skip_report = Application.AppButton(
-                "Skip report", bottom_frame, side=RIGHT, command=self.show_next_report
+                "Skip report", bottom_frame, side=RIGHT, command=lambda: self.show_next_report(False)
             )
             # endregion Bottom
 
-            thumbnail_canvas.config(scrollregion=thumbnail_frame.bbox("all"))
-
     class ReportedScreen(Page):
         bug_handler = None
+        last_bug = None
 
-        def __init__(self, bug_handler):
+        def __init__(self, bug_handler, last_bug):
             super().__init__()
 
+            self.last_bug = last_bug
             self.bug_handler = bug_handler
             self.pack(fill=BOTH, expand=True)
             self.init_widgets()
@@ -740,7 +789,7 @@ class Application(Frame):
             middle_frame = Frame(background_frame, bg=Application.color_theme[3])
             middle_frame.pack(anchor="center", pady=85, padx=15)
 
-            current_bug_summary = self.bug_handler.get_current()[0][:-1]
+            current_bug_summary = self.last_bug[0][:-1]
             current_bug_text = Text(middle_frame, height=1, width=100, bg=Application.color_theme[3],
                                     fg=Application.color_theme[1], bd=0, font="Helvetica 13")
             current_bug_text.pack(side=TOP, pady=10, padx=10)
