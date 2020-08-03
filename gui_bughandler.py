@@ -7,7 +7,7 @@ from information_compile import get_image
 
 
 class BugHandler:
-    _all_bugs = deque()  # Queue of bugs read from the bugs file, each bug is a stack of lines, the bug head on top
+    all_the_bugs = deque()  # Queue of bugs read from the bugs file, each bug is a stack of lines, the bug head on top
     current = deque()  # The current bug popped from the above queue
 
     # The current bug has its images stored here
@@ -26,25 +26,24 @@ class BugHandler:
         out_string = io.StringIO()
         bug_lines = read_bugs_file(self.game_path, out_string)
         if out_string.getvalue() == "":
-            self._all_bugs = read_bug_lines(bug_lines)
+            self.all_the_bugs = read_bug_lines(bug_lines)
             self.read_next()
 
         else:
-            self._all_bugs = None
+            self.all_the_bugs = None
             self.current = None
             self.message = out_string.getvalue()
 
     def archive(self):
         archive_bug(self.current, self.game_path)
-        self.read_next()
 
     def read_next(self):
-        if len(self._all_bugs) > 0:
+        if len(self.all_the_bugs) > 0:
             self.image_locations.clear()
-            self.current = self._all_bugs.popleft()
+            self.current = self.all_the_bugs.popleft()
             while self.current[0][0] in ['!', ';']:
                 self.archive()
-                self.current = self._all_bugs.popleft()
+                self.current = self.all_the_bugs.popleft()
             for line in self.current:
                 self.image_locations[line] = get_image(line)
         else:
