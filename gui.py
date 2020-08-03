@@ -1,4 +1,5 @@
 import copy
+from collections import deque
 from tkinter import *
 from tkinter.font import Font
 from threading import Thread
@@ -10,6 +11,9 @@ import bugs
 import config
 from gui_bughandler import BugHandler
 from chromedrivers import DriverHandler
+from information_compile import determine_bug_category
+from sector_seek import find_assign_to
+from chromedrivers import log_into_mantis
 import utils
 import reporter
 
@@ -346,7 +350,6 @@ class Application(Frame):
                     "No", buttons_frame, side=RIGHT, text_spacing=0, pady=0, font_size=12,
                     command=lambda: self.submit_yes_no(False, 5)
                 )
-                # TODO: make these buttons do stuff
 
         def submit_yes_no(self, yes_no, index):
             config.ConfigHandler().gui_config_edit(index=index, yes_no_value=yes_no)
@@ -554,20 +557,46 @@ class Application(Frame):
                 try_again_button.get_element().destroy()
 
         def open_duplicates(self, bug_line, report_button):
-            # if not self.driver_handler:
-            #     self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-            # reporter.check_for_duplicates(
-            #     config.read_config("mantis username"), "CrYVhn7FSM", bug_line,
-            #     driver_handler=self.driver_handler
-            # )
+            # TODO: get rid of the error message when you close the browser in the process
+           # if not self.driver_handler:
+           #     self.driver_handler = DriverHandler(config.read_config("preferred browser"))
+           # reporter.check_for_duplicates(
+           #     config.read_config("mantis username"), "CrYVhn7FSM", bug_line,
+           #     driver_handler=self.driver_handler
+           # )
             report_button.get_element()['text'] = "REPORT"
-            report_button.get_element()['command'] = self.go_to_reported
+            report_button.get_element()['command'] = lambda: self.open_report(bug_line)
             # report_button.get_element()['command'] = lambda: self.open_report(bug_line)
 
         def open_report(self, bug_line):
             # This is called when the 'Report' button is pressed, reporting will happen starting here
             # TODO: add reporting here
             # TODO: also maybe make it use a new thread?
+
+            project = self.selected_project
+            game = project[0]
+            version = find_version(game=game)
+            category = determine_bug_category(bug_line)
+            log_lines = deque()
+            log_lines.append(bug_line)
+            assign_to = find_assign_to(bug_line, chosen_game=game)
+            username = config.read_config('mantis username')
+            password = 'CrYVhn7FSM'
+            browser = config.read_config("preferred browser")
+            path_to_asset = None
+            debug_info = None
+
+            if not self.driver_handler:
+                self.driver_handler = DriverHandler(config.read_config("preferred browser"))
+            log_into_mantis(self.driver_handler.get_driver(), username, password)
+            reporter.upload_to_mantis(version=version, category=category, log_lines=log_lines,
+                                      assign_to=assign_to, project=project,
+                                      username=username, password=password, browser=browser,
+                                      path_to_asset=path_to_asset, debug_info=debug_info,
+                                      web_driver=self.driver_handler, priority=None)
+
+            self.go_to_reported()
+
             print(f"Reporting: {bug_line}")
             self.go_to_reported()
 

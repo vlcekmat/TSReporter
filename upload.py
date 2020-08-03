@@ -37,7 +37,10 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
         debug_info = clean_debug_info(debug_info)
         path_to_asset = f"{path_to_asset}\n{debug_info}"
     while len(log_lines) > 0:
-        line_to_process = log_lines.popleft()
+        if ']' in log_lines:
+            line_to_process = log_lines
+        else:
+            line_to_process = log_lines.popleft()
         if category == 'a' and first_loop:
             if first_loop:
                 first_path_to_asset = path_to_asset
