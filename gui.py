@@ -314,11 +314,11 @@ class Application(Frame):
             go_to_main_menu(self)
             app.main_menu.go_to_settings()
 
-        input_activated = False
+        dialog_activated = False
 
         def show_text_input(self, master):
-            if not self.input_activated:
-                self.input_activated = True
+            if not self.dialog_activated:
+                self.dialog_activated = True
                 text_input = Entry(master, bg=Application.color_theme[3], fg=Application.color_theme[2], width=25,
                                    font=Font(size=20))
                 text_input.pack()
@@ -332,8 +332,8 @@ class Application(Frame):
             # TODO: we need to replace the index parameter in config.ConfigHandler().gui_config_edit()
             #  with a key argument, so I don't have to create a
             #  separate function for each y/n setting we might add in the future
-            if not self.input_activated:
-                self.input_activated = True
+            if not self.dialog_activated:
+                self.dialog_activated = True
                 buttons_frame = Frame(master, bg=Application.color_theme[3])
                 buttons_frame.pack(pady=10)
 
@@ -356,7 +356,27 @@ class Application(Frame):
             go_to_main_menu(self)
             app.main_menu.go_to_settings()
 
+        def show_browser_selection(self, master):
+            if not self.dialog_activated:
+                self.dialog_activated = True
+                options = ["Chrome", "Firefox"]
+                frame = Frame(master, bg=Application.color_theme[3], padx=10, pady=10)
+                frame.pack()
+                dialog_text = Label(master=frame, text="Select your preferred browser", bg=Application.color_theme[3],
+                                    font=Font(size=10), fg=Application.color_theme[2])
+                dialog_text.pack(side=TOP)
+                for i in range(len(options)):
+                    option_to_process = options[i].lower()
+                    button = Application.AppButton(frame=frame, text=options[i], offx=5, offy=5, side=LEFT,
+                                                   command=lambda option_to_process=option_to_process:
+                                                   self.submit_browser_selection(option_to_process),
+                                                   text_spacing=2, pady=2, font_size=10)
+                    button.get_element().pack()
 
+        def submit_browser_selection(self, chosen_browser):
+            config.ConfigHandler().gui_config_edit(index=4, browser_chosen=chosen_browser)
+            go_to_main_menu(self)
+            app.main_menu.go_to_settings()
         # endregion
 
         def init_widgets(self):
@@ -380,6 +400,11 @@ class Application(Frame):
                     self.SettingsOption(
                         background=subbackground, parent_frame=self, row=grid_i, text=f'{setting.capitalize()}: ',
                         command=lambda s=setting: self.ask_yes_no(background, s)
+                    )
+                elif config.ConfigHandler.config_layout[setting] == "browser":
+                    self.SettingsOption(
+                        background=subbackground, parent_frame=self, row=grid_i, text=f'{setting.capitalize()}: ',
+                        command=lambda s=setting: self.show_browser_selection(master=background)
                     )
                 else:
                     self.SettingsOption(
@@ -944,7 +969,7 @@ class Application(Frame):
             back_button = Application.AppButton('BACK', frame=bottom_frame, anchor="sw",
                                                 command=lambda: go_to_projects(self, "normal"))
 
-
+# region GLOBAL COMMANDS
 def go_to_projects(frame, use_mode):
     frame.pack_forget()
     app.projects_page = Application.SelectProject(use_mode)
@@ -962,8 +987,9 @@ def make_error_textbox(message, error_textbox):
     # use this to clear a textbox and display a message
     error_textbox.delete("1.0", END)
     error_textbox.insert(END, message)
+# endregion
 
-
+# region Program init
 # Creates the basic "box" in which you can put all of the GUI elements
 # It also takes care of misc stuff, s.a. fixed window size, title on the app window and the icon
 root = Tk()
@@ -974,3 +1000,4 @@ root.wm_iconbitmap('.//resources/icon.ico')
 root.wm_title('TSReporter')
 app = Application()
 root.mainloop()
+# endregion
