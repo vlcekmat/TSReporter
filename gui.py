@@ -491,7 +491,7 @@ class Application(Frame):
         severity_var = None
         priority_var = None
 
-        bug_in_process = None
+        bug_priority = None
 
         small_img_size = (170, 130)  # Size, to which the BugEntry thumbnails its images
         img_size = (515, 530)
@@ -562,41 +562,39 @@ class Application(Frame):
 
         def open_duplicates(self, bug_line, report_button):
             # TODO: get rid of the error message when you close the browser in the process
-           # if not self.driver_handler:
-           #     self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-           # reporter.check_for_duplicates(
-           #     config.read_config("mantis username"), "CrYVhn7FSM", bug_line,
-           #     driver_handler=self.driver_handler
-           # )
+            if not self.driver_handler:
+                self.driver_handler = DriverHandler(config.read_config("preferred browser"))
+            reporter.check_for_duplicates(
+                config.read_config("mantis username"), "CrYVhn7FSM", bug_line,
+                driver_handler=self.driver_handler
+            )
             report_button.get_element()['text'] = "REPORT"
             report_button.get_element()['command'] = lambda: self.open_report(bug_line)
-            # report_button.get_element()['command'] = lambda: self.open_report(bug_line)
 
         def open_report(self, bug_line):
             # This is called when the 'Report' button is pressed, reporting will happen starting here
-            # TODO: add reporting here
             # TODO: also maybe make it use a new thread?
 
             project = self.selected_project
             game = project[0]
             version = find_version(game=game)
-            category = determine_bug_category(bug_line)
             current_bug_deque = self.bug_handler.get_current()
 
             assign_to = find_assign_to(bug_line, chosen_game=game)
             username = config.read_config('mantis username')
             password = 'CrYVhn7FSM'
-            browser = config.read_config("preferred browser")
-            path_to_asset = None
-            debug_info = None
+
+            priority = self.priority_var.get().lower()
+            severity = self.severity_var.get().lower()
 
             if not self.driver_handler:
                 self.driver_handler = DriverHandler(config.read_config("preferred browser"))
+                log_into_mantis(self.driver_handler.get_driver(), username, password)
 
-            log_into_mantis(self.driver_handler.get_driver(), username, password)
             reporter.report_bug(project=project, log_lines=current_bug_deque, version=version,
                                 images_folder_path=config.read_config('edited images location'),
-                                assign=assign_to, username=username, password=password, driver_h=self.driver_handler)
+                                assign=assign_to, username=username, password=password,
+                                _driver_handler=self.driver_handler, priority=priority, severity=severity)
 
             #reporter.upload_to_mantis(version=version, category=category, log_lines=log_lines,
             #                          assign_to=assign_to, project=project,

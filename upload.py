@@ -22,7 +22,7 @@ def ask_for_missing_image(line_to_process):
 
 
 def upload_to_mantis(version, category, log_lines, assign_to, project, username, password,
-                     browser, path_to_asset=None, debug_info=None, web_driver=None, priority=None):
+                     browser, path_to_asset=None, debug_info=None, web_driver=None, priority=None, severity=None):
     # Opens chrome browser, connects to mantis and uploads all of the gathered information
     # If priority is not None, it will treat the report as a batch report = will not as for image if its missing and
     #       will submit it automatically
@@ -115,19 +115,22 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
     if priority:
         if priority != 'normal':
             driver.find_element_by_xpath(f"//select[@name='priority']/option[text()='{priority}']").click()
-        if priority != "low":
-            driver.find_element_by_xpath(f"//select[@name='severity']/option[text()='major']").click()
+        if severity is not None:
+            if priority != "low":
+                driver.find_element_by_xpath(f"//select[@name='severity']/option[text()='major']").click()
     # endregion
 
-    if priority:  # if in batch reporter mode
-        sleep(1)
-        driver.find_element_by_xpath("//input[@value='Submit Issue']").click()
-        print(f'Reported bug "{summary.split("] - ")[1]}"')
-        sleep(1)
-    else:
-        # This waits for the user to close the browser window after submitting the bug
-        while True:
-            try:
-                current_url = driver.current_url
-            except WebDriverException:
-                break
+    sleep(5)
+
+    #if priority:  # if in batch reporter mode
+    #    sleep(1)
+    #    driver.find_element_by_xpath("//input[@value='Submit Issue']").click()
+    #    print(f'Reported bug "{summary.split("] - ")[1]}"')
+    #    sleep(1)
+    #else:
+    #    # This waits for the user to close the browser window after submitting the bug
+    #    while True:
+    #        try:
+    #            current_url = driver.current_url
+    #        except WebDriverException:
+    #            break

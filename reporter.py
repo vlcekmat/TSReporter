@@ -6,14 +6,15 @@ from information_compile import determine_bug_category, extract_asset_path
 import copy
 
 
-def report_bug(project, log_lines, version, images_folder_path, assign, username, password, driver_h, browser='chrome'):
+def report_bug(project, log_lines, version, images_folder_path, assign, username, password, _driver_handler,
+               browser='chrome', priority=None, severity=None):
     # uploads stuff to Mantis or calls other methods to do that
     log_first = log_lines.popleft()
     print(f'CURRENT BUG: {log_first}')
     log_lines.appendleft(log_first)
     category = determine_bug_category(log_first)
 
-    error_message = "Don't interact with browser during the process, trying again..."
+    error_message = "Don't interact with the browser during the process, trying again..."
     tried_duplicates = False
     duplicate_found = False
     a_path = None
@@ -26,12 +27,12 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
 
     while True:
         try:
-            driver_handler = driver_h
+            driver_handler = _driver_handler
             use_log_lines = copy.deepcopy(log_lines)
             upload_to_mantis(
                 version, category, use_log_lines,
                 assign, project, username, password, browser,
-                path_to_asset=a_path, debug_info=d_info, web_driver=driver_handler
+                path_to_asset=a_path, debug_info=d_info, web_driver=driver_handler, priority=priority, severity=severity
             )
             break
         except SessionNotCreatedException:
