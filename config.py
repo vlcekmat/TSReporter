@@ -121,15 +121,21 @@ class ConfigHandler:
             write_config("s_password", "")
 
     @staticmethod
-    def gui_config_edit(index, entered_text=None):
+    def gui_config_edit(index, entered_text=None, yes_no_value=None):
         cfg_layout = []
         for key in ConfigHandler.config_layout.keys():
             if ConfigHandler.config_layout[key] != "secret":
                 cfg_layout.append(key)
 
         line_selection = index
-        ConfigHandler.cfg_dict[cfg_layout[line_selection]] = ConfigHandler.ask_config_line(cfg_layout[line_selection]
-                                                                                           , entered_text=entered_text)
+        if entered_text is not None:
+            ConfigHandler.cfg_dict[cfg_layout[line_selection]] = ConfigHandler.ask_config_line(
+                cfg_layout[line_selection]
+                , entered_text=entered_text)
+        elif yes_no_value is not None:
+            ConfigHandler.cfg_dict[cfg_layout[line_selection]] = ConfigHandler.ask_config_line(
+                cfg_layout[line_selection]
+                , yes_no_value=yes_no_value)
         ConfigHandler.save_config()
 
     @staticmethod
@@ -146,12 +152,12 @@ class ConfigHandler:
         ConfigHandler.save_config(stdout)
 
     @staticmethod
-    def ask_config_line(key_to_ask, entered_text=None):
+    def ask_config_line(key_to_ask, entered_text=None, yes_no_value=None):
         # Asks user to select new configuration item based on the contents of the received token
         cfg_type = ConfigHandler.config_layout[key_to_ask]
         if cfg_type == "yn":
-            print(f"Would you like to {key_to_ask}")
-            new_value = ask_yes_no()
+            #print(f"Would you like to {key_to_ask}")
+            new_value = yes_no_value
         else:
             if cfg_type != "text":
                 print(f"Select your {key_to_ask}")

@@ -325,6 +325,9 @@ class Application(Frame):
                 submit_button.pack(pady=5)
 
         def ask_yes_no(self, master, setting):
+            # TODO: we need to replace the index parameter in config.ConfigHandler().gui_config_edit()
+            #  with a key argument, so I don't have to create a
+            #  separate function for each y/n setting we might add in the future
             if not self.input_activated:
                 self.input_activated = True
                 buttons_frame = Frame(master, bg=Application.color_theme[3])
@@ -336,12 +339,20 @@ class Application(Frame):
                 reported_text.insert(0, setting.capitalize() + "?")
 
                 yes_button = Application.AppButton(
-                    "Yes", buttons_frame, side=LEFT, text_spacing=0, pady=0, font_size=12
+                    "Yes", buttons_frame, side=LEFT, text_spacing=0, pady=0, font_size=12,
+                    command=lambda: self.submit_yes_no(True, 5)
                 )
                 no_button = Application.AppButton(
-                    "No", buttons_frame, side=RIGHT, text_spacing=0, pady=0, font_size=12
+                    "No", buttons_frame, side=RIGHT, text_spacing=0, pady=0, font_size=12,
+                    command=lambda: self.submit_yes_no(False, 5)
                 )
                 # TODO: make these buttons do stuff
+
+        def submit_yes_no(self, yes_no, index):
+            config.ConfigHandler().gui_config_edit(index=index, yes_no_value=yes_no)
+            go_to_main_menu(self)
+            app.main_menu.go_to_settings()
+
 
         # endregion
 
@@ -896,7 +907,6 @@ class Application(Frame):
             bottom_frame.pack(side=BOTTOM, anchor="sw")
             back_button = Application.AppButton('BACK', frame=bottom_frame, anchor="sw",
                                                 command=lambda: go_to_projects(self, "normal"))
-
 
 
 def go_to_projects(frame, use_mode):
