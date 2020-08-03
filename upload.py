@@ -120,8 +120,6 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
                 driver.find_element_by_xpath(f"//select[@name='severity']/option[text()='major']").click()
     # endregion
 
-    sleep(5)
-
     #if priority:  # if in batch reporter mode
     #    sleep(1)
     #    driver.find_element_by_xpath("//input[@value='Submit Issue']").click()

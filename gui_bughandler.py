@@ -36,6 +36,7 @@ class BugHandler:
 
     def archive(self):
         archive_bug(self.current, self.game_path)
+        self.read_next()
 
     def read_next(self):
         if len(self._all_bugs) > 0:

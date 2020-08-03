@@ -120,12 +120,12 @@ class Application(Frame):
         # region COMMANDS
         # Commands are functions callable by buttons
         def go_to_settings(self):
-            # ACHTUNG! When you destroy an instance of a page class, remember to create a new one of a different
+            # ACHTUNG! When you annul an instance of a page class, remember to create a new one of a different
             # page class as following:
             self.pack_forget()
             app.settings_menu = Application.SettingsMenu()
             app.settings_menu.open_page()
-            self.destroy()
+            app.main_menu = None
 
         @staticmethod
         def start_reporting(self):
@@ -136,7 +136,7 @@ class Application(Frame):
             self.pack_forget()
             app.projects_page = Application.SelectProject(use_mode)
             app.projects_page.open_page()
-            self.destroy()
+            app.main_menu = None
 
         # endregion
 
@@ -303,15 +303,20 @@ class Application(Frame):
 
             def ask_for_directory(self, index):
                 config.ConfigHandler.gui_config_edit(index)
-                go_to_main_menu(self.parent_frame)
+                app.settings_menu.go_to_main_menu()
                 app.main_menu.go_to_settings()
 
         # region COMMANDS
 
+        def go_to_main_menu(self):
+            self.pack_forget()
+            app.main_menu = Application.MainMenu()
+            app.settings_menu = None
+
         def submit(self, text_input, event=None):
             username = text_input.get()
             config.ConfigHandler.gui_config_edit(3, entered_text=username)
-            go_to_main_menu(self)
+            self.go_to_main_menu()
             app.main_menu.go_to_settings()
 
         dialog_activated = False
@@ -353,7 +358,7 @@ class Application(Frame):
 
         def submit_yes_no(self, yes_no, index):
             config.ConfigHandler().gui_config_edit(index=index, yes_no_value=yes_no)
-            go_to_main_menu(self)
+            self.go_to_main_menu()
             app.main_menu.go_to_settings()
 
         def show_browser_selection(self, master):
@@ -375,7 +380,7 @@ class Application(Frame):
 
         def submit_browser_selection(self, chosen_browser):
             config.ConfigHandler().gui_config_edit(index=4, browser_chosen=chosen_browser)
-            go_to_main_menu(self)
+            self.go_to_main_menu()
             app.main_menu.go_to_settings()
         # endregion
 
@@ -413,7 +418,7 @@ class Application(Frame):
                 grid_i += 1
 
             button = Application.AppButton('Main Menu', frame=template_background,
-                                           command=lambda: go_to_main_menu(self), side=LEFT)
+                                           command=self.go_to_main_menu, side=LEFT)
 
     class SelectProject(Page):
         use_mode = None
@@ -429,17 +434,17 @@ class Application(Frame):
         def go_to_main_menu(self):
             self.pack_forget()
             app.main_menu = Application.MainMenu()
-            self.destroy()
+            app.projects_page = None
 
         def go_to_reporting(self, project, bug_handler):
             self.pack_forget()
             app.reporting = Application.Reporting(project, bug_handler=bug_handler)
-            self.destroy()
+            app.projects_page = None
 
         def go_to_batch(self, project):
             self.pack_forget()
             app.batch = Application.Batch(project)
-            self.destroy()
+            app.projects_page = None
 
         def try_going_duplicates(self, project, frame):
             bug_handler = BugHandler(project[0])
@@ -547,22 +552,35 @@ class Application(Frame):
         def go_to_reported(self):
             self.pack_forget()
             last_bug = self.bug_handler.get_current()
+            saved_report = deque(last_bug)
             self.bug_handler.archive()  # Must archive before moving on to next screen
-            app.reported = Application.ReportedScreen(self.bug_handler, last_bug)
-            self.destroy()
+            next_bug = self.bug_handler.get_current()
+            app.reported = Application.ReportedScreen(self.bug_handler, saved_report)
+            app.reporting = None
+
+        def go_to_main_menu(self):
+            self.pack_forget()
+            app.main_menu = Application.MainMenu()
+            app.reporting = None
+
+        def go_to_projects(self, use_mode):
+            self.pack_forget()
+            app.projects_page = Application.SelectProject(use_mode)
+            app.projects_page.open_page()
+            app.reporting = None
 
         def show_next_report(self, archive):
             if archive:
                 self.bug_handler.archive()
             self.bug_handler.read_next()
             if not self.bug_handler.get_current():
-                go_to_main_menu(self)
+                self.go_to_main_menu()
                 return
             self.pack_forget()
             app.reporting = Application.Reporting(
                 Application.Reporting.selected_project, self.bug_handler, reported=True
             )
-            self.destroy()
+            app.reporting = None
 
         def find_missing_image(self, image_label, bug_entry, try_again_button, find_img_button=None,
                                image_location_text=None):
@@ -621,15 +639,6 @@ class Application(Frame):
                                 assign=assign_to, username=username, password=password,
                                 _driver_handler=self.driver_handler, priority=priority, severity=severity)
 
-            #reporter.upload_to_mantis(version=version, category=category, log_lines=log_lines,
-            #                          assign_to=assign_to, project=project,
-            #                          username=username, password=password, browser=browser,
-            #                          path_to_asset=path_to_asset, debug_info=debug_info,
-            #                          web_driver=self.driver_handler, priority=None)
-
-            self.go_to_reported()
-
-            print(f"Reporting: {bug_line}")
             self.go_to_reported()
 
         def look_for_images_again(self, current_bug):
@@ -857,10 +866,10 @@ class Application(Frame):
                 # If a report has been made already, it is not possible to go back to project selection
                 # instead, this button will take the user to the main menu
                 back_button = Application.AppButton(
-                    'Main Menu', frame=bottom_frame, command=lambda: go_to_main_menu(self), side=LEFT)
+                    'Main Menu', frame=bottom_frame, command=lambda: app.reporting.go_to_main_menu(), side=LEFT)
             else:
                 back_button = Application.AppButton(
-                    'BACK', frame=bottom_frame, side=LEFT, command=lambda: go_to_projects(self, "normal")
+                    'BACK', frame=bottom_frame, side=LEFT, command=lambda: app.reporting.go_to_projects("normal")
                 )
             report_options_button = Application.AppButton("Report\noptions", right_buttons_frame, side=RIGHT)
 
@@ -923,7 +932,12 @@ class Application(Frame):
                 app.reporting = Application.Reporting(None, bug_handler=self.bug_handler, reported=True)
             else:
                 app.main_menu = Application.MainMenu()
-            self.destroy()
+            app.reported = None
+
+        def go_to_main_menu(self):
+            self.pack_forget()
+            app.main_menu = Application.MainMenu()
+            app.reported = None
 
         def init_widgets(self):
             background_frame = Frame(master=self, bg=Application.color_theme[4])
@@ -946,7 +960,7 @@ class Application(Frame):
             reported_text.insert(0, f"Opened Mantis report")
 
             menu_button = Application.AppButton(
-                'Main Menu', frame=bottom_frame, command=lambda: go_to_main_menu(self), side=LEFT)
+                'Main Menu', frame=bottom_frame, command=self.go_to_main_menu, side=LEFT)
 
             next_report_button = Application.AppButton(
                 'Next Report', frame=middle_frame, command=self.go_to_reporting, side=TOP, font_size=20,
@@ -967,21 +981,15 @@ class Application(Frame):
             bottom_frame = Frame(background_frame, bg=Application.color_theme[4])
             bottom_frame.pack(side=BOTTOM, anchor="sw")
             back_button = Application.AppButton('BACK', frame=bottom_frame, anchor="sw",
-                                                command=lambda: go_to_projects(self, "normal"))
+                                                command=lambda: self.go_to_projects("normal"))
+
+        def go_to_projects(self, use_mode):
+            self.pack_forget()
+            app.projects_page = Application.SelectProject(use_mode)
+            app.projects_page.open_page()
+            app.main_menu = None
 
 # region GLOBAL COMMANDS
-def go_to_projects(frame, use_mode):
-    frame.pack_forget()
-    app.projects_page = Application.SelectProject(use_mode)
-    app.projects_page.open_page()
-    frame.destroy()
-
-
-def go_to_main_menu(frame):
-    frame.pack_forget()
-    app.main_menu = Application.MainMenu()
-    frame.destroy()
-
 
 def make_error_textbox(message, error_textbox):
     # use this to clear a textbox and display a message
