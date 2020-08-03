@@ -140,6 +140,9 @@ class ConfigHandler:
             ConfigHandler.cfg_dict[cfg_layout[line_selection]] = ConfigHandler.ask_config_line(
                 cfg_layout[line_selection]
                 , preferred_browser=browser_chosen)
+        else:
+            ConfigHandler.cfg_dict[cfg_layout[line_selection]] = ConfigHandler.ask_config_line(
+                cfg_layout[line_selection])
         ConfigHandler.save_config()
 
     @staticmethod

@@ -302,6 +302,7 @@ class Application(Frame):
                     directory_button.pack(side=RIGHT)
 
             def ask_for_directory(self, index):
+                print('hey there')
                 config.ConfigHandler.gui_config_edit(index)
                 app.settings_menu.go_to_main_menu()
                 app.main_menu.go_to_settings()
