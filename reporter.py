@@ -6,7 +6,7 @@ from information_compile import determine_bug_category, extract_asset_path
 import copy
 
 
-def report_bug(project, log_lines, version, images_folder_path, assign, username, password, browser='chrome'):
+def report_bug(project, log_lines, version, images_folder_path, assign, username, password, driver_h, browser='chrome'):
     # uploads stuff to Mantis or calls other methods to do that
     log_first = log_lines.popleft()
     print(f'CURRENT BUG: {log_first}')
@@ -26,25 +26,13 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
 
     while True:
         try:
-            driver_handler = DriverHandler(headless=False, browser=browser)
-            if not tried_duplicates:
-                duplicate_found = check_for_duplicates(
-                    username, password, bug_description=log_first, asset_path=a_path,
-                    driver_handler=driver_handler, ask_input=True)
-                tried_duplicates = True
-            if duplicate_found == -1:
-                return False  # For returning to menu during reporting
-            elif duplicate_found == 0:
-                use_log_lines = copy.deepcopy(log_lines)
-                upload_to_mantis(
-                    version, category, use_log_lines,
-                    assign, project, username, password, browser,
-                    path_to_asset=a_path, debug_info=d_info, web_driver=driver_handler
-                )
-                print("Bug reported successfully!\n")
-            else:
-                print('Reporting not needed')
-                driver_handler.get_driver().quit()
+            driver_handler = driver_h
+            use_log_lines = copy.deepcopy(log_lines)
+            upload_to_mantis(
+                version, category, use_log_lines,
+                assign, project, username, password, browser,
+                path_to_asset=a_path, debug_info=d_info, web_driver=driver_handler
+            )
             break
         except SessionNotCreatedException:
             print(error_message + ' SessionNotCreatedException')

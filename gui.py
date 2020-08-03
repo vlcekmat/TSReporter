@@ -491,6 +491,8 @@ class Application(Frame):
         severity_var = None
         priority_var = None
 
+        bug_in_process = None
+
         small_img_size = (170, 130)  # Size, to which the BugEntry thumbnails its images
         img_size = (515, 530)
 
@@ -510,6 +512,8 @@ class Application(Frame):
             current_bug = []
             for bug_line in self.bug_handler.get_current():
                 current_bug.append(self.BugEntry(bug_line, self.bug_handler.try_get_image(bug_line)))
+
+            self.bug_in_process = current_bug
 
             self.already_reported = reported
             self.pack(fill=BOTH, expand=True)
@@ -577,8 +581,8 @@ class Application(Frame):
             game = project[0]
             version = find_version(game=game)
             category = determine_bug_category(bug_line)
-            log_lines = deque()
-            log_lines.append(bug_line)
+            current_bug_deque = self.bug_handler.get_current()
+
             assign_to = find_assign_to(bug_line, chosen_game=game)
             username = config.read_config('mantis username')
             password = 'CrYVhn7FSM'
@@ -588,12 +592,17 @@ class Application(Frame):
 
             if not self.driver_handler:
                 self.driver_handler = DriverHandler(config.read_config("preferred browser"))
+
             log_into_mantis(self.driver_handler.get_driver(), username, password)
-            reporter.upload_to_mantis(version=version, category=category, log_lines=log_lines,
-                                      assign_to=assign_to, project=project,
-                                      username=username, password=password, browser=browser,
-                                      path_to_asset=path_to_asset, debug_info=debug_info,
-                                      web_driver=self.driver_handler, priority=None)
+            reporter.report_bug(project=project, log_lines=current_bug_deque, version=version,
+                                images_folder_path=config.read_config('edited images location'),
+                                assign=assign_to, username=username, password=password, driver_h=self.driver_handler)
+
+            #reporter.upload_to_mantis(version=version, category=category, log_lines=log_lines,
+            #                          assign_to=assign_to, project=project,
+            #                          username=username, password=password, browser=browser,
+            #                          path_to_asset=path_to_asset, debug_info=debug_info,
+            #                          web_driver=self.driver_handler, priority=None)
 
             self.go_to_reported()
 
