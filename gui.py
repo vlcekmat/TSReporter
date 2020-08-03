@@ -604,12 +604,12 @@ class Application(Frame):
 
         def open_duplicates(self, bug_line, report_button):
             # TODO: get rid of the error message when you close the browser in the process
-           # if not self.driver_handler:
-           #     self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-           # reporter.check_for_duplicates(
-           #     config.read_config("mantis username"), "CrYVhn7FSM", bug_line,
-           #     driver_handler=self.driver_handler
-           # )
+            if not self.driver_handler:
+                self.driver_handler = DriverHandler(config.read_config("preferred browser"))
+            reporter.check_for_duplicates(
+                config.read_config("mantis username"), "CrYVhn7FSM", bug_line,
+                driver_handler=self.driver_handler
+            )
             report_button.get_element()['text'] = "REPORT"
             report_button.get_element()['command'] = lambda: self.open_report(bug_line)
 
@@ -629,14 +629,14 @@ class Application(Frame):
             priority = self.priority_var.get().lower()
             severity = self.severity_var.get().lower()
 
-           # if not self.driver_handler:
-           #     self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-           #     log_into_mantis(self.driver_handler.get_driver(), username, password)
-#
-           # reporter.report_bug(project=project, log_lines=current_bug_deque, version=version,
-           #                     images_folder_path=config.read_config('edited images location'),
-           #                     assign=assign_to, username=username, password=password,
-           #                     _driver_handler=self.driver_handler, priority=priority, severity=severity)
+            if not self.driver_handler:
+                self.driver_handler = DriverHandler(config.read_config("preferred browser"))
+                log_into_mantis(self.driver_handler.get_driver(), username, password)
+
+            reporter.report_bug(project=project, log_lines=current_bug_deque, version=version,
+                                images_folder_path=config.read_config('edited images location'),
+                                assign=assign_to, username=username, password=password,
+                                _driver_handler=self.driver_handler, priority=priority, severity=severity)
 
             self.go_to_reported()
 
@@ -928,7 +928,10 @@ class Application(Frame):
             self.pack_forget()
             self.bug_handler.read_next()
             if self.bug_handler.get_current:
-                app.reporting = Application.Reporting(None, bug_handler=self.bug_handler, reported=True)
+                try:
+                    app.reporting = Application.Reporting(None, bug_handler=self.bug_handler, reported=True)
+                except TypeError:
+                    app.main_menu = Application.MainMenu()
             else:
                 app.main_menu = Application.MainMenu()
             app.reported = None
