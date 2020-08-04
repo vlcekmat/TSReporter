@@ -4,6 +4,7 @@ from tkinter import *
 from tkinter.font import Font
 from threading import Thread
 from PIL import ImageTk, Image
+from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowException, WebDriverException
 
 import main
 from versions import find_version
@@ -636,12 +637,42 @@ class Application(Frame):
             if self.asset_path_input.get() != "Enter asset path/debug info":
                 asset_path = self.asset_path_input.get()
 
-            if not self.driver_handler:
-                self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-            reporter.check_for_duplicates(
-                config.read_config("mantis username"), "CrYVhn7FSM", bug_line,
-                driver_handler=self.driver_handler, asset_path=asset_path
-            )
+            while True:
+                error_message = "Do not interact with the browser during the process"
+                try:
+                    if not self.driver_handler:
+                        self.driver_handler = DriverHandler(config.read_config("preferred browser"))
+                    reporter.check_for_duplicates(
+                        config.read_config("mantis username"), "CrYVhn7FSM", bug_line,
+                        driver_handler=self.driver_handler, asset_path=asset_path
+                    )
+                except SessionNotCreatedException:
+                    print(error_message + ' SessionNotCreatedException')
+                    self.driver_handler = None
+                    self.driver_handler = DriverHandler(config.read_config("preferred browser"))
+                except NoSuchWindowException:
+                    print(error_message + ' NoSuchWindowException')
+                    self.driver_handler = None
+                    self.driver_handler = DriverHandler(config.read_config("preferred browser"))
+                except WebDriverException:
+                    print(error_message + ' WebDriverException')
+                    self.driver_handler = None
+                    self.driver_handler = DriverHandler(config.read_config("preferred browser"))
+                except AttributeError:
+                    print(error_message + ' AttributeError')
+                    self.driver_handler = None
+                    self.driver_handler = DriverHandler(config.read_config("preferred browser"))
+                except TypeError:
+                    print(error_message + ' TypeError')
+                    self.driver_handler = None
+                    self.driver_handler = DriverHandler(config.read_config("preferred browser"))
+                except NameError:
+                    print(error_message + ' NameError')
+                    self.driver_handler = None
+                    self.driver_handler = DriverHandler(config.read_config("preferred browser"))
+                else:
+                    break
+
             report_button.get_element()['text'] = "REPORT"
             report_button.get_element()['command'] = lambda: self.open_report(bug_line)
 
