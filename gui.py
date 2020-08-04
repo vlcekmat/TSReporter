@@ -46,6 +46,7 @@ class Application(Frame):
     reporting = None
     reported = None
     batch = None
+    login = None
 
     # It's important to keep in mind the class instances above,
     # when gui is active, exactly one has to have a non Null value, cuz having more than one pages active
@@ -130,7 +131,7 @@ class Application(Frame):
 
         @staticmethod
         def start_reporting(self):
-            # Here we create a new thread on which the reporting loop is running
+            # Here we create a new thread on which the reporting loop is running !!!not used, just for the future!!!
             ProgramThread().start()
 
         def go_to_projects(self, use_mode):
@@ -179,7 +180,7 @@ class Application(Frame):
 
             report_button = Application.AppButton('Report Bugs', frame=left_frame,
                                                   command=lambda: self.go_to_projects("normal"))
-            batch_report_button = Application.AppButton('Batch Report', frame=left_frame,
+            batch_report_button = Application.AppButton('Batch Report \n (WIP)', frame=left_frame,
                                                         command=lambda: self.go_to_projects("batch"))
             settings_button = Application.AppButton('Settings', frame=left_frame,
                                                     command=self.go_to_settings)
@@ -227,6 +228,31 @@ class Application(Frame):
         def init_widgets(self):
             self.pack(fill=BOTH, expand=True)
             self.set_up_menu()
+
+    class Login(Page):
+        current_mode = None
+
+        def __init__(self, use_mode):
+            super().__init__()
+            self.init_widgets()
+            self.current_mode = use_mode
+
+        def go_to_projects(self):
+            self.pack_forget()
+            app.projects_page = Application.SelectProject(self.current_mode)
+            app.projects_page.open_page()
+            app.login = None
+
+        def go_to_main_menu(self):
+            self.pack_forget()
+            app.main_menu = Application.MainMenu()
+            app.login = None
+
+        def init_widgets(self):
+            main_background = Frame(master=self, bg=Application.color_theme[4])
+            main_background.pack(fill=BOTH, expand=True)
+            button = Application.AppButton('Main Menu', frame=main_background,
+                                           command=self.go_to_main_menu, side=LEFT)
 
     class SettingsMenu(Page):
         # The settings page where you can change, you guessed it, settings! AKA former config
@@ -1030,11 +1056,10 @@ class Application(Frame):
             current_bug_text.insert(END, current_bug_summary)
             current_bug_text.configure(state=DISABLED)
 
-            reported_text = Entry(middle_frame, bg=Application.color_theme[3],
-                                  fg=Application.color_theme[1], bd=0, font="Helvetica 30", justify=CENTER)
+            reported_text = Label(middle_frame, bg=Application.color_theme[3],
+                                  fg=Application.color_theme[1], bd=0,
+                                  font="Helvetica 30", justify=CENTER, text="Opened Mantis report")
             reported_text.pack(anchor="n", pady=35, padx=35, side=TOP)
-            reported_text.insert(0, f"Opened Mantis report")
-            reported_text.configure(state=DISABLED)
 
             menu_button = Application.AppButton(
                 'Main Menu', frame=bottom_frame, command=self.go_to_main_menu, side=LEFT)
