@@ -13,7 +13,6 @@ import bugs
 import config
 from gui_bughandler import BugHandler
 from chromedrivers import DriverHandler, gui_login
-from information_compile import determine_bug_category
 from sector_seek import find_assign_to
 from chromedrivers import log_into_mantis
 import utils
