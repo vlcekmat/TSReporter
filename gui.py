@@ -465,6 +465,7 @@ class Application(Frame):
             error_textbox = Text(error_frame, height=1, width=80, bg=Application.color_theme[4],
                                  fg=Application.color_theme[2], bd=0, font="Helvetica 12")
             error_textbox.pack(pady=0, padx=0, side=TOP, anchor='n')
+            error_textbox.configure(state=DISABLED)
 
             bottom_frame = Frame(background, bg=Application.color_theme[4])
             bottom_frame.pack(side=BOTTOM, anchor="sw")
@@ -561,6 +562,7 @@ class Application(Frame):
         dialog_activated = False
 
         asset_path_input = None
+
         def show_text_input(self, master):
             if not self.dialog_activated:
                 self.dialog_activated = True
@@ -569,6 +571,7 @@ class Application(Frame):
                                        width=10, fg='white')
                 asset_info_text.grid(row=0, column=0)
                 asset_info_text.insert(END, "Asset Path")
+                asset_info_text.configure(state=DISABLED)
 
                 text_input = Entry(master, bg=Application.color_theme[3], fg=Application.color_theme[2], width=25,
                                    font=Font(size=10))
@@ -610,6 +613,7 @@ class Application(Frame):
             bug_entry.reload_image(self.bug_handler)
             if image_location_text:
                 image_location_text.insert(END, new_image_path)
+                image_location_text.configure(state=DISABLED)
             if find_img_button:
                 find_img_button.get_element().pack_forget()
                 find_img_button.get_element().destroy()
@@ -691,6 +695,7 @@ class Application(Frame):
                     find_img_button.get_element().pack_forget()
                     find_img_button.get_element().destroy()
                 image_location_text.insert(END, current_bug[0].image_location)
+                image_location_text.configure(state=DISABLED)
             if self.bug_handler.images_good() and try_again_button:
                 try_again_button.get_element().pack_forget()
                 try_again_button.get_element().destroy()
@@ -852,6 +857,7 @@ class Application(Frame):
                                      fg=Application.color_theme[2], bd=0, font="Helvetica 12")
             version_info_text.pack(anchor="nw", pady=5, padx=5, side=TOP)
             version_info_text.insert(END, version_line)
+            version_info_text.configure(state=DISABLED)
 
             middle_frame = Frame(background_frame, bg=Application.color_theme[3])
             middle_frame.pack(anchor="center", pady=5, padx=15)
@@ -861,6 +867,7 @@ class Application(Frame):
                                     fg=Application.color_theme[1], bd=0, font="Helvetica 13")
             current_bug_text.pack(side=TOP, fill=X, pady=5, padx=5)
             current_bug_text.insert(END, current_bug_summary)
+            current_bug_text.configure(state=DISABLED)
 
             left_frame = Frame(middle_frame, bg=Application.color_theme[3])
             left_frame.pack(anchor="w", side=LEFT, pady=0, padx=10)
@@ -989,11 +996,13 @@ class Application(Frame):
                                     fg=Application.color_theme[1], bd=0, font="Helvetica 13")
             current_bug_text.pack(side=TOP, pady=10, padx=10)
             current_bug_text.insert(END, current_bug_summary)
+            current_bug_text.configure(state=DISABLED)
 
             reported_text = Entry(middle_frame, bg=Application.color_theme[3],
                                   fg=Application.color_theme[1], bd=0, font="Helvetica 30", justify=CENTER)
             reported_text.pack(anchor="n", pady=35, padx=35, side=TOP)
             reported_text.insert(0, f"Opened Mantis report")
+            reported_text.configure(state=DISABLED)
 
             menu_button = Application.AppButton(
                 'Main Menu', frame=bottom_frame, command=self.go_to_main_menu, side=LEFT)
