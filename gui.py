@@ -627,11 +627,16 @@ class Application(Frame):
         def open_duplicates(self, bug_line, report_button):
             # TODO: get rid of the error message when you close the browser in the process
             self.submit_asset_info()
+
+            asset_path = None
+            if self.asset_path_input.get() != "Enter asset path/debug info":
+                asset_path = self.asset_path_input.get()
+
             if not self.driver_handler:
                 self.driver_handler = DriverHandler(config.read_config("preferred browser"))
             reporter.check_for_duplicates(
                 config.read_config("mantis username"), "CrYVhn7FSM", bug_line,
-                driver_handler=self.driver_handler
+                driver_handler=self.driver_handler, asset_path=asset_path
             )
             report_button.get_element()['text'] = "REPORT"
             report_button.get_element()['command'] = lambda: self.open_report(bug_line)
