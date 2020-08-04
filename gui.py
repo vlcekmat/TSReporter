@@ -191,7 +191,7 @@ class Application(Frame):
 
             quit_button = Application.AppButton('QUIT', color1=Application.color_theme[2],
                                                 color2=Application.color_theme[2],
-                                                frame=left_frame, font_color='white', command=quit)
+                                                frame=left_frame, font_color='white', command=sys.exit)
 
             # region BUG COUNTER
             bugs_count_frame = Frame(top_frame, bg=Application.color_theme[3])
