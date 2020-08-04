@@ -631,11 +631,12 @@ class Application(Frame):
 
         def open_duplicates(self, bug_line, report_button):
             # TODO: get rid of the error message when you close the browser in the process
-            self.submit_asset_info()
 
             asset_path = None
-            if self.asset_path_input.get() != "Enter asset path/debug info":
-                asset_path = self.asset_path_input.get()
+            if bug_line[0] == 'a':
+                self.submit_asset_info()
+                if self.asset_path_input.get() != "Enter asset path/debug info":
+                    asset_path = self.asset_path_input.get()
 
             while True:
                 error_message = "Do not interact with the browser during the process"
