@@ -11,7 +11,7 @@ from versions import find_version
 import bugs
 import config
 from gui_bughandler import BugHandler
-from chromedrivers import DriverHandler
+from chromedrivers import DriverHandler, gui_login
 from information_compile import determine_bug_category
 from sector_seek import find_assign_to
 from chromedrivers import log_into_mantis
@@ -47,6 +47,7 @@ class Application(Frame):
     reported = None
     batch = None
     login = None
+    password = None
 
     # It's important to keep in mind the class instances above,
     # when gui is active, exactly one has to have a non Null value, cuz having more than one pages active
@@ -135,10 +136,16 @@ class Application(Frame):
             ProgramThread().start()
 
         def go_to_projects(self, use_mode):
-            self.pack_forget()
-            app.projects_page = Application.SelectProject(use_mode)
-            app.projects_page.open_page()
-            app.main_menu = None
+            if app.password is None:
+                self.pack_forget()
+                app.login = Application.Login(use_mode)
+                app.main_menu = None
+                placeholder = -1
+            else:
+                self.pack_forget()
+                app.projects_page = Application.SelectProject(use_mode)
+                app.projects_page.open_page()
+                app.main_menu = None
 
         # endregion
 
@@ -231,11 +238,29 @@ class Application(Frame):
 
     class Login(Page):
         current_mode = None
+        entered_password = None
 
         def __init__(self, use_mode):
             super().__init__()
             self.init_widgets()
             self.current_mode = use_mode
+            self.pack(fill=BOTH, expand=True)
+
+        class LoginThread(Thread):
+            def run(self):
+                successfully_logged_in = gui_login(username=config.read_config('mantis username'),
+                                                   password=app.login.entered_password)
+                return successfully_logged_in
+
+        # region COMMANDS
+
+        def try_log_in(self, text_field, login_frame, event=None):
+            self.entered_password = text_field.get()
+            login_frame.pack_forget()
+            successfully_logged_in = self.LoginThread().start()
+
+
+        # endregion
 
         def go_to_projects(self):
             self.pack_forget()
@@ -248,10 +273,36 @@ class Application(Frame):
             app.main_menu = Application.MainMenu()
             app.login = None
 
+        def create_login_interface(self, main_background):
+            login_border = Frame(main_background, bg=Application.color_theme[2], pady=10, padx=10)
+            login_border.pack(expand=True)
+
+            login_frame = Frame(login_border, bg=Application.color_theme[3], pady=10, padx=10)
+            login_frame.pack(expand=True)
+
+            login_text = Label(master=login_frame, bg=Application.color_theme[3], fg=Application.color_theme[2],
+                               text="Please enter your Mantis password:", font=Font(size=13))
+            login_text.pack(pady=5)
+
+            password_entry = Entry(login_frame, width=25, bg=Application.color_theme[1], font=Font(size=16), show="*")
+            password_entry.pack(padx=10)
+
+            login_button = Application.AppButton(frame=login_frame,
+                                                 text="LOGIN",
+                                                 command=lambda password_entry=password_entry: self.try_log_in(
+                                                     password_entry, login_frame=login_border))
+            root.bind('<Return>',
+                      lambda password_entry=password_entry: self.try_log_in(password_entry, login_frame=login_border))
+
         def init_widgets(self):
             main_background = Frame(master=self, bg=Application.color_theme[4])
             main_background.pack(fill=BOTH, expand=True)
-            button = Application.AppButton('Main Menu', frame=main_background,
+
+            self.create_login_interface(main_background)
+
+            bottom_frame = Frame(main_background, bg=Application.color_theme[4])
+            bottom_frame.pack(fill=X, expand=False, side=BOTTOM)
+            button = Application.AppButton('Main Menu', frame=bottom_frame,
                                            command=self.go_to_main_menu, side=LEFT)
 
     class SettingsMenu(Page):

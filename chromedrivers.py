@@ -3,6 +3,7 @@ import os
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException, NoSuchElementException
 
+import config
 from information_compile import extract_location_filter
 from information_compile import extract_asset_name
 from config import read_config
@@ -100,6 +101,17 @@ def log_into_tsreporter(test_login_username, browser='chrome'):
             if read_config("save password") == "True":
                 save_password(password)
             return password
+
+
+def gui_login(username, password):
+    driver_handler = DriverHandler(config.read_config("preferred browser"), headless=True)
+    log_into_mantis(driver_handler.get_driver(), username, password)
+    try:
+        driver_handler.get_driver().find_element_by_xpath('//div[@class="col-md-12 col-xs-12"]')
+    except NoSuchElementException:
+        return False
+    else:
+        return True
 
 
 def log_into_mantis(driver, username, password):
