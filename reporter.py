@@ -5,6 +5,7 @@ from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowE
 from information_compile import determine_bug_category, extract_asset_path
 import copy
 
+asset_path = None
 
 def report_bug(project, log_lines, version, images_folder_path, assign, username, password, _driver_handler,
                browser='chrome', priority=None, severity=None):
@@ -17,10 +18,10 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
     error_message = "Don't interact with the browser during the process, trying again..."
     tried_duplicates = False
     duplicate_found = False
-    a_path = None
     d_info = None
+    a_path = asset_path
     if 'A' in category.upper():
-        a_path = input('Enter DEBUG INFO or path to the asset:\n> ')
+        # a_path = input('Enter DEBUG INFO or path to the asset:\n> ')
         if 'DEBUG INFO' in a_path or 'Position' in a_path or 'Object' in a_path:  # To accommodate only partial debug i.
             d_info = a_path
             a_path = extract_asset_path(a_path)

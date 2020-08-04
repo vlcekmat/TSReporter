@@ -558,6 +558,27 @@ class Application(Frame):
             app.reported = Application.ReportedScreen(self.bug_handler, saved_report, self.bug_handler.get_current())
             app.reporting = None
 
+        dialog_activated = False
+
+        asset_path_input = None
+        def show_text_input(self, master):
+            if not self.dialog_activated:
+                self.dialog_activated = True
+
+                asset_info_text = Text(master, font=Font(size=12), bg=Application.color_theme[3], bd=0, height=1,
+                                       width=10, fg='white')
+                asset_info_text.grid(row=0, column=0)
+                asset_info_text.insert(END, "Asset Path")
+
+                text_input = Entry(master, bg=Application.color_theme[3], fg=Application.color_theme[2], width=25,
+                                   font=Font(size=10))
+                text_input.grid(row=0, column=1)
+                text_input.insert(END, "Enter asset path/debug info")
+                self.asset_path_input = text_input
+
+        def submit_asset_info(self):
+            reporter.asset_path = self.asset_path_input.get()
+
         def go_to_main_menu(self):
             self.pack_forget()
             app.main_menu = Application.MainMenu()
@@ -605,6 +626,7 @@ class Application(Frame):
 
         def open_duplicates(self, bug_line, report_button):
             # TODO: get rid of the error message when you close the browser in the process
+            self.submit_asset_info()
             if not self.driver_handler:
                 self.driver_handler = DriverHandler(config.read_config("preferred browser"))
             reporter.check_for_duplicates(
@@ -727,19 +749,23 @@ class Application(Frame):
             thumbnail_canvas.config(scrollregion=thumbnail_frame.bbox("all"))
             return image_labels
 
-        def make_options_sidebar(self, frame):
+        def make_options_sidebar(self, frame, current_bug_summary):
             # The report options sidebar is created here.
             # It is not displayed at first, only when show_sidebar() is called
 
             # TODO: Make some widgets for the sidebar here
+
+            if current_bug_summary[0] == 'a':
+                self.show_text_input(frame)
+
             priority_choices = ['Low', 'Normal', 'High', 'Urgent', 'Immediate']
             self.priority_var = StringVar(frame)
             self.priority_var.set(priority_choices[0])
 
             priority_menu = OptionMenu(frame, self.priority_var, *priority_choices)
             Label(frame, text="Priority", bg=Application.color_theme[3], fg=Application.color_theme[1],
-                  font="Helvetica 13 bold").grid(row=0, column=0)
-            priority_menu.grid(row=0, column=1)
+                  font="Helvetica 13 bold").grid(row=1, column=0)
+            priority_menu.grid(row=1, column=1)
             priority_menu.config(bg=Application.color_theme[3])
             priority_menu.config(fg=Application.color_theme[1])
             priority_menu.config(font="Helvetica 10")
@@ -751,8 +777,8 @@ class Application(Frame):
 
             severity_menu = OptionMenu(frame, self.severity_var, *severity_choices)
             Label(frame, text="Severity", bg=Application.color_theme[3], fg=Application.color_theme[1],
-                  font="Helvetica 13 bold").grid(row=1, column=0)
-            severity_menu.grid(row=1, column=1)
+                  font="Helvetica 13 bold").grid(row=2, column=0)
+            severity_menu.grid(row=2, column=1)
             severity_menu.config(bg=Application.color_theme[3])
             severity_menu.config(fg=Application.color_theme[1])
             severity_menu.config(font="Helvetica 10")
@@ -808,6 +834,7 @@ class Application(Frame):
                 thumbnails_frame, options_frame, this_button, current_bug, image_labels, image_location_text,
                 image_path_button, try_again_button
             )
+        text_input_frame = None
 
         def init_widgets(self, current_bug):
             # region Frames
@@ -839,6 +866,7 @@ class Application(Frame):
             frame_for_canvas.pack(side=TOP, pady=0, padx=0)
             frame_for_canvas.grid_columnconfigure(0, weight=1)
             frame_for_sidebar = Frame(right_frame, bg=Application.color_theme[3])  # Frame for the sidebar
+
             # These two frames will be filled and then alternated between in show_canvas and show_sidebar
 
             right_buttons_frame = Frame(right_frame, bg=Application.color_theme[3])
@@ -859,7 +887,7 @@ class Application(Frame):
             # The scrollable canvas is created here
             image_labels += self.make_scrollable_canvas(frame_for_canvas, len(current_bug))
 
-            self.make_options_sidebar(frame_for_sidebar)
+            self.make_options_sidebar(frame_for_sidebar, current_bug_summary)
 
             # endregion Frames
             if self.already_reported:

@@ -167,7 +167,8 @@ class ConfigHandler:
             new_value = yes_no_value
         else:
             if cfg_type != "text":
-                print(f"Select your {key_to_ask}")
+                #print(f"Select your {key_to_ask}")
+                pass
             new_value = ""
             if cfg_type == "path":
                 new_value = find_path()
