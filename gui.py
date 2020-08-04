@@ -138,7 +138,7 @@ class Application(Frame):
         def go_to_projects(self, use_mode):
             if app.password is None:
                 self.pack_forget()
-                app.login = Application.Login(use_mode)
+                app.login = Application.Login(use_mode, fail=False)
                 app.main_menu = None
                 placeholder = -1
             else:
@@ -241,9 +241,11 @@ class Application(Frame):
         entered_password = None
         logged_in = False
         logging_in_process = False
+        fail = None
 
-        def __init__(self, use_mode):
+        def __init__(self, use_mode, fail):
             super().__init__()
+            self.fail = fail
             self.init_widgets()
             self.current_mode = use_mode
             self.pack(fill=BOTH, expand=True)
@@ -266,7 +268,10 @@ class Application(Frame):
                     app.password = app.login.entered_password
                 app.login.logging_in_process = False
                 app.login.pack_forget()
-                app.login = Application.Login(app.login.current_mode)
+                if successfully_logged_in:
+                    app.login = Application.Login(app.login.current_mode, fail=False)
+                else:
+                    app.login = Application.Login(app.login.current_mode, fail=True)
                 app.login.open_page()
 
         class LoginAnimation(Thread):
@@ -290,11 +295,9 @@ class Application(Frame):
                     loading_text['text'] = 'Logging in...'
                     sleep(0.5)
 
-
         # region COMMANDS
 
         def try_log_in(self, text_field, login_frame, event=None):
-            print(text_field.get())
             self.entered_password = text_field.get()
             login_frame.pack_forget()
             self.LoginThread(login_frame).start()
@@ -319,8 +322,12 @@ class Application(Frame):
             login_frame = Frame(login_border, bg=Application.color_theme[3], pady=10, padx=10)
             login_frame.pack(expand=True)
 
-            login_text = Label(master=login_frame, bg=Application.color_theme[3], fg=Application.color_theme[2],
-                               text="Please enter your Mantis password:", font=Font(size=13))
+            login_text = Label(master=login_frame, bg=Application.color_theme[3],
+                               fg=Application.color_theme[2], font=Font(size=13))
+            if not self.fail:
+                login_text['text'] = "Please enter your Mantis password:"
+            else:
+                login_text['text'] = "Invalid password or username..."
             login_text.pack(pady=5)
 
             password_entry = Entry(login_frame, width=25, bg=Application.color_theme[1], font=Font(size=16), show="*")
@@ -333,7 +340,7 @@ class Application(Frame):
                       lambda x: self.try_log_in(text_field=password_entry, login_frame=login_border))
 
         def init_widgets(self):
-            main_background = Frame(master=self, bg=Application.color_theme[2])
+            main_background = Frame(master=self, bg=Application.color_theme[4])
             main_background.pack(fill=BOTH, expand=True)
 
             if app.password is None:
@@ -343,10 +350,6 @@ class Application(Frame):
                 button = Application.AppButton('Main Menu', frame=bottom_frame,
                                                command=self.go_to_main_menu, side=LEFT)
             else:
-                success_message = Label(main_background, bg=Application.color_theme[4], fg=Application.color_theme[2],
-                                     font=Font(size=15))
-                success_message.pack(expand=True)
-                main_background.pack_forget()
                 self.go_to_projects()
 
     class SettingsMenu(Page):
@@ -424,7 +427,6 @@ class Application(Frame):
                     directory_button.pack(side=RIGHT)
 
             def ask_for_directory(self, index):
-                print('hey there')
                 config.ConfigHandler.gui_config_edit(index)
                 app.settings_menu.go_to_main_menu()
                 app.main_menu.go_to_settings()
