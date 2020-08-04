@@ -262,6 +262,8 @@ class Application(Frame):
                 successfully_logged_in = gui_login(username=config.read_config('mantis username'),
                                                    password=app.login.entered_password)
                 app.login.logged_in = successfully_logged_in
+                if successfully_logged_in:
+                    app.password = app.login.entered_password
                 app.login.logging_in_process = False
                 app.login.pack_forget()
                 app.login = Application.Login(app.login.current_mode)
@@ -331,15 +333,21 @@ class Application(Frame):
                       lambda x: self.try_log_in(text_field=password_entry, login_frame=login_border))
 
         def init_widgets(self):
-            main_background = Frame(master=self, bg=Application.color_theme[4])
+            main_background = Frame(master=self, bg=Application.color_theme[2])
             main_background.pack(fill=BOTH, expand=True)
 
-            self.create_login_interface(main_background)
-
-            bottom_frame = Frame(main_background, bg=Application.color_theme[4])
-            bottom_frame.pack(fill=X, expand=False, side=BOTTOM)
-            button = Application.AppButton('Main Menu', frame=bottom_frame,
-                                           command=self.go_to_main_menu, side=LEFT)
+            if app.password is None:
+                self.create_login_interface(main_background)
+                bottom_frame = Frame(main_background, bg=Application.color_theme[4])
+                bottom_frame.pack(fill=X, expand=False, side=BOTTOM)
+                button = Application.AppButton('Main Menu', frame=bottom_frame,
+                                               command=self.go_to_main_menu, side=LEFT)
+            else:
+                success_message = Label(main_background, bg=Application.color_theme[4], fg=Application.color_theme[2],
+                                     font=Font(size=15))
+                success_message.pack(expand=True)
+                main_background.pack_forget()
+                self.go_to_projects()
 
     class SettingsMenu(Page):
         # The settings page where you can change, you guessed it, settings! AKA former config
