@@ -1,5 +1,6 @@
 import copy
 from collections import deque
+from time import sleep
 from tkinter import *
 from tkinter.font import Font
 from threading import Thread
@@ -239,6 +240,8 @@ class Application(Frame):
     class Login(Page):
         current_mode = None
         entered_password = None
+        logged_in = False
+        logging_in_process = False
 
         def __init__(self, use_mode):
             super().__init__()
@@ -247,18 +250,53 @@ class Application(Frame):
             self.pack(fill=BOTH, expand=True)
 
         class LoginThread(Thread):
+            login_frame = None
+
+            def __init__(self, login_frame):
+                super().__init__()
+                self.login_frame = login_frame
+
             def run(self):
+                app.login.logging_in_process = True
+                animation_thread = app.login.LoginAnimation(self.login_frame.master)
+                animation_thread.start()
                 successfully_logged_in = gui_login(username=config.read_config('mantis username'),
                                                    password=app.login.entered_password)
-                return successfully_logged_in
+                app.login.logged_in = successfully_logged_in
+                app.login.logging_in_process = False
+                app.login.pack_forget()
+                app.login = Application.Login(app.login.current_mode)
+                app.login.open_page()
+
+        class LoginAnimation(Thread):
+            master = None
+
+            def __init__(self, master):
+                super().__init__()
+                self.master = master
+
+            def run(self):
+                loading_text = Label(self.master, bg=Application.color_theme[4], fg=Application.color_theme[2],
+                                     font=Font(size=15))
+                while app.login.logging_in_process:
+                    loading_text['text'] = 'Logging in'
+                    loading_text.pack(expand=True)
+                    sleep(0.5)
+                    loading_text['text'] = 'Logging in.'
+                    sleep(0.5)
+                    loading_text['text'] = 'Logging in..'
+                    sleep(0.5)
+                    loading_text['text'] = 'Logging in...'
+                    sleep(0.5)
+
 
         # region COMMANDS
 
         def try_log_in(self, text_field, login_frame, event=None):
+            print(text_field.get())
             self.entered_password = text_field.get()
             login_frame.pack_forget()
-            successfully_logged_in = self.LoginThread().start()
-
+            self.LoginThread(login_frame).start()
 
         # endregion
 
@@ -289,10 +327,9 @@ class Application(Frame):
 
             login_button = Application.AppButton(frame=login_frame,
                                                  text="LOGIN",
-                                                 command=lambda password_entry=password_entry: self.try_log_in(
-                                                     password_entry, login_frame=login_border))
+                                                 command=lambda password_entry=password_entry: self.try_log_in(text_field=password_entry, login_frame=login_border))
             root.bind('<Return>',
-                      lambda password_entry=password_entry: self.try_log_in(password_entry, login_frame=login_border))
+                      lambda x: self.try_log_in(text_field=password_entry, login_frame=login_border))
 
         def init_widgets(self):
             main_background = Frame(master=self, bg=Application.color_theme[4])

@@ -110,6 +110,8 @@ def gui_login(username, password):
         driver_handler.get_driver().find_element_by_xpath('//div[@class="col-md-12 col-xs-12"]')
     except NoSuchElementException:
         return False
+    except TypeError:
+        return False
     else:
         return True
 
