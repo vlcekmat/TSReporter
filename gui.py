@@ -9,6 +9,7 @@ from PIL import ImageTk, Image
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowException, WebDriverException
 
 import main
+from password import get_password
 from versions import find_version
 import bugs
 import config
@@ -49,6 +50,7 @@ class Application(Frame):
     reported = None
     batch = None
     login = None
+
     password = None
 
     # It's important to keep in mind the class instances above,
@@ -67,7 +69,7 @@ class Application(Frame):
         else:
             self.main_menu = self.MainMenu()
             if config.read_config("save password") == "True":
-                self.password = config.read_config("save password")
+                self.password = get_password()
 
     color_theme = {
         # Change the values below to change the overall color theme of the app
@@ -1142,8 +1144,10 @@ class Application(Frame):
             self.init_widgets()
 
         def go_to_reporting(self):
+            app.reported.pack_forget()
             self.pack_forget()
             self.bug_handler.read_next()
+            app.reported = None
             if self.bug_handler.get_current:
                 try:
                     app.reporting = Application.Reporting(None, bug_handler=self.bug_handler, reported=True)
@@ -1151,7 +1155,6 @@ class Application(Frame):
                     app.main_menu = Application.MainMenu()
             else:
                 app.main_menu = Application.MainMenu()
-            app.reported = None
 
         def go_to_main_menu(self):
             self.pack_forget()
@@ -1208,6 +1211,7 @@ class Application(Frame):
             app.projects_page = Application.SelectProject(use_mode)
             app.projects_page.open_page()
             app.main_menu = None
+
 
 def make_error_textbox(message, error_textbox):
     # use this to clear a textbox and display a message
