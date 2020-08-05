@@ -675,6 +675,8 @@ class Application(Frame):
         small_img_size = (170, 130)  # Size, to which the BugEntry thumbnails its images
         img_size = (515, 530)
 
+        late_image = None
+
         def __init__(self, project, bug_handler, reported=False):
             super().__init__()
 
@@ -775,6 +777,8 @@ class Application(Frame):
                 try_again_button.get_element().pack_forget()
                 try_again_button.get_element().destroy()
 
+            self.late_image = new_image_path
+
         def open_duplicates(self, bug_line, report_button):
             # TODO: get rid of the error message when you close the browser in the process
 
@@ -846,8 +850,8 @@ class Application(Frame):
             reporter.report_bug(project=project, log_lines=current_bug_deque, version=version,
                                 images_folder_path=config.read_config('edited images location'),
                                 assign=assign_to, username=username, password=password,
-                                _driver_handler=self.driver_handler, priority=priority, severity=severity)
-
+                                _driver_handler=self.driver_handler, priority=priority, severity=severity, late_image=self.late_image)
+            self.late_image = None
             self.go_to_reported()
 
         def look_for_images_again(self, current_bug):
