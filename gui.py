@@ -1,4 +1,5 @@
 import copy
+import os
 from collections import deque
 from time import sleep
 from tkinter import *
@@ -40,6 +41,7 @@ class ProgramThread(Thread):
 
 class Application(Frame):
     # The first GUI element put in the basic Win window, important for layout, everything sits on this
+    setup = None
     main_menu = None
     settings_menu = None
     projects_page = None
@@ -55,9 +57,17 @@ class Application(Frame):
 
     def __init__(self):
         super().__init__()
-        self.main_menu = self.MainMenu()
-        if config.read_config("save password") == "True":
-            self.password = config.read_config("save password")
+
+        config_path = "./config.cfg"
+        if not os.path.isfile(config_path):
+            config.ConfigHandler()
+            self.settings_menu = self.SettingsMenu(first_time=True)
+            self.settings_menu.open_page()
+
+        else:
+            self.main_menu = self.MainMenu()
+            if config.read_config("save password") == "True":
+                self.password = config.read_config("save password")
 
     color_theme = {
         # Change the values below to change the overall color theme of the app
@@ -124,11 +134,11 @@ class Application(Frame):
 
         # region COMMANDS
         # Commands are functions callable by buttons
-        def go_to_settings(self):
+        def go_to_settings(self, first_time=False):
             # ACHTUNG! When you annul an instance of a page class, remember to create a new one of a different
             # page class as following:
             self.pack_forget()
-            app.settings_menu = Application.SettingsMenu()
+            app.settings_menu = Application.SettingsMenu(first_time=first_time)
             app.settings_menu.open_page()
             app.main_menu = None
 
@@ -356,8 +366,11 @@ class Application(Frame):
 
     class SettingsMenu(Page):
         # The settings page where you can change, you guessed it, settings! AKA former config
-        def __init__(self):
+        first_time = False
+
+        def __init__(self, first_time=False):
             super().__init__()
+            self.first_time = first_time
             self.init_widgets()
 
         class SettingsOption:
@@ -393,7 +406,7 @@ class Application(Frame):
                 frame_text.pack(side=LEFT)
 
                 key_to_find = text.lower().split(':')[0]
-                directory_path = config.read_config(key_to_find)
+                directory_path = str(config.read_config(key_to_find))
 
                 directory_value_frame = Frame(value_frame, bg=Application.color_theme[3])
                 directory_value_frame.pack(fill=BOTH, side=TOP)
@@ -430,8 +443,9 @@ class Application(Frame):
 
             def ask_for_directory(self, index):
                 config.ConfigHandler.gui_config_edit(index)
+                first_time = app.settings_menu.first_time
                 app.settings_menu.go_to_main_menu()
-                app.main_menu.go_to_settings()
+                app.main_menu.go_to_settings(first_time=first_time)
 
         # region COMMANDS
 
@@ -444,7 +458,7 @@ class Application(Frame):
             username = text_input.get()
             config.ConfigHandler.gui_config_edit(3, entered_text=username)
             self.go_to_main_menu()
-            app.main_menu.go_to_settings()
+            app.main_menu.go_to_settings(first_time=self.first_time)
 
         dialog_activated = False
 
@@ -486,7 +500,7 @@ class Application(Frame):
         def submit_yes_no(self, yes_no, index):
             config.ConfigHandler().gui_config_edit(index=index, yes_no_value=yes_no)
             self.go_to_main_menu()
-            app.main_menu.go_to_settings()
+            app.main_menu.go_to_settings(first_time=self.first_time)
 
         def show_browser_selection(self, master):
             if not self.dialog_activated:
@@ -508,7 +522,7 @@ class Application(Frame):
         def submit_browser_selection(self, chosen_browser):
             config.ConfigHandler().gui_config_edit(index=4, browser_chosen=chosen_browser)
             self.go_to_main_menu()
-            app.main_menu.go_to_settings()
+            app.main_menu.go_to_settings(first_time=self.first_time)
         # endregion
 
         def init_widgets(self):
@@ -517,6 +531,11 @@ class Application(Frame):
 
             background = Frame(template_background, bg=Application.color_theme[4])
             background.pack(fill=BOTH, expand=True, padx=10, pady=10)
+
+            if self.first_time:
+                warning_text = Label(background, bg=Application.color_theme[4], fg=Application.color_theme[2], font=Font(size=20))
+                warning_text['text'] = "FIRST TIME SETUP"
+                warning_text.pack()
 
             subbackground = Frame(background, bg=Application.color_theme[4])
             subbackground.pack(fill=Y, expand=False, padx=10, pady=10)

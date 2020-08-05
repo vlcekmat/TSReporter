@@ -40,7 +40,7 @@ class ConfigHandler:
         else:
             config_path = "./config.cfg"
         if not os.path.isfile(config_path):
-            ConfigHandler.config_setup()
+            ConfigHandler.gui_config_setup()  # changed from config_setup()
         else:
             cfg_file = open(config_path, "r")
             cfg_lines = cfg_file.readlines()
@@ -87,7 +87,8 @@ class ConfigHandler:
         for key in ConfigHandler.cfg_dict:
             cfg_file.write(f'"{key}" : "{ConfigHandler.cfg_dict[key]}"\n')
         if o_stream:
-            o_stream.write("Configuration changes saved")
+            pass
+            # o_stream.write("Configuration changes saved")
 
     @staticmethod
     def config_edit():
@@ -156,6 +157,23 @@ class ConfigHandler:
             if ConfigHandler.config_layout[entry] == "secret":
                 continue
             ConfigHandler.cfg_dict[entry] = ConfigHandler.ask_config_line(entry)
+        ConfigHandler.save_config(stdout)
+
+    @staticmethod
+    def gui_config_setup():
+        cfg_layout = ConfigHandler.config_layout.keys()
+        for entry in cfg_layout:
+            if ConfigHandler.config_layout[entry] == "secret":
+                ConfigHandler.cfg_dict[entry] = ""
+            elif ConfigHandler.config_layout[entry] == "path":
+                ConfigHandler.cfg_dict[entry] = "ENTER A PATH"
+            elif ConfigHandler.config_layout[entry] == "text":
+                ConfigHandler.cfg_dict[entry] = ""
+            elif ConfigHandler.config_layout[entry] == "browser":
+                ConfigHandler.cfg_dict[entry] = "chrome"
+            elif ConfigHandler.config_layout[entry] == "yn":
+                ConfigHandler.cfg_dict[entry] = False
+
         ConfigHandler.save_config(stdout)
 
     @staticmethod
