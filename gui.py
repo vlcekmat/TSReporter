@@ -56,6 +56,8 @@ class Application(Frame):
     def __init__(self):
         super().__init__()
         self.main_menu = self.MainMenu()
+        if config.read_config("save password") == "True":
+            self.password = config.read_config("save password")
 
     color_theme = {
         # Change the values below to change the overall color theme of the app

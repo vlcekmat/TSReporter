@@ -113,6 +113,8 @@ def gui_login(username, password):
     except TypeError:
         return False
     else:
+        if read_config("save password") == "True":
+            save_password(password)
         return True
 
 
