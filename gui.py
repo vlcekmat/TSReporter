@@ -788,7 +788,7 @@ class Application(Frame):
                     if not self.driver_handler:
                         self.driver_handler = DriverHandler(config.read_config("preferred browser"))
                     reporter.check_for_duplicates(
-                        config.read_config("mantis username"), "CrYVhn7FSM", bug_line,
+                        config.read_config("mantis username"), app.password, bug_line,
                         driver_handler=self.driver_handler, asset_path=asset_path
                     )
                 except SessionNotCreatedException:
@@ -832,7 +832,7 @@ class Application(Frame):
 
             assign_to = find_assign_to(bug_line, chosen_game=game)
             username = config.read_config('mantis username')
-            password = 'CrYVhn7FSM'
+            password = app.password
 
             priority = self.priority_var.get().lower()
             severity = self.severity_var.get().lower()
