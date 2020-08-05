@@ -1084,7 +1084,7 @@ class Application(Frame):
                 # If a report has been made already, it is not possible to go back to project selection
                 # instead, this button will take the user to the main menu
                 back_button = Application.AppButton(
-                    'Main Menu', frame=bottom_frame, command=lambda: app.reporting.go_to_main_menu(), side=LEFT)
+                    'Main Menu', frame=bottom_frame, command=lambda: self.go_to_main_menu(), side=LEFT)
             else:
                 back_button = Application.AppButton(
                     'BACK', frame=bottom_frame, side=LEFT, command=lambda: app.reporting.go_to_projects("normal")
