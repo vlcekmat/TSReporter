@@ -1244,11 +1244,9 @@ def make_error_textbox(message, error_textbox):
 # Creates the basic "box" in which you can put all of the GUI elements
 # It also takes care of misc stuff, s.a. fixed window size, title on the app window and the icon
 
-# ENABLE THIS WHEN MAKING A NEW BUILD
-# It prevents console windows from opening in the gui version
-# When not disabled while running in editor, it messes pycharm up!!!!
-# hide = win32gui.GetForegroundWindow()
-# win32gui.ShowWindow(hide, win32con.SW_HIDE)
+if os.path.isfile("TSReporter.exe"):
+    hide = win32gui.GetForegroundWindow()
+    win32gui.ShowWindow(hide, win32con.SW_HIDE)
 
 root = Tk()
 root.geometry('960x540')
