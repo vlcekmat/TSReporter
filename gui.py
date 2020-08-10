@@ -482,9 +482,6 @@ class Application(Frame):
                 submit_button.pack(pady=5)
 
         def ask_yes_no(self, master, setting):
-            # TODO: we need to replace the index parameter in config.ConfigHandler().gui_config_edit()
-            #  with a key argument, so I don't have to create a
-            #  separate function for each y/n setting we might add in the future
             if not self.dialog_activated:
                 self.dialog_activated = True
                 buttons_frame = Frame(master, bg=Application.color_theme[3])
@@ -781,7 +778,7 @@ class Application(Frame):
             image_to_show = ImageTk.PhotoImage(image_retrieved)
             image_label.configure(image=image_to_show)
             image_label.image = image_to_show
-            if try_again_button:
+            if try_again_button and self.bug_handler.images_good():
                 try_again_button.get_element().pack_forget()
                 try_again_button.get_element().destroy()
 
