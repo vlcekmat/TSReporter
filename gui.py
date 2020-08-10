@@ -73,13 +73,56 @@ class Application(Frame):
             if config.read_config("save password") == "True":
                 self.password = get_password()
 
-    color_theme = {
+    ph_theme = {
         # Change the values below to change the overall color theme of the app
         1: 'white',  # Regular Buttons, bugs counter text
         2: '#ffa500',  # Quit Button, text
         3: '#484848',  # Integrated Frames
         4: '#2B2B2B'  # Background
     }
+
+    that_ass_theme = {
+        # Change the values below to change the overall color theme of the app
+        1: '#D9C5C1',  # Regular Buttons, bugs counter text
+        2: '#F2B694',  # Quit Button, text
+        3: '#8C5C4A',  # Integrated Frames
+        4: '#593C36'  # Background
+    }
+
+    hazard_theme = {
+        # Change the values below to change the overall color theme of the app
+        1: '#FF7237',  # Regular Buttons, bugs counter text
+        2: '#CF423C',  # Quit Button, text
+        3: '#570B2A',  # Integrated Frames
+        4: '#33081E'  # Background
+    }
+
+    pastel_theme = {
+        # Change the values below to change the overall color theme of the app
+        1: '#94FFD0',  # Regular Buttons, bugs counter text
+        2: '#F9B1FF',  # Quit Button, text
+        3: '#A382E8',  # Integrated Frames
+        4: '#7C9EFF'  # Background
+    }
+
+    forest_theme = {
+        # Change the values below to change the overall color theme of the app
+        1: '#D4D93D',  # Regular Buttons, bugs counter text
+        2: '#99BF0F',  # Quit Button, text
+        3: '#467302',  # Integrated Frames
+        4: '#214001'  # Background
+    }
+
+    red_black__theme = {
+        # Change the values below to change the overall color theme of the app
+        1: '#ECE8E1',  # Regular Buttons, bugs counter text
+        2: '#FF4655',  # Quit Button, text
+        3: '#8C3243',  # Integrated Frames
+        4: '#271D26'  # Background
+    }
+
+    current_color_theme = ph_theme
+
 
     class Page(Frame):
         # All pages inherit from this class
@@ -99,9 +142,9 @@ class Application(Frame):
         def __init__(self, text, frame, color1=None, color2=None, font_color='black', command=None,
                      offx=10, offy=10, font_size=15, text_spacing=20, side=None, pady=10, anchor=None):
             if color1 is None:
-                color1 = Application.color_theme[1]
+                color1 = Application.current_color_theme[1]
             if color2 is None:
-                color2 = Application.color_theme[1]
+                color2 = Application.current_color_theme[1]
 
             self.text = text
 
@@ -180,15 +223,15 @@ class Application(Frame):
             except FileNotFoundError:
                 ets_bugs_count = 'N/A'
 
-            background_frame = Frame(self, bg=Application.color_theme[4])
+            background_frame = Frame(self, bg=Application.current_color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
             # The main frame of this page
 
-            top_frame = Frame(background_frame, bg=Application.color_theme[4])
+            top_frame = Frame(background_frame, bg=Application.current_color_theme[4])
             top_frame.pack(side=TOP, fill=X)
             # duh
 
-            left_frame = Frame(top_frame, bg=Application.color_theme[3])
+            left_frame = Frame(top_frame, bg=Application.current_color_theme[3])
             left_frame.pack(expand=False, fill=Y, side=LEFT, pady=10, padx=10)
 
             # From now on the variable names are pretty self-explanatory
@@ -197,8 +240,8 @@ class Application(Frame):
             title_font = "Helvetica 20 bold"
 
             title = Label(left_frame, text='TSReporter',
-                          bg=Application.color_theme[4], font=title_font, padx=17, pady=5,
-                          fg=Application.color_theme[2])
+                          bg=Application.current_color_theme[4], font=title_font, padx=17, pady=5,
+                          fg=Application.current_color_theme[2])
             title.pack(side=TOP)
 
             report_button = Application.AppButton('Report Bugs', frame=left_frame,
@@ -208,34 +251,34 @@ class Application(Frame):
             settings_button = Application.AppButton('Settings', frame=left_frame,
                                                     command=self.go_to_settings)
 
-            placeholder_frame = Frame(left_frame, bg=Application.color_theme[3])
+            placeholder_frame = Frame(left_frame, bg=Application.current_color_theme[3])
             placeholder_frame.pack(fill=BOTH, pady=70)
             # This is only for creating the gap between regular buttons and the quit button
 
-            quit_button = Application.AppButton('QUIT', color1=Application.color_theme[2],
-                                                color2=Application.color_theme[2],
+            quit_button = Application.AppButton('QUIT', color1=Application.current_color_theme[2],
+                                                color2=Application.current_color_theme[2],
                                                 frame=left_frame, font_color='white', command=sys.exit)
 
             # region BUG COUNTER
-            bugs_count_frame = Frame(top_frame, bg=Application.color_theme[3])
+            bugs_count_frame = Frame(top_frame, bg=Application.current_color_theme[3])
             bugs_count_frame.pack(side=TOP, pady=10)
             subtitle_font = Font(size=15)
             reports_count_text = Label(bugs_count_frame, text=f'Number of bugs in bugs.txt',
-                                       bg=Application.color_theme[4], fg=Application.color_theme[2], font=subtitle_font)
+                                       bg=Application.current_color_theme[4], fg=Application.current_color_theme[2], font=subtitle_font)
             reports_count_text.pack()
             ETS2_bugs_count = Label(bugs_count_frame, text=f'ETS 2: {ets_bugs_count}',
-                                    bg=Application.color_theme[3], fg=Application.color_theme[1], font=subtitle_font)
+                                    bg=Application.current_color_theme[3], fg=Application.current_color_theme[1], font=subtitle_font)
             ETS2_bugs_count.pack()
             ATS_bugs_count = Label(bugs_count_frame, text=f'ATS: {ats_bugs_count}',
-                                   bg=Application.color_theme[3], fg=Application.color_theme[1], font=subtitle_font)
+                                   bg=Application.current_color_theme[3], fg=Application.current_color_theme[1], font=subtitle_font)
             ATS_bugs_count.pack()
             # endregion
 
-            bottom_frame = Frame(background_frame, bg=Application.color_theme[4])
+            bottom_frame = Frame(background_frame, bg=Application.current_color_theme[4])
             bottom_frame.pack(side=BOTTOM, fill=X)
 
             img = ImageTk.PhotoImage(Image.open("./resources/logo.png"))
-            img_panel = Label(top_frame, image=img, bg=Application.color_theme[4])
+            img_panel = Label(top_frame, image=img, bg=Application.current_color_theme[4])
             img_panel.image = img
             img_panel.place(x=0, y=0)
             img_panel.pack(pady=100, side=BOTTOM)
@@ -244,8 +287,8 @@ class Application(Frame):
                 # Reads the version and displays it on the screen
                 version = version_file.readline()
             version_label = Label(bottom_frame, text=version,
-                                  bg=Application.color_theme[4],
-                                  fg=Application.color_theme[2])
+                                  bg=Application.current_color_theme[4],
+                                  fg=Application.current_color_theme[2])
             version_label.pack(side=RIGHT)
 
         def init_widgets(self):
@@ -298,7 +341,7 @@ class Application(Frame):
                 self.master = master
 
             def run(self):
-                loading_text = Label(self.master, bg=Application.color_theme[4], fg=Application.color_theme[2],
+                loading_text = Label(self.master, bg=Application.current_color_theme[4], fg=Application.current_color_theme[2],
                                      font=Font(size=15))
                 while app.login.logging_in_process:
                     loading_text['text'] = 'Logging in'
@@ -332,21 +375,21 @@ class Application(Frame):
             app.login = None
 
         def create_login_interface(self, main_background):
-            login_border = Frame(main_background, bg=Application.color_theme[2], pady=10, padx=10)
+            login_border = Frame(main_background, bg=Application.current_color_theme[2], pady=10, padx=10)
             login_border.pack(expand=True)
 
-            login_frame = Frame(login_border, bg=Application.color_theme[3], pady=10, padx=10)
+            login_frame = Frame(login_border, bg=Application.current_color_theme[3], pady=10, padx=10)
             login_frame.pack(expand=True)
 
-            login_text = Label(master=login_frame, bg=Application.color_theme[3],
-                               fg=Application.color_theme[2], font=Font(size=13))
+            login_text = Label(master=login_frame, bg=Application.current_color_theme[3],
+                               fg=Application.current_color_theme[2], font=Font(size=13))
             if not self.fail:
                 login_text['text'] = "Please enter your Mantis password:"
             else:
                 login_text['text'] = "Invalid password or username..."
             login_text.pack(pady=5)
 
-            password_entry = Entry(login_frame, width=25, bg=Application.color_theme[1], font=Font(size=16), show="*")
+            password_entry = Entry(login_frame, width=25, bg=Application.current_color_theme[1], font=Font(size=16), show="*")
             password_entry.pack(padx=10)
 
             login_button = Application.AppButton(frame=login_frame,
@@ -356,12 +399,12 @@ class Application(Frame):
                       lambda x: self.try_log_in(text_field=password_entry, login_frame=login_border))
 
         def init_widgets(self):
-            main_background = Frame(master=self, bg=Application.color_theme[4])
+            main_background = Frame(master=self, bg=Application.current_color_theme[4])
             main_background.pack(fill=BOTH, expand=True)
 
             if app.password is None:
                 self.create_login_interface(main_background)
-                bottom_frame = Frame(main_background, bg=Application.color_theme[4])
+                bottom_frame = Frame(main_background, bg=Application.current_color_theme[4])
                 bottom_frame.pack(fill=X, expand=False, side=BOTTOM)
                 button = Application.AppButton('Main Menu', frame=bottom_frame,
                                                command=self.go_to_main_menu, side=LEFT)
@@ -389,33 +432,33 @@ class Application(Frame):
                 minimized_font = Font(size=10)
                 super_minimized_font = Font(size=7)
 
-                setting_name_frame = Frame(background, bg=Application.color_theme[3])
+                setting_name_frame = Frame(background, bg=Application.current_color_theme[3])
                 setting_name_frame.grid(row=row, column=0, sticky=W + E + N + S, pady=5)
 
-                value_frame = Frame(background, bg=Application.color_theme[3])
+                value_frame = Frame(background, bg=Application.current_color_theme[3])
                 value_frame.grid(row=row, column=1, sticky=W + E + N + S, pady=5, padx=10)
 
-                button_frame = Frame(background, bg=Application.color_theme[4])
+                button_frame = Frame(background, bg=Application.current_color_theme[4])
                 button_frame.grid(row=row, column=2, padx=10, sticky=W + E + N + S, pady=10)
 
                 setting_name_frame_packed = Frame(setting_name_frame)
 
-                left_frame = Frame(setting_name_frame, bg=Application.color_theme[3])
+                left_frame = Frame(setting_name_frame, bg=Application.current_color_theme[3])
                 left_frame.pack(fill=X, side=TOP)
                 frame_text = Label(left_frame, text=text,
                                    font=subtitle_font,
-                                   fg=Application.color_theme[2],
-                                   bg=Application.color_theme[3],
+                                   fg=Application.current_color_theme[2],
+                                   bg=Application.current_color_theme[3],
                                    pady=5, padx=10)
                 frame_text.pack(side=LEFT)
 
                 key_to_find = text.lower().split(':')[0]
                 directory_path = str(config.read_config(key_to_find))
 
-                span_frame = Frame(value_frame, bg=Application.color_theme[3])
+                span_frame = Frame(value_frame, bg=Application.current_color_theme[3])
                 span_frame.pack(fill=X, side=TOP, padx=250)
 
-                directory_value_frame = Frame(value_frame, bg=Application.color_theme[3])
+                directory_value_frame = Frame(value_frame, bg=Application.current_color_theme[3])
                 directory_value_frame.pack(fill=BOTH, side=TOP)
 
                 selected_text = f'{directory_path}'
@@ -430,17 +473,17 @@ class Application(Frame):
                     selected_text = '...'
                 directory_value = Label(directory_value_frame, text=selected_text,
                                         font=selected_font,
-                                        fg=Application.color_theme[2],
-                                        bg=Application.color_theme[3],
+                                        fg=Application.current_color_theme[2],
+                                        bg=Application.current_color_theme[3],
                                         pady=5, padx=10)
 
                 directory_value.pack(side=LEFT, fill=BOTH)
                 if include_button:
-                    directory_button_frame = Frame(button_frame, bg=Application.color_theme[3])
+                    directory_button_frame = Frame(button_frame, bg=Application.current_color_theme[3])
                     directory_button_frame.pack(fill=X, side=TOP)
                     directory_button = Button(directory_button_frame, text=button_text,
-                                              bg=Application.color_theme[1],
-                                              activebackground=Application.color_theme[1])
+                                              bg=Application.current_color_theme[1],
+                                              activebackground=Application.current_color_theme[1])
                     if command is None:
                         directory_button['command'] = lambda: self.ask_for_directory(row)
                     else:
@@ -472,10 +515,10 @@ class Application(Frame):
         def show_text_input(self, master):
             if not self.dialog_activated:
                 self.dialog_activated = True
-                text_input = Entry(master, bg=Application.color_theme[3], fg=Application.color_theme[2], width=25,
+                text_input = Entry(master, bg=Application.current_color_theme[3], fg=Application.current_color_theme[2], width=25,
                                    font=Font(size=20))
                 text_input.pack()
-                submit_button = Button(master, bg=Application.color_theme[3], fg=Application.color_theme[2],
+                submit_button = Button(master, bg=Application.current_color_theme[3], fg=Application.current_color_theme[2],
                                        text='Submit',
                                        command=lambda: self.submit(text_input))
                 root.bind('<Return>', lambda x: self.submit(text_input))
@@ -484,11 +527,11 @@ class Application(Frame):
         def ask_yes_no(self, master, setting):
             if not self.dialog_activated:
                 self.dialog_activated = True
-                buttons_frame = Frame(master, bg=Application.color_theme[3])
+                buttons_frame = Frame(master, bg=Application.current_color_theme[3])
                 buttons_frame.pack(pady=10)
 
-                reported_text = Entry(buttons_frame, bg=Application.color_theme[3],
-                                      fg=Application.color_theme[1], bd=0, font="Helvetica 14", justify=CENTER)
+                reported_text = Entry(buttons_frame, bg=Application.current_color_theme[3],
+                                      fg=Application.current_color_theme[1], bd=0, font="Helvetica 14", justify=CENTER)
                 reported_text.pack(anchor="n", pady=5, padx=5, side=TOP)
                 reported_text.insert(0, setting.capitalize() + "?")
 
@@ -510,10 +553,10 @@ class Application(Frame):
             if not self.dialog_activated:
                 self.dialog_activated = True
                 options = ["Chrome", "Firefox"]
-                frame = Frame(master, bg=Application.color_theme[3], padx=10, pady=10)
+                frame = Frame(master, bg=Application.current_color_theme[3], padx=10, pady=10)
                 frame.pack()
-                dialog_text = Label(master=frame, text="Select your preferred browser", bg=Application.color_theme[3],
-                                    font=Font(size=10), fg=Application.color_theme[2])
+                dialog_text = Label(master=frame, text="Select your preferred browser", bg=Application.current_color_theme[3],
+                                    font=Font(size=10), fg=Application.current_color_theme[2])
                 dialog_text.pack(side=TOP)
                 for i in range(len(options)):
                     option_to_process = options[i].lower()
@@ -530,18 +573,18 @@ class Application(Frame):
         # endregion
 
         def init_widgets(self):
-            template_background = Frame(self, bg=Application.color_theme[4])
+            template_background = Frame(self, bg=Application.current_color_theme[4])
             template_background.pack(fill=BOTH, expand=True)
 
-            background = Frame(template_background, bg=Application.color_theme[4])
+            background = Frame(template_background, bg=Application.current_color_theme[4])
             background.pack(fill=BOTH, expand=True, padx=10, pady=10)
 
             if self.first_time:
-                warning_text = Label(background, bg=Application.color_theme[4], fg=Application.color_theme[2], font=Font(size=20))
+                warning_text = Label(background, bg=Application.current_color_theme[4], fg=Application.current_color_theme[2], font=Font(size=20))
                 warning_text['text'] = "FIRST TIME SETUP"
                 warning_text.pack()
 
-            subbackground = Frame(background, bg=Application.color_theme[4])
+            subbackground = Frame(background, bg=Application.current_color_theme[4])
             subbackground.pack(fill=Y, expand=False, padx=10, pady=10)
 
             grid_i = 0
@@ -609,40 +652,40 @@ class Application(Frame):
         # endregion
 
         def init_widgets(self):
-            background = Frame(self, bg=Application.color_theme[4])
+            background = Frame(self, bg=Application.current_color_theme[4])
             background.pack(fill=BOTH, expand=True)
 
-            error_frame = Frame(background, bg=Application.color_theme[4])
+            error_frame = Frame(background, bg=Application.current_color_theme[4])
             error_frame.pack(side=TOP, anchor="n")
-            error_textbox = Text(error_frame, height=1, width=80, bg=Application.color_theme[4],
-                                 fg=Application.color_theme[2], bd=0, font="Helvetica 12")
+            error_textbox = Text(error_frame, height=1, width=80, bg=Application.current_color_theme[4],
+                                 fg=Application.current_color_theme[2], bd=0, font="Helvetica 12")
             error_textbox.pack(pady=0, padx=0, side=TOP, anchor='n')
             error_textbox.configure(state=DISABLED)
 
-            bottom_frame = Frame(background, bg=Application.color_theme[4])
+            bottom_frame = Frame(background, bg=Application.current_color_theme[4])
             bottom_frame.pack(side=BOTTOM, anchor="sw")
 
             back_button = Application.AppButton('Main Menu', frame=bottom_frame, command=self.go_to_main_menu,
                                                 anchor="sw")
 
-            middle_frame = Frame(background, bg=Application.color_theme[4])
+            middle_frame = Frame(background, bg=Application.current_color_theme[4])
             middle_frame.pack(anchor="center", pady=70)
 
-            buttons_ats_background = Frame(middle_frame, bg=Application.color_theme[2])
+            buttons_ats_background = Frame(middle_frame, bg=Application.current_color_theme[2])
             buttons_ats_background.pack(padx=30, pady=30, side=LEFT)
 
-            buttons_ats_frame = Frame(buttons_ats_background, bg=Application.color_theme[3])
+            buttons_ats_frame = Frame(buttons_ats_background, bg=Application.current_color_theme[3])
             buttons_ats_frame.pack(side=LEFT, padx=10, pady=10)
 
-            buttons_ets_background = Frame(middle_frame, bg=Application.color_theme[2])
+            buttons_ets_background = Frame(middle_frame, bg=Application.current_color_theme[2])
             buttons_ets_background.pack(padx=30, pady=30, side=RIGHT)
 
-            buttons_ets_frame = Frame(buttons_ets_background, bg=Application.color_theme[3])
+            buttons_ets_frame = Frame(buttons_ets_background, bg=Application.current_color_theme[3])
             buttons_ets_frame.pack(side=LEFT, padx=10, pady=10)
 
             buttons = []
             ats_projects = ['ATS - INTERNAL', 'ATS - PUBLIC', 'ATS - PUBLIC - SENIORS']
-            ets_projects = ['ETS2 - INTERNAL', 'ETS2 - PUBLIC', 'ETS2 - PUBLIC - SENIORS']
+            ets_projects = ['ETS 2 - INTERNAL', 'ETS 2 - PUBLIC', 'ETS 2 - PUBLIC - SENIORS']
 
             for i in range(len(ats_projects)):
                 this_button = Application.AppButton(text=ats_projects[i], frame=buttons_ats_frame,
@@ -721,13 +764,13 @@ class Application(Frame):
             if not self.dialog_activated:
                 self.dialog_activated = True
 
-                asset_info_text = Text(master, font=Font(size=12), bg=Application.color_theme[3], bd=0, height=1,
+                asset_info_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[3], bd=0, height=1,
                                        width=10, fg='white')
                 asset_info_text.grid(row=0, column=0)
                 asset_info_text.insert(END, "Asset Path")
                 asset_info_text.configure(state=DISABLED)
 
-                text_input = Entry(master, bg=Application.color_theme[3], fg=Application.color_theme[2], width=25,
+                text_input = Entry(master, bg=Application.current_color_theme[3], fg=Application.current_color_theme[2], width=25,
                                    font=Font(size=10))
                 text_input.grid(row=0, column=1)
                 text_input.insert(END, "Enter asset path/debug info")
@@ -921,7 +964,7 @@ class Application(Frame):
         def make_scrollable_canvas(frame, bug_len):
             # Here, a canvas is created to display the image thumbnails and allow for scrolling
             # Taken from https://stackoverflow.com/questions/43731784/tkinter-canvas-scrollbar-with-grid
-            thumbnail_canvas = Canvas(frame, bg=Application.color_theme[3], highlightthickness=0)
+            thumbnail_canvas = Canvas(frame, bg=Application.current_color_theme[3], highlightthickness=0)
             thumbnail_canvas.grid(row=0, column=0, sticky="news")
 
             # Make a Scrollbar if there are more than 5 images (bug head and 4 extra)
@@ -933,12 +976,12 @@ class Application(Frame):
                 sb.config(command=thumbnail_canvas.yview)
 
             # Use this thumbnail_frame to insert image thumbnails
-            thumbnail_frame = Frame(thumbnail_canvas, bg=Application.color_theme[3])
+            thumbnail_frame = Frame(thumbnail_canvas, bg=Application.current_color_theme[3])
             thumbnail_canvas.create_window((0, 0), window=thumbnail_frame, anchor="nw")
 
             image_labels = []
             for line_no in range(bug_len - 1):
-                temp_img_label = Label(thumbnail_frame, bg=Application.color_theme[3])
+                temp_img_label = Label(thumbnail_frame, bg=Application.current_color_theme[3])
                 temp_img_label.place(x=0, y=0)
                 temp_img_label.grid(row=line_no // 2, column=line_no % 2, sticky="news")
                 image_labels.append(temp_img_label)
@@ -960,11 +1003,11 @@ class Application(Frame):
             self.priority_var.set(priority_choices[0])
 
             priority_menu = OptionMenu(frame, self.priority_var, *priority_choices)
-            Label(frame, text="Priority", bg=Application.color_theme[3], fg=Application.color_theme[1],
+            Label(frame, text="Priority", bg=Application.current_color_theme[3], fg=Application.current_color_theme[1],
                   font="Helvetica 13 bold").grid(row=1, column=0)
             priority_menu.grid(row=1, column=1, sticky=W+E)
-            priority_menu.config(bg=Application.color_theme[3])
-            priority_menu.config(fg=Application.color_theme[1])
+            priority_menu.config(bg=Application.current_color_theme[3])
+            priority_menu.config(fg=Application.current_color_theme[1])
             priority_menu.config(font="Helvetica 10")
             self.priority_var.trace("w", self.priority_callback)  # This binds the callback to the write event
 
@@ -973,7 +1016,7 @@ class Application(Frame):
             self.severity_var.set(severity_choices[0])
 
             severity_menu = OptionMenu(frame, self.severity_var, *severity_choices)
-            Label(frame, text="Severity", bg=Application.color_theme[3], fg=Application.color_theme[1],
+            Label(frame, text="Severity", bg=Application.current_color_theme[3], fg=Application.current_color_theme[1],
                   font="Helvetica 13 bold").grid(row=2, column=0)
             severity_menu.grid(row=2, column=1, sticky=W+E)
             if current_bug_summary[0] == 'm':
@@ -984,8 +1027,8 @@ class Application(Frame):
                 self.priority_var.set(priority_choices[1])
                 self.severity_var.set(severity_choices[0])
 
-            severity_menu.config(bg=Application.color_theme[3])
-            severity_menu.config(fg=Application.color_theme[1])
+            severity_menu.config(bg=Application.current_color_theme[3])
+            severity_menu.config(fg=Application.current_color_theme[1])
             severity_menu.config(font="Helvetica 10")
             self.severity_var.trace("w", self.severity_callback)
 
@@ -1041,53 +1084,53 @@ class Application(Frame):
 
         def init_widgets(self, current_bug):
             # region Frames
-            background_frame = Frame(master=self, bg=Application.color_theme[4])
+            background_frame = Frame(master=self, bg=Application.current_color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
             version = find_version(Application.Reporting.selected_project[0])
             version_line = f"Reporting in project [{Application.Reporting.selected_project}] at version {version}"
 
-            version_info_text = Text(background_frame, height=1, width=60, bg=Application.color_theme[4],
-                                     fg=Application.color_theme[2], bd=0, font="Helvetica 12")
+            version_info_text = Text(background_frame, height=1, width=60, bg=Application.current_color_theme[4],
+                                     fg=Application.current_color_theme[2], bd=0, font="Helvetica 12")
             version_info_text.pack(anchor="nw", pady=5, padx=5, side=TOP)
             version_info_text.insert(END, version_line)
             version_info_text.configure(state=DISABLED)
 
-            middle_frame = Frame(background_frame, bg=Application.color_theme[3])
+            middle_frame = Frame(background_frame, bg=Application.current_color_theme[3])
             middle_frame.pack(anchor="center", pady=5, padx=15)
 
             current_bug_summary = self.bug_handler.get_current()[0][:-1]
-            current_bug_text = Text(middle_frame, height=1, width=100, bg=Application.color_theme[3],
-                                    fg=Application.color_theme[1], bd=0, font="Helvetica 13")
+            current_bug_text = Text(middle_frame, height=1, width=100, bg=Application.current_color_theme[3],
+                                    fg=Application.current_color_theme[1], bd=0, font="Helvetica 13")
             current_bug_text.pack(side=TOP, fill=X, pady=5, padx=5)
             current_bug_text.insert(END, current_bug_summary)
             current_bug_text.configure(state=DISABLED)
 
-            left_frame = Frame(middle_frame, bg=Application.color_theme[3])
+            left_frame = Frame(middle_frame, bg=Application.current_color_theme[3])
             left_frame.pack(anchor="w", side=LEFT, pady=0, padx=10)
-            right_frame = Frame(middle_frame, bg=Application.color_theme[3])
+            right_frame = Frame(middle_frame, bg=Application.current_color_theme[3])
             right_frame.pack(anchor="e", side=RIGHT, fill=Y, padx=10)
 
-            frame_for_canvas = Frame(right_frame, bg=Application.color_theme[3])  # Frame for the canvas
+            frame_for_canvas = Frame(right_frame, bg=Application.current_color_theme[3])  # Frame for the canvas
             frame_for_canvas.pack(side=TOP, pady=0, padx=0)
             frame_for_canvas.grid_columnconfigure(0, weight=1)
-            frame_for_sidebar = Frame(right_frame, bg=Application.color_theme[3])  # Frame for the sidebar
+            frame_for_sidebar = Frame(right_frame, bg=Application.current_color_theme[3])  # Frame for the sidebar
 
             # These two frames will be filled and then alternated between in show_canvas and show_sidebar
 
-            right_buttons_frame = Frame(right_frame, bg=Application.color_theme[3])
+            right_buttons_frame = Frame(right_frame, bg=Application.current_color_theme[3])
             right_buttons_frame.pack(side=BOTTOM, fill=X)
-            bottom_frame = Frame(background_frame, bg=Application.color_theme[4])
+            bottom_frame = Frame(background_frame, bg=Application.current_color_theme[4])
             bottom_frame.pack(side=BOTTOM, fill=X)
 
             # All image labels are created here, they will be grid-placed into the thumbnail_frame
             # Except the first one, that is the bug head and gets the big preview
             image_labels = []  # Use this array to reference the labels and update them
-            head_img_label = Label(left_frame, bg=Application.color_theme[3])
+            head_img_label = Label(left_frame, bg=Application.current_color_theme[3])
             head_img_label.place(x=0, y=0)
             head_img_label.pack(pady=0, padx=0, side=TOP)
             image_labels.append(head_img_label)
-            image_location_text = Text(left_frame, height=1, width=60, bg=Application.color_theme[3],
-                                       fg=Application.color_theme[1], bd=0, font="Helvetica 10")
+            image_location_text = Text(left_frame, height=1, width=60, bg=Application.current_color_theme[3],
+                                       fg=Application.current_color_theme[1], bd=0, font="Helvetica 10")
             image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
             # The scrollable canvas is created here
             image_labels += self.make_scrollable_canvas(frame_for_canvas, len(current_bug))
@@ -1177,23 +1220,23 @@ class Application(Frame):
             app.reported = None
 
         def init_widgets(self):
-            background_frame = Frame(master=self, bg=Application.color_theme[4])
+            background_frame = Frame(master=self, bg=Application.current_color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
-            bottom_frame = Frame(background_frame, bg=Application.color_theme[4])
+            bottom_frame = Frame(background_frame, bg=Application.current_color_theme[4])
             bottom_frame.pack(side=BOTTOM, fill=X)
 
-            middle_frame = Frame(background_frame, bg=Application.color_theme[3])
+            middle_frame = Frame(background_frame, bg=Application.current_color_theme[3])
             middle_frame.pack(anchor="center", pady=85, padx=15)
 
             current_bug_summary = self.last_bug[0][:-1]
-            current_bug_text = Text(middle_frame, height=1, width=100, bg=Application.color_theme[3],
-                                    fg=Application.color_theme[1], bd=0, font="Helvetica 13")
+            current_bug_text = Text(middle_frame, height=1, width=100, bg=Application.current_color_theme[3],
+                                    fg=Application.current_color_theme[1], bd=0, font="Helvetica 13")
             current_bug_text.pack(side=TOP, pady=10, padx=10)
             current_bug_text.insert(END, current_bug_summary)
             current_bug_text.configure(state=DISABLED)
 
-            reported_text = Label(middle_frame, bg=Application.color_theme[3],
-                                  fg=Application.color_theme[1], bd=0,
+            reported_text = Label(middle_frame, bg=Application.current_color_theme[3],
+                                  fg=Application.current_color_theme[1], bd=0,
                                   font="Helvetica 30", justify=CENTER, text="Opened Mantis report")
             reported_text.pack(anchor="n", pady=35, padx=35, side=TOP)
 
@@ -1202,7 +1245,7 @@ class Application(Frame):
 
             next_report_button = Application.AppButton(
                 'Next Report', frame=middle_frame, command=self.go_to_reporting, side=TOP, font_size=20,
-                offx=40, offy=30, text_spacing=25, color1=Application.color_theme[2]
+                offx=40, offy=30, text_spacing=25, color1=Application.current_color_theme[2]
             )
 
     class Batch(Page):
@@ -1213,10 +1256,10 @@ class Application(Frame):
 
         def init_widgets(self):
             # Placeholder screen to make app clickier lol
-            background_frame = Frame(master=self, bg=Application.color_theme[4])
+            background_frame = Frame(master=self, bg=Application.current_color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
 
-            bottom_frame = Frame(background_frame, bg=Application.color_theme[4])
+            bottom_frame = Frame(background_frame, bg=Application.current_color_theme[4])
             bottom_frame.pack(side=BOTTOM, anchor="sw")
             back_button = Application.AppButton('BACK', frame=bottom_frame, anchor="sw",
                                                 command=lambda: self.go_to_projects("normal"))
