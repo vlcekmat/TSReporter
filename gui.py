@@ -410,6 +410,9 @@ class Application(Frame):
                 key_to_find = text.lower().split(':')[0]
                 directory_path = str(config.read_config(key_to_find))
 
+                span_frame = Frame(value_frame, bg=Application.color_theme[3])
+                span_frame.pack(fill=X, side=TOP, padx=250)
+
                 directory_value_frame = Frame(value_frame, bg=Application.color_theme[3])
                 directory_value_frame.pack(fill=BOTH, side=TOP)
 
