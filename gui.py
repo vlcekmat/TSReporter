@@ -965,7 +965,7 @@ class Application(Frame):
             priority_menu = OptionMenu(frame, self.priority_var, *priority_choices)
             Label(frame, text="Priority", bg=Application.color_theme[3], fg=Application.color_theme[1],
                   font="Helvetica 13 bold").grid(row=1, column=0)
-            priority_menu.grid(row=1, column=1)
+            priority_menu.grid(row=1, column=1, sticky=W+E)
             priority_menu.config(bg=Application.color_theme[3])
             priority_menu.config(fg=Application.color_theme[1])
             priority_menu.config(font="Helvetica 10")
@@ -978,7 +978,7 @@ class Application(Frame):
             severity_menu = OptionMenu(frame, self.severity_var, *severity_choices)
             Label(frame, text="Severity", bg=Application.color_theme[3], fg=Application.color_theme[1],
                   font="Helvetica 13 bold").grid(row=2, column=0)
-            severity_menu.grid(row=2, column=1)
+            severity_menu.grid(row=2, column=1, sticky=W+E)
             severity_menu.config(bg=Application.color_theme[3])
             severity_menu.config(fg=Application.color_theme[1])
             severity_menu.config(font="Helvetica 10")
