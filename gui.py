@@ -1142,7 +1142,7 @@ class Application(Frame):
                 command=lambda: self.open_duplicates(current_bug_summary, button_find_duplicates)
             )
             button_skip_report = Application.AppButton(
-                "Don't report", bottom_frame, side=RIGHT, command=lambda: self.show_next_report(True)
+                "Delete report", bottom_frame, side=RIGHT, command=lambda: self.show_next_report(True)
             )
             button_skip_report = Application.AppButton(
                 "Skip report", bottom_frame, side=RIGHT, command=lambda: self.show_next_report(False)
