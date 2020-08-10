@@ -1219,8 +1219,12 @@ class Application(Frame):
 
 def make_error_textbox(message, error_textbox):
     # use this to clear a textbox and display a message
+    error_textbox.configure(state=NORMAL)
     error_textbox.delete("1.0", END)
+    # error_textbox['text'] = message
     error_textbox.insert(END, message)
+    error_textbox.configure(state=DISABLED)
+
 
 # region Program init
 # Creates the basic "box" in which you can put all of the GUI elements
