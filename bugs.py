@@ -75,8 +75,8 @@ def count_bugs():
     documents_location = config.read_config('documents location')
     ats_bugs_path = f"{documents_location}/American Truck Simulator/bugs.txt"
     ets_bugs_path = f"{documents_location}/Euro Truck Simulator 2/bugs.txt"
-    ats_bugs = open(ats_bugs_path)
-    ets_bugs = open(ets_bugs_path)
+    ats_bugs = open(ats_bugs_path, encoding='utf8')
+    ets_bugs = open(ets_bugs_path, encoding='utf8')
 
     for line in ats_bugs:
         if ';' in line and line[0] not in ['!', ';', '.']:
