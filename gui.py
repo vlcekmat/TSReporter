@@ -962,7 +962,7 @@ class Application(Frame):
             priority_menu = OptionMenu(frame, self.priority_var, *priority_choices)
             Label(frame, text="Priority", bg=Application.color_theme[3], fg=Application.color_theme[1],
                   font="Helvetica 13 bold").grid(row=1, column=0)
-            priority_menu.grid(row=1, column=1)
+            priority_menu.grid(row=1, column=1, sticky=W+E)
             priority_menu.config(bg=Application.color_theme[3])
             priority_menu.config(fg=Application.color_theme[1])
             priority_menu.config(font="Helvetica 10")
@@ -975,7 +975,15 @@ class Application(Frame):
             severity_menu = OptionMenu(frame, self.severity_var, *severity_choices)
             Label(frame, text="Severity", bg=Application.color_theme[3], fg=Application.color_theme[1],
                   font="Helvetica 13 bold").grid(row=2, column=0)
-            severity_menu.grid(row=2, column=1)
+            severity_menu.grid(row=2, column=1, sticky=W+E)
+            if current_bug_summary[0] == 'm':
+                severity_menu['state'] = DISABLED
+
+            if current_bug_summary[0] == 'a':
+                priority_menu['state'] = DISABLED
+                self.priority_var.set(priority_choices[1])
+                self.severity_var.set(severity_choices[0])
+
             severity_menu.config(bg=Application.color_theme[3])
             severity_menu.config(fg=Application.color_theme[1])
             severity_menu.config(font="Helvetica 10")
@@ -987,9 +995,9 @@ class Application(Frame):
                 frame.grid_rowconfigure(row, minsize=40)
 
         def severity_callback(self, *args):
+            pass
             # These callback methods are called when the value of the OptionMenu changes
             # https://www.delftstack.com/howto/python-tkinter/how-to-create-dropdown-menu-in-tkinter/
-            print(self.severity_var.get())  # Placeholder functionality
 
         def priority_callback(self, *args):
             # See severity_callback()
@@ -998,8 +1006,6 @@ class Application(Frame):
                 self.severity_var.set("Minor")
             elif self.priority_var.get() != "Low" and self.severity_var.get() == "Minor":
                 self.severity_var.set("Major")
-
-            print(self.priority_var.get())  # Placeholder functionality
 
         def show_canvas(self, thumbnails_frame, options_frame, this_button, current_bug, image_labels,
                         image_location_text, image_path_button, try_again_button):
@@ -1133,7 +1139,7 @@ class Application(Frame):
                 command=lambda: self.open_duplicates(current_bug_summary, button_find_duplicates)
             )
             button_skip_report = Application.AppButton(
-                "Don't report", bottom_frame, side=RIGHT, command=lambda: self.show_next_report(True)
+                "Delete report", bottom_frame, side=RIGHT, command=lambda: self.show_next_report(True)
             )
             button_skip_report = Application.AppButton(
                 "Skip report", bottom_frame, side=RIGHT, command=lambda: self.show_next_report(False)
