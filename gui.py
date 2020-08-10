@@ -8,6 +8,8 @@ from threading import Thread
 from PIL import ImageTk, Image
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowException, WebDriverException
 
+import win32gui, win32con
+
 import main
 from password import get_password
 from versions import find_version
@@ -1235,6 +1237,13 @@ def make_error_textbox(message, error_textbox):
 # region Program init
 # Creates the basic "box" in which you can put all of the GUI elements
 # It also takes care of misc stuff, s.a. fixed window size, title on the app window and the icon
+
+# ENABLE THIS WHEN MAKING A NEW BUILD
+# It prevents console windows from opening in the gui version
+# When not disabled while running in editor, it messes pycharm up!!!!
+# hide = win32gui.GetForegroundWindow()
+# win32gui.ShowWindow(hide, win32con.SW_HIDE)
+
 root = Tk()
 root.geometry('960x540')
 root.minsize(width=960, height=540)
