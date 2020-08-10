@@ -12,7 +12,7 @@ def read_bugs_file(game_path, o_stream):
             f"bugs.txt not found in {game_path}. Change config or report some bugs first.\n")
         return None
 
-    bugs_file = open(game_path + "/bugs.txt", "r")
+    bugs_file = open(game_path + "/bugs.txt", "r", encoding="utf-8")
     bug_lines = bugs_file.readlines()
     bugs_file.close()
 

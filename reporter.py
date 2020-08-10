@@ -51,7 +51,8 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
             print(error_message + ' NameError')
     return True
 
-def batch_report_bugs(project, bugs_stack, version, images_folder_path, username, password, browser='chrome'):
+
+def batch_report_bugs(project, bugs_stack, version, username, password, browser='chrome'):
     # This prefix will be added at the beginning of all summaries to save time
     # eg. writing "State - City -" at the beginning of each report
     prefix = ask_for_prefix()

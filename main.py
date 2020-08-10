@@ -99,7 +99,7 @@ def report_option(use_mode, password):
             return None
 
         reported = batch_report_bugs(
-            chosen_project, all_bugs, version, images_folder,
+            chosen_project, all_bugs, version,
             mantis_username, password, read_config("preferred browser")
         )
         if not reported:
