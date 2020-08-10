@@ -48,7 +48,9 @@ class ConfigHandler:
                 cfg_lines[i[0]] = cfg_lines[i[0]][:-1]
             temp_dict = "{" + ", ".join(cfg_lines) + "}"
             ConfigHandler.cfg_dict = literal_eval(temp_dict)
-            ConfigHandler.validate_config()
+            if not debug:
+                ConfigHandler.validate_config()
+            cfg_file.close()
 
     @staticmethod
     def validate_config():

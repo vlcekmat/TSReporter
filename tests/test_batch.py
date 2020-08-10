@@ -68,7 +68,7 @@ class TestBatch(unittest.TestCase):
         with open("tests/bug_20200702_101838_-80950_79_-30576.jpg", "w"):
             pass
         with open("tests/config.cfg", "w") as cfg_file:
-            cfg_file.write('"edited images location" : "tests"')
+            cfg_file.write('"edited images location" : "tests"\n')
         ConfigHandler(debug=True)
 
         images_missing = batch.check_batch_images(all_bugs)
@@ -87,12 +87,14 @@ class TestBatch(unittest.TestCase):
             with open("tests/temp_image.jpg", "w"):
                 pass
             with open("tests/config.cfg", "w") as cfg_file:
-                cfg_file.write('"edited images location" : "tests"')
+                cfg_file.write('"edited images location" : "tests"\n')
             ConfigHandler(debug=True)
 
             images_missing = batch.check_batch_images(all_bugs)
-            os.remove("tests/temp_image.jpg")
-            os.remove("tests/config.cfg")
+            if os.path.isfile("temp_image.jpg"):
+                os.remove("temp_image.jpg")
+            if os.path.isfile("tests/config.cfg"):
+                os.remove("tests/config.cfg")
             self.assertTrue(images_missing)
 
     @mock.patch('builtins.input', side_effect=["y", "y", "n"])
@@ -105,13 +107,16 @@ class TestBatch(unittest.TestCase):
             all_bugs.append(temp_bug)
 
             with open("tests/config.cfg", "w") as cfg_file:
-                cfg_file.write('"edited images location" : "tests"')
+                cfg_file.write('"edited images location" : "tests"\n')
             ConfigHandler(debug=True)
 
             with open("tests/temp_image.jpg", "w"):
                 pass
             images_missing = batch.check_batch_images(all_bugs)
-            os.remove("temp_image.jpg")
-            os.remove("tests/config.cfg")
+
+            if os.path.isfile("tests/temp_image.jpg"):
+                os.remove("tests/temp_image.jpg")
+            if os.path.isfile("tests/config.cfg"):
+                os.remove("tests/config.cfg")
             self.assertFalse(images_missing)
 
