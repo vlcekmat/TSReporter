@@ -568,6 +568,9 @@ class Application(Frame):
             button = Application.AppButton('Main Menu', frame=template_background,
                                            command=self.go_to_main_menu, side=LEFT)
 
+            if self.first_time:
+                button.get_element()["text"] = "Done"
+
     class SelectProject(Page):
         use_mode = None
 
