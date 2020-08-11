@@ -83,7 +83,7 @@ def report_option(use_mode, password):
             current_bug = all_bugs.popleft()
             if current_bug[0][0] not in ['!', ';']:
                 assign_to = find_assign_to(current_bug[0], chosen_project[0])
-                report_bug(chosen_project, current_bug, version, images_folder, assign_to,
+                report_bug(chosen_project, current_bug, version, assign_to,
                            mantis_username, password, read_config("preferred browser"))
             archive_bug(current_bug, game_path)
 

@@ -24,23 +24,60 @@ import utils
 import reporter
 
 
-class ProgramThread(Thread):
-    # When this class is called, calls a function from main.py to report a bug
-    # This is a separate thread from the gui thread, it is also a singleton
-    instance_created = False
+def get_theme(theme):
+    theme_dict = {
+        "ph_theme": {
+            # Change the values below to change the overall color theme of the app
+            1: 'white',  # Regular Buttons, bugs counter text
+            2: '#ffa500',  # Quit Button, text
+            3: '#484848',  # Integrated Frames
+            4: '#2B2B2B'  # Background
+        },
 
-    def run(self):
-        # After creating the thread object, call its ProgramThread().start() to call run()
-        if ProgramThread.instance_created is not True:
-            ProgramThread.instance_created = False
-            password = 'CrYVhn7FSM'
-            config.ConfigHandler()
-            main.report_option(use_mode=1, password=password)
+        "that_ass_theme": {
+            # Change the values below to change the overall color theme of the app
+            1: '#D9C5C1',  # Regular Buttons, bugs counter text
+            2: '#F2B694',  # Quit Button, text
+            3: '#8C5C4A',  # Integrated Frames
+            4: '#593C36'  # Background
+        },
 
-    @staticmethod
-    def set_instance_created(self):
-        # This is needed for singleton, we do not want to run multiple reporting threads at the same time... yet
-        ProgramThread.instance_created = True
+        "hazard_theme": {
+            # Change the values below to change the overall color theme of the app
+            1: '#FF7237',  # Regular Buttons, bugs counter text
+            2: '#CF423C',  # Quit Button, text
+            3: '#570B2A',  # Integrated Frames
+            4: '#33081E'  # Background
+        },
+
+        "pastel_theme": {
+            # Change the values below to change the overall color theme of the app
+            1: '#94FFD0',  # Regular Buttons, bugs counter text
+            2: '#F9B1FF',  # Quit Button, text
+            3: '#A382E8',  # Integrated Frames
+            4: '#7C9EFF'  # Background
+        },
+
+        "forest_theme": {
+            # Change the values below to change the overall color theme of the app
+            1: '#D4D93D',  # Regular Buttons, bugs counter text
+            2: '#99BF0F',  # Quit Button, text
+            3: '#467302',  # Integrated Frames
+            4: '#214001'  # Background
+        },
+
+        "red_black_theme": {
+            # Change the values below to change the overall color theme of the app
+            1: '#ECE8E1',  # Regular Buttons, bugs counter text
+            2: '#FF4655',  # Quit Button, text
+            3: '#8C3243',  # Integrated Frames
+            4: '#271D26'  # Background
+        }
+    }
+    if theme_dict[theme]:
+        return theme_dict[theme]
+    else:
+        return theme_dict["ph_theme"]
 
 
 class Application(Frame):
@@ -74,56 +111,7 @@ class Application(Frame):
             if config.read_config("save password") == "True":
                 self.password = get_password()
 
-    ph_theme = {
-        # Change the values below to change the overall color theme of the app
-        1: 'white',  # Regular Buttons, bugs counter text
-        2: '#ffa500',  # Quit Button, text
-        3: '#484848',  # Integrated Frames
-        4: '#2B2B2B'  # Background
-    }
-
-    that_ass_theme = {
-        # Change the values below to change the overall color theme of the app
-        1: '#D9C5C1',  # Regular Buttons, bugs counter text
-        2: '#F2B694',  # Quit Button, text
-        3: '#8C5C4A',  # Integrated Frames
-        4: '#593C36'  # Background
-    }
-
-    hazard_theme = {
-        # Change the values below to change the overall color theme of the app
-        1: '#FF7237',  # Regular Buttons, bugs counter text
-        2: '#CF423C',  # Quit Button, text
-        3: '#570B2A',  # Integrated Frames
-        4: '#33081E'  # Background
-    }
-
-    pastel_theme = {
-        # Change the values below to change the overall color theme of the app
-        1: '#94FFD0',  # Regular Buttons, bugs counter text
-        2: '#F9B1FF',  # Quit Button, text
-        3: '#A382E8',  # Integrated Frames
-        4: '#7C9EFF'  # Background
-    }
-
-    forest_theme = {
-        # Change the values below to change the overall color theme of the app
-        1: '#D4D93D',  # Regular Buttons, bugs counter text
-        2: '#99BF0F',  # Quit Button, text
-        3: '#467302',  # Integrated Frames
-        4: '#214001'  # Background
-    }
-
-    red_black__theme = {
-        # Change the values below to change the overall color theme of the app
-        1: '#ECE8E1',  # Regular Buttons, bugs counter text
-        2: '#FF4655',  # Quit Button, text
-        3: '#8C3243',  # Integrated Frames
-        4: '#271D26'  # Background
-    }
-
-    current_color_theme = ph_theme
-
+    current_color_theme = get_theme("ph_theme")
 
     class Page(Frame):
         # All pages inherit from this class
@@ -189,11 +177,6 @@ class Application(Frame):
             app.settings_menu = Application.SettingsMenu(first_time=first_time)
             app.settings_menu.open_page()
             app.main_menu = None
-
-        @staticmethod
-        def start_reporting(self):
-            # Here we create a new thread on which the reporting loop is running !!!not used, just for the future!!!
-            ProgramThread().start()
 
         def go_to_projects(self, use_mode):
             if app.password is None:
@@ -646,7 +629,7 @@ class Application(Frame):
         def try_going_duplicates(self, project, frame):
             bug_handler = BugHandler(project[0])
             if not bug_handler.get_current():
-                make_error_textbox(bug_handler.message, frame)
+                rewrite_textbox(bug_handler.message, frame)
             else:
                 self.go_to_reporting(project, bug_handler)
 
@@ -919,9 +902,9 @@ class Application(Frame):
                 log_into_mantis(self.driver_handler.get_driver(), username, password)
 
             reporter.report_bug(project=project, log_lines=current_bug_deque, version=version,
-                                images_folder_path=config.read_config('edited images location'),
                                 assign=assign_to, username=username, password=password,
-                                _driver_handler=self.driver_handler, priority=priority, severity=severity, late_image=self.late_image)
+                                _driver_handler=self.driver_handler, priority=priority, severity=severity,
+                                late_image=self.late_image)
             self.late_image = None
             self.go_to_reported()
 
@@ -1302,13 +1285,12 @@ class Application(Frame):
             app.main_menu = None
 
 
-def make_error_textbox(message, error_textbox):
+def rewrite_textbox(message, textbox):
     # use this to clear a textbox and display a message
-    error_textbox.configure(state=NORMAL)
-    error_textbox.delete("1.0", END)
-    # error_textbox['text'] = message
-    error_textbox.insert(END, message)
-    error_textbox.configure(state=DISABLED)
+    textbox.configure(state=NORMAL)
+    textbox.delete("1.0", END)
+    textbox.insert(END, message)
+    textbox.configure(state=DISABLED)
 
 
 # region Program init
