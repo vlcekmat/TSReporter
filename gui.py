@@ -831,48 +831,30 @@ class Application(Frame):
                 app.reporting.open_duplicates(bug_line=self.bug_line)
 
         def open_duplicates(self, bug_line):
-            # TODO: get rid of the error message when you close the browser in the process
-
             asset_path = None
             if self.category == 'a' and self.asset_path_input.get() != "Enter asset path/debug info":
                 self.submit_asset_info()
                 asset_path = self.asset_path_input.get()
 
-            while True:
-                error_message = "Do not interact with the browser during the process"
-                try:
-                    if not self.driver_handler:
-                        self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-                    reporter.check_for_duplicates(
-                        config.read_config("mantis username"), app.password, bug_line,
-                        driver_handler=self.driver_handler, asset_path=asset_path
-                    )
-                except SessionNotCreatedException:
-                    print(error_message + ' SessionNotCreatedException')
-                    self.driver_handler = None
+            try:
+                if not self.driver_handler:
                     self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-                except NoSuchWindowException:
-                    print(error_message + ' NoSuchWindowException')
-                    self.driver_handler = None
-                    self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-                except WebDriverException:
-                    print(error_message + ' WebDriverException')
-                    self.driver_handler = None
-                    self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-                except AttributeError:
-                    print(error_message + ' AttributeError')
-                    self.driver_handler = None
-                    self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-                except TypeError:
-                    print(error_message + ' TypeError')
-                    self.driver_handler = None
-                    self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-                except NameError:
-                    print(error_message + ' NameError')
-                    self.driver_handler = None
-                    self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-                else:
-                    break
+                reporter.check_for_duplicates(
+                    config.read_config("mantis username"), app.password, bug_line,
+                    driver_handler=self.driver_handler, asset_path=asset_path
+                )
+            except SessionNotCreatedException:
+                self.driver_handler = None
+            except NoSuchWindowException:
+                self.driver_handler = None
+            except WebDriverException:
+                self.driver_handler = None
+            except AttributeError:
+                self.driver_handler = None
+            except TypeError:
+                self.driver_handler = None
+            except NameError:
+                self.driver_handler = None
 
         class ReportingThread(Thread):
             bug_line = None
@@ -887,6 +869,12 @@ class Application(Frame):
         def open_report(self, bug_line):
             # This is called when the 'Report' button is pressed, reporting will happen starting here
             # TODO: also maybe make it use a new thread?
+
+            asset_path = None
+            if self.category == 'a' and self.asset_path_input.get() != "Enter asset path/debug info":
+                self.submit_asset_info()
+                asset_path = self.asset_path_input.get()
+                reporter.asset_path = asset_path
 
             project = self.selected_project
             game = project[0]
@@ -1224,6 +1212,7 @@ class Application(Frame):
             self.init_widgets()
 
         def go_to_reporting(self):
+            reporter.asset_path = None
             app.reported.pack_forget()
             self.pack_forget()
             self.bug_handler.read_next()
