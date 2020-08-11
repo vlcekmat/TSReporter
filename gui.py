@@ -124,7 +124,6 @@ class Application(Frame):
 
     current_color_theme = ph_theme
 
-
     class Page(Frame):
         # All pages inherit from this class
         def open_page(self):
@@ -233,7 +232,7 @@ class Application(Frame):
             # duh
 
             left_frame = Frame(top_frame, bg=Application.current_color_theme[3])
-            left_frame.pack(expand=False, fill=Y, side=LEFT, pady=10, padx=10)
+            left_frame.pack(expand=False, fill=Y, side=LEFT, pady=10, padx=30)
 
             # From now on the variable names are pretty self-explanatory
 
@@ -770,13 +769,15 @@ class Application(Frame):
             if not self.dialog_activated:
                 self.dialog_activated = True
 
-                asset_info_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[3], bd=0, height=1,
+                asset_info_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[3],
+                                       bd=0, height=1,
                                        width=10, fg='white')
                 asset_info_text.grid(row=0, column=0)
                 asset_info_text.insert(END, "Asset Path")
                 asset_info_text.configure(state=DISABLED)
 
-                text_input = Entry(master, bg=Application.current_color_theme[3], fg=Application.current_color_theme[2], width=25,
+                text_input = Entry(master, bg=Application.current_color_theme[3],
+                                   fg=Application.current_color_theme[2], width=25,
                                    font=Font(size=10))
                 text_input.grid(row=0, column=1)
                 text_input.insert(END, "Enter asset path/debug info")
@@ -921,7 +922,8 @@ class Application(Frame):
             reporter.report_bug(project=project, log_lines=current_bug_deque, version=version,
                                 images_folder_path=config.read_config('edited images location'),
                                 assign=assign_to, username=username, password=password,
-                                _driver_handler=self.driver_handler, priority=priority, severity=severity, late_image=self.late_image)
+                                _driver_handler=self.driver_handler, priority=priority,
+                                severity=severity, late_image=self.late_image)
             self.late_image = None
             self.go_to_reported()
 
@@ -1314,7 +1316,6 @@ def make_error_textbox(message, error_textbox):
 # region Program init
 # Creates the basic "box" in which you can put all of the GUI elements
 # It also takes care of misc stuff, s.a. fixed window size, title on the app window and the icon
-
 if os.path.isfile("TSReporter.exe"):
     hide = win32gui.GetForegroundWindow()
     win32gui.ShowWindow(hide, win32con.SW_HIDE)
