@@ -835,7 +835,17 @@ class Application(Frame):
 
             self.late_image = new_image_path
 
-        def open_duplicates(self, bug_line, report_button):
+        class DuplicatesThread(Thread):
+            bug_line = None
+
+            def __init__(self, bug_line):
+                super().__init__()
+                self.bug_line = bug_line
+
+            def run(self):
+                app.reporting.open_duplicates(bug_line=self.bug_line)
+
+        def open_duplicates(self, bug_line):
             # TODO: get rid of the error message when you close the browser in the process
 
             asset_path = None
@@ -879,8 +889,15 @@ class Application(Frame):
                 else:
                     break
 
-            report_button.get_element()['text'] = "REPORT"
-            report_button.get_element()['command'] = lambda: self.open_report(bug_line)
+        class ReportingThread(Thread):
+            bug_line = None
+
+            def __init__(self, bug_line):
+                super().__init__()
+                self.bug_line = bug_line
+
+            def run(self):
+                app.reporting.open_report(bug_line=self.bug_line)
 
         def open_report(self, bug_line):
             # This is called when the 'Report' button is pressed, reporting will happen starting here
@@ -1183,11 +1200,19 @@ class Application(Frame):
             self.update_image_thumbnails(current_bug, image_labels, image_location_text, image_path_button,
                                          try_again_button)
             # region Bottom
+
+            button_report = Application.AppButton(
+                "REPORT", bottom_frame, side=RIGHT,
+                # TODO: make new thread here? Else program is 'not responding' until search is complete
+                command=lambda: self.ReportingThread(current_bug_summary).start()
+            )
+
             button_find_duplicates = Application.AppButton(
                 "Find\nduplicates", bottom_frame, side=RIGHT,
                 # TODO: make new thread here? Else program is 'not responding' until search is complete
-                command=lambda: self.open_duplicates(current_bug_summary, button_find_duplicates)
+                command=lambda: self.DuplicatesThread(current_bug_summary).start()
             )
+
             button_skip_report = Application.AppButton(
                 "Delete report", bottom_frame, side=RIGHT, command=lambda: self.show_next_report(True)
             )
