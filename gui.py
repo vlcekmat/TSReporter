@@ -105,6 +105,8 @@ class Application(Frame):
 
     password = None
 
+    current_color_theme = ""
+
     # It's important to keep in mind the class instances above,
     # when gui is active, exactly one has to have a non Null value, cuz having more than one pages active
     # at the same time is BS
@@ -115,18 +117,17 @@ class Application(Frame):
         config_path = "./config.cfg"
         if not os.path.isfile(config_path):
             config.ConfigHandler()
+            self.current_color_theme = get_theme(config.read_config("current_theme"))
+            Application.current_color_theme = get_theme(config.read_config("current_theme"))
             self.settings_menu = self.SettingsMenu(first_time=True)
             self.settings_menu.open_page()
+            if self.current_color_theme == "":
+                config.write_config("current_theme", "ph")
 
         else:
             self.main_menu = self.MainMenu()
             if config.read_config("save password") == "True":
                 self.password = get_password()
-
-    c_handler = config.ConfigHandler()
-    current_color_theme = get_theme(config.read_config("current_theme"))
-    if current_color_theme == "":
-        config.write_config("current_theme", "ph")
 
     class Page(Frame):
         # All pages inherit from this class
