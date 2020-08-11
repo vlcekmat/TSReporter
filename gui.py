@@ -815,7 +815,7 @@ class Application(Frame):
 
                 asset_info_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[3],
                                        bd=0, height=1,
-                                       width=10, fg='white')
+                                       width=10, fg=app.current_color_theme[1])
                 asset_info_text.grid(row=0, column=0)
                 asset_info_text.insert(END, "Asset Path")
                 asset_info_text.configure(state=DISABLED)
