@@ -117,6 +117,8 @@ class Application(Frame):
 
     c_handler = config.ConfigHandler()
     current_color_theme = get_theme(config.read_config("current_theme"))
+    if current_color_theme == "":
+        config.write_config("current_theme", "ph")
 
     class Page(Frame):
         # All pages inherit from this class
