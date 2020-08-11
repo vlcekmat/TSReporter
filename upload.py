@@ -34,7 +34,7 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
     images = []
     first_loop = True
 
-    if debug_info is not None:
+    if debug_info:
         debug_info = clean_debug_info(debug_info)
         path_to_asset = f"{path_to_asset}\n{debug_info}"
     if late_image:
@@ -93,7 +93,7 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
             else:
                 description_box.send_keys(no_ver_description)
 
-    if category == 'a' and path_to_asset != None:
+    if 'a' in category and path_to_asset:
         asset_name = extract_asset_name(first_path_to_asset)
         no_ver_summary = generate_no_version_des(bug_descriptions[0].split(';')[0])
         summary = f'{version} - {asset_name} - {no_ver_summary}'

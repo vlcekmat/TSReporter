@@ -247,14 +247,21 @@ class Application(Frame):
             bugs_count_frame.pack(side=TOP, pady=10)
             subtitle_font = Font(size=15)
             reports_count_text = Label(bugs_count_frame, text=f'Number of bugs in bugs.txt',
-                                       bg=Application.current_color_theme[4], fg=Application.current_color_theme[2], font=subtitle_font)
+                                       bg=Application.current_color_theme[4],
+                                       fg=Application.current_color_theme[2], font=subtitle_font)
+
             reports_count_text.pack()
-            ETS2_bugs_count = Label(bugs_count_frame, text=f'ETS 2: {ets_bugs_count}',
-                                    bg=Application.current_color_theme[3], fg=Application.current_color_theme[1], font=subtitle_font)
-            ETS2_bugs_count.pack()
+
             ATS_bugs_count = Label(bugs_count_frame, text=f'ATS: {ats_bugs_count}',
-                                   bg=Application.current_color_theme[3], fg=Application.current_color_theme[1], font=subtitle_font)
+                                   bg=Application.current_color_theme[3],
+                                   fg=Application.current_color_theme[1], font=subtitle_font)
             ATS_bugs_count.pack()
+
+            ETS2_bugs_count = Label(bugs_count_frame, text=f'ETS 2: {ets_bugs_count}',
+                                    bg=Application.current_color_theme[3],
+                                    fg=Application.current_color_theme[1], font=subtitle_font)
+            ETS2_bugs_count.pack()
+
             # endregion
 
             bottom_frame = Frame(background_frame, bg=Application.current_color_theme[4])
@@ -703,8 +710,8 @@ class Application(Frame):
 
         bug_priority = None
 
-        small_img_size = (170, 130)  # Size, to which the BugEntry thumbnails its images
-        img_size = (515, 530)
+        small_img_size = (160, 170)  # Size, to which the BugEntry thumbnails its images
+        img_size = (510, 525)
 
         late_image = None
 
@@ -829,48 +836,30 @@ class Application(Frame):
                 app.reporting.open_duplicates(bug_line=self.bug_line)
 
         def open_duplicates(self, bug_line):
-            # TODO: get rid of the error message when you close the browser in the process
-
             asset_path = None
             if self.category == 'a' and self.asset_path_input.get() != "Enter asset path/debug info":
                 self.submit_asset_info()
                 asset_path = self.asset_path_input.get()
 
-            while True:
-                error_message = "Do not interact with the browser during the process"
-                try:
-                    if not self.driver_handler:
-                        self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-                    reporter.check_for_duplicates(
-                        config.read_config("mantis username"), app.password, bug_line,
-                        driver_handler=self.driver_handler, asset_path=asset_path
-                    )
-                except SessionNotCreatedException:
-                    print(error_message + ' SessionNotCreatedException')
-                    self.driver_handler = None
+            try:
+                if not self.driver_handler:
                     self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-                except NoSuchWindowException:
-                    print(error_message + ' NoSuchWindowException')
-                    self.driver_handler = None
-                    self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-                except WebDriverException:
-                    print(error_message + ' WebDriverException')
-                    self.driver_handler = None
-                    self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-                except AttributeError:
-                    print(error_message + ' AttributeError')
-                    self.driver_handler = None
-                    self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-                except TypeError:
-                    print(error_message + ' TypeError')
-                    self.driver_handler = None
-                    self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-                except NameError:
-                    print(error_message + ' NameError')
-                    self.driver_handler = None
-                    self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-                else:
-                    break
+                reporter.check_for_duplicates(
+                    config.read_config("mantis username"), app.password, bug_line,
+                    driver_handler=self.driver_handler, asset_path=asset_path
+                )
+            except SessionNotCreatedException:
+                self.driver_handler = None
+            except NoSuchWindowException:
+                self.driver_handler = None
+            except WebDriverException:
+                self.driver_handler = None
+            except AttributeError:
+                self.driver_handler = None
+            except TypeError:
+                self.driver_handler = None
+            except NameError:
+                self.driver_handler = None
 
         class ReportingThread(Thread):
             bug_line = None
@@ -885,6 +874,12 @@ class Application(Frame):
         def open_report(self, bug_line):
             # This is called when the 'Report' button is pressed, reporting will happen starting here
             # TODO: also maybe make it use a new thread?
+
+            asset_path = None
+            if self.category == 'a' and self.asset_path_input.get() != "Enter asset path/debug info":
+                self.submit_asset_info()
+                asset_path = self.asset_path_input.get()
+                reporter.asset_path = asset_path
 
             project = self.selected_project
             game = project[0]
@@ -916,7 +911,7 @@ class Application(Frame):
                 bug.reload_image(self.bug_handler)
 
         def update_image_thumbnails(self, current_bug, thumbnails, image_location_text, find_img_button,
-                                    try_again_button):
+                                    try_again_button, canvas):
             # This method takes all Labels in thumbnails[] and tries to update them to the BugEntry's image
             # It also checks if all images are selected and if so, cleans up the buttons
             self.look_for_images_again(current_bug)
@@ -936,6 +931,7 @@ class Application(Frame):
             if self.bug_handler.images_good() and try_again_button:
                 try_again_button.get_element().pack_forget()
                 try_again_button.get_element().destroy()
+            canvas.config(scrollregion=canvas.bbox("all"))
 
         class BugEntry:
             # Each line of current bug is represented by a line and an image as instances of this class
@@ -967,11 +963,11 @@ class Application(Frame):
                 if self.image_location:
                     self.image = Image.open(self.image_location)
 
-        @staticmethod
-        def make_scrollable_canvas(frame, bug_len):
+        def make_scrollable_canvas(self, frame, bug_len, image_labels):
             # Here, a canvas is created to display the image thumbnails and allow for scrolling
             # Taken from https://stackoverflow.com/questions/43731784/tkinter-canvas-scrollbar-with-grid
-            thumbnail_canvas = Canvas(frame, bg=Application.current_color_theme[3], highlightthickness=0)
+            thumbnail_canvas = Canvas(frame, bg=Application.current_color_theme[3],
+                                      highlightthickness=0, width=self.small_img_size[0]*2 + 10)
             thumbnail_canvas.grid(row=0, column=0, sticky="news")
 
             # Make a Scrollbar if there are more than 5 images (bug head and 4 extra)
@@ -979,14 +975,14 @@ class Application(Frame):
             if bug_len > 5:
                 sb = Scrollbar(frame, orient="vertical")
                 sb.grid(row=0, column=1, sticky="ns")
-                thumbnail_canvas.config(yscrollcommand=sb.set)
                 sb.config(command=thumbnail_canvas.yview)
+                thumbnail_canvas.config(yscrollcommand=sb.set)
 
             # Use this thumbnail_frame to insert image thumbnails
             thumbnail_frame = Frame(thumbnail_canvas, bg=Application.current_color_theme[3])
             thumbnail_canvas.create_window((0, 0), window=thumbnail_frame, anchor="nw")
 
-            image_labels = []
+            # image_labels = []
             for line_no in range(bug_len - 1):
                 temp_img_label = Label(thumbnail_frame, bg=Application.current_color_theme[3])
                 temp_img_label.place(x=0, y=0)
@@ -994,7 +990,8 @@ class Application(Frame):
                 image_labels.append(temp_img_label)
 
             thumbnail_canvas.config(scrollregion=thumbnail_frame.bbox("all"))
-            return image_labels
+            # return image_labels
+            return thumbnail_canvas
 
         def make_options_sidebar(self, frame, current_bug_summary):
             # The report options sidebar is created here.
@@ -1058,7 +1055,7 @@ class Application(Frame):
                 self.severity_var.set("Major")
 
         def show_canvas(self, thumbnails_frame, options_frame, this_button, current_bug, image_labels,
-                        image_location_text, image_path_button, try_again_button):
+                        image_location_text, image_path_button, try_again_button, thumbnail_canvas):
             # This switches the frame to the thumbnails_frame and updates all thumbnails and buttons
             options_frame.pack_forget()
             thumbnails_frame.pack()
@@ -1067,16 +1064,16 @@ class Application(Frame):
                 try_again_button.get_element().pack(padx=10, pady=10, side=RIGHT)
 
             self.update_image_thumbnails(current_bug, image_labels, image_location_text, image_path_button,
-                                         try_again_button)
+                                         try_again_button, thumbnail_canvas)
 
             this_button.get_element()['text'] = "Report\noptions"
             this_button.get_element()['command'] = lambda: self.show_sidebar(
                     thumbnails_frame, options_frame, this_button, current_bug, image_labels, image_location_text,
-                    image_path_button, try_again_button
+                    image_path_button, try_again_button, thumbnail_canvas
                 )
 
         def show_sidebar(self, thumbnails_frame, options_frame, this_button, current_bug, image_labels,
-                         image_location_text, image_path_button, try_again_button):
+                         image_location_text, image_path_button, try_again_button, thumbnail_canvas):
             # This switches to the report options frame and updates buttons
             thumbnails_frame.pack_forget()
             options_frame.pack()
@@ -1085,7 +1082,7 @@ class Application(Frame):
             this_button.get_element()['text'] = "Image\npreview"
             this_button.get_element()['command'] = lambda: self.show_canvas(
                 thumbnails_frame, options_frame, this_button, current_bug, image_labels, image_location_text,
-                image_path_button, try_again_button
+                image_path_button, try_again_button, thumbnail_canvas
             )
         text_input_frame = None
 
@@ -1139,7 +1136,7 @@ class Application(Frame):
                                        fg=Application.current_color_theme[1], bd=0, font="Helvetica 10")
             image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
             # The scrollable canvas is created here
-            image_labels += self.make_scrollable_canvas(frame_for_canvas, len(current_bug))
+            thumbnail_canvas = self.make_scrollable_canvas(frame_for_canvas, len(current_bug), image_labels)
 
             self.make_options_sidebar(frame_for_sidebar, current_bug_summary)
 
@@ -1164,14 +1161,14 @@ class Application(Frame):
                 try_again_button = Application.AppButton(
                     "Try again", right_buttons_frame, side=RIGHT,
                     command=lambda: self.update_image_thumbnails(current_bug, image_labels, image_location_text,
-                                                                 image_path_button, try_again_button)
+                                                                 image_path_button, try_again_button, thumbnail_canvas)
                 )
             else:
                 try_again_button = None  # Why try again if you have everything
 
             report_options_button.get_element()['command'] = lambda: self.show_sidebar(
                 frame_for_canvas, frame_for_sidebar, report_options_button, current_bug, image_labels,
-                image_location_text, image_path_button, try_again_button
+                image_location_text, image_path_button, try_again_button, thumbnail_canvas
             )
 
             if image_path_button:
@@ -1179,19 +1176,23 @@ class Application(Frame):
                     head_img_label, current_bug[0], try_again_button, image_path_button, image_location_text
                 )  # Ignore the warning, this works!
 
+
             self.update_image_thumbnails(current_bug, image_labels, image_location_text, image_path_button,
-                                         try_again_button)
+                                         try_again_button, thumbnail_canvas)
+
+            self.show_sidebar(
+                frame_for_canvas, frame_for_sidebar, report_options_button, current_bug, image_labels,
+                image_location_text, image_path_button, try_again_button, thumbnail_canvas)
+
             # region Bottom
 
             button_report = Application.AppButton(
                 "REPORT", bottom_frame, side=RIGHT,
-                # TODO: make new thread here? Else program is 'not responding' until search is complete
                 command=lambda: self.ReportingThread(current_bug_summary).start()
             )
 
             button_find_duplicates = Application.AppButton(
                 "Find\nduplicates", bottom_frame, side=RIGHT,
-                # TODO: make new thread here? Else program is 'not responding' until search is complete
                 command=lambda: self.DuplicatesThread(current_bug_summary).start()
             )
 
@@ -1216,6 +1217,7 @@ class Application(Frame):
             self.init_widgets()
 
         def go_to_reporting(self):
+            reporter.asset_path = None
             app.reported.pack_forget()
             self.pack_forget()
             self.bug_handler.read_next()
