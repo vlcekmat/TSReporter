@@ -71,6 +71,14 @@ def get_theme(theme):
             2: '#FF4655',  # Quit Button, text
             3: '#8C3243',  # Integrated Frames
             4: '#271D26'  # Background
+        },
+
+        "storm": {
+            # Change the values below to change the overall color theme of the app
+            1: '#908CAC',  # Regular Buttons, bugs counter text
+            2: '#C3BBD2',  # Quit Button, text
+            3: '#3F384F',  # Integrated Frames
+            4: '#1A1E26'  # Background
         }
     }
     if theme == 'all':
