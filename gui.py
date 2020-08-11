@@ -79,6 +79,9 @@ def get_theme(theme):
         return theme_dict["ph_theme"]
 
 
+version = "0.3.4"
+
+
 class Application(Frame):
     # The first GUI element put in the basic Win window, important for layout, everything sits on this
     setup = None
@@ -273,9 +276,6 @@ class Application(Frame):
             img_panel.place(x=0, y=0)
             img_panel.pack(pady=100, side=BOTTOM)
 
-            with open('version.txt', 'r', encoding='UTF-8') as version_file:
-                # Reads the version and displays it on the screen
-                version = version_file.readline()
             version_label = Label(bottom_frame, text=version,
                                   bg=Application.current_color_theme[4],
                                   fg=Application.current_color_theme[2])
