@@ -198,7 +198,9 @@ class Application(Frame):
             app.main_menu = None
 
         def go_to_projects(self, use_mode):
-            if app.password is None:
+            app.password = get_password()
+            password = app.password
+            if app.password is None or app.password == '':
                 self.pack_forget()
                 app.login = Application.Login(use_mode, fail=False)
                 app.main_menu = None
@@ -460,7 +462,7 @@ class Application(Frame):
             main_background = Frame(master=self, bg=Application.current_color_theme[4])
             main_background.pack(fill=BOTH, expand=True)
 
-            if app.password is None:
+            if app.password is None or app.password == '':
                 self.create_login_interface(main_background)
                 bottom_frame = Frame(main_background, bg=Application.current_color_theme[4])
                 bottom_frame.pack(fill=X, expand=False, side=BOTTOM)
