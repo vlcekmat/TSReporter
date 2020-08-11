@@ -10,6 +10,7 @@ class BugHandler:
     all_the_bugs = deque()  # Queue of bugs read from the bugs file, each bug is a stack of lines, the bug head on top
     current = deque()  # The current bug popped from the above queue
 
+
     # The current bug has its images stored here
     # The dictionary is "line": "image path", accessed by try_get_image()
     image_locations = {}
@@ -37,12 +38,13 @@ class BugHandler:
     def archive(self):
         archive_bug(self.current, self.game_path)
 
-    def read_next(self):
+    def read_next(self, archive_comments=True):
         if len(self.all_the_bugs) > 0:
             self.image_locations.clear()
             self.current = self.all_the_bugs.popleft()
             while self.current[0][0] in ['!', ';']:
-                self.archive()
+                if archive_comments:
+                    self.archive()
                 self.current = self.all_the_bugs.popleft()
             for line in self.current:
                 self.image_locations[line] = get_image(line)

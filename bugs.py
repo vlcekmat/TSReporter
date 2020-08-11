@@ -49,6 +49,7 @@ def read_bug_lines(bug_lines):
     # Lines that are meant to be ignored are still added to all_bugs and must be archived and cleansed later
     all_bugs = deque()
     this_bug = deque()
+    comments = deque()
 
     this_bug.append(bug_lines[0])
     if len(bug_lines) > 1:
@@ -56,12 +57,15 @@ def read_bug_lines(bug_lines):
             if line[0] in [';', '!']:  # Ignored lines are added as separate bugs, remove and archive before reporting!
                 temp_deque = deque()
                 temp_deque.append(line)
-                all_bugs.append(temp_deque)
+                comments.append(temp_deque)
                 continue
             elif line[0] == '.':
                 this_bug.append(line)
             else:  # All others are valid bug heads
                 all_bugs.append(copy.deepcopy(this_bug))   # Return the previous bug
+                for comment in comments:
+                    all_bugs.append(comment)
+                comments.clear()
                 this_bug.clear()            # and start a new one
                 this_bug.append(line)
     all_bugs.append(this_bug)  # The last bug must also be added!

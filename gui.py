@@ -10,7 +10,6 @@ from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowE
 
 import win32gui, win32con
 
-import main
 from information_compile import determine_bug_category
 from password import get_password
 from versions import find_version
@@ -783,7 +782,9 @@ class Application(Frame):
         def show_next_report(self, archive):
             if archive:
                 self.bug_handler.archive()
-            self.bug_handler.read_next()
+                self.bug_handler.read_next()
+            else:
+                self.bug_handler.read_next(archive_comments=False)
             if not self.bug_handler.get_current():
                 self.go_to_main_menu()
                 return
