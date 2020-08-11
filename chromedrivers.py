@@ -43,7 +43,6 @@ class DriverHandler:
 def check_for_duplicates(username, password, bug_description=None,
                          asset_path=None, driver_handler=None, ask_input=False):
     # opens mantis so the user can check for duplicates
-    print("Opening search for duplicates")
 
     if not driver_handler.is_active():
         driver = DriverHandler(browser=read_config("preferred browser")).get_driver()
@@ -63,7 +62,6 @@ def check_for_duplicates(username, password, bug_description=None,
     driver.find_element_by_xpath("//input[@value='Apply Filter']").click()  # apply filter button
 
     if ask_input:
-        print('Did you find any duplicates? (Y/N/Q)')
         while True:
             answer = input('> ')
             if answer.upper() == 'N':
@@ -73,7 +71,6 @@ def check_for_duplicates(username, password, bug_description=None,
             elif answer.upper() == 'Q':
                 return -1
             else:
-                print('Answer Y/N/Q')
                 pass
 
 
@@ -85,18 +82,14 @@ def log_into_tsreporter(test_login_username, browser='chrome'):
         # password = getpass.getpass()
         # password = "CrYVhn7FSM"
         if password == "":
-            print("No password entered, returning to menu")
             return ""
-        print("Checking your login credentials")
         driver = DriverHandler(browser=browser, headless=True).get_driver()
         try:
             log_into_mantis(driver, test_login_username, password)
             driver.find_element_by_id('sidebar-btn')
         except NoSuchElementException:
-            print('Incorrect password or username')
             return ""
         else:
-            print("Login successful!")
             driver.quit()
             if read_config("save password") == "True":
                 save_password(password)

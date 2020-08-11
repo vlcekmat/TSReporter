@@ -64,7 +64,6 @@ class ConfigHandler:
                     ConfigHandler.cfg_dict[layout_item] = ""
                     config_wasnt_valid = True
                     continue
-                print("Your config.cfg is missing some lines!")
                 ConfigHandler.cfg_dict[layout_item] = ConfigHandler.ask_config_line(layout_item)
                 config_wasnt_valid = True
         if ConfigHandler.cfg_dict["save password"] == "False":
@@ -80,7 +79,6 @@ class ConfigHandler:
         i = 1
         for key in ConfigHandler.cfg_dict:
             if ConfigHandler.config_layout[key] != "secret":
-                print(str(i) + ": " + key + ":\t\t" + str(ConfigHandler.cfg_dict[key]))
                 i += 1
 
     @staticmethod
@@ -103,13 +101,10 @@ class ConfigHandler:
             cfg_layout.append(key)
 
         while True:
-            print("These is your current configuration, type the number of what you want to modify:")
-            print("0: Exit config")
             ConfigHandler.list_config()
             line_selection = input("> ")
 
             if not is_int(line_selection) or not 0 <= int(line_selection) <= len(cfg_layout):
-                print("Invalid choice")
                 continue
             else:
                 ls = int(line_selection)
@@ -151,7 +146,6 @@ class ConfigHandler:
         # Opens windows dialogue windows and has the user select their Trunk, Steam and edited pictures directories
         # Then reads Mantis username from user input
         # Saves the directories to './config.cfg'
-        print("No config.cfg file detected, running first time setup")
         cfg_layout = ConfigHandler.config_layout.keys()
         for entry in cfg_layout:
             if ConfigHandler.config_layout[entry] == "secret":
@@ -163,7 +157,6 @@ class ConfigHandler:
     def gui_config_setup():
         cfg_layout = ConfigHandler.config_layout.keys()
         for entry in cfg_layout:
-            print(entry)
             if ConfigHandler.config_layout[entry] == "secret":
                 ConfigHandler.cfg_dict[entry] = ""
                 if entry == "current_theme":
@@ -184,11 +177,9 @@ class ConfigHandler:
         # Asks user to select new configuration item based on the contents of the received token
         cfg_type = ConfigHandler.config_layout[key_to_ask]
         if cfg_type == "yn":
-            #print(f"Would you like to {key_to_ask}")
             new_value = yes_no_value
         else:
             if cfg_type != "text":
-                #print(f"Select your {key_to_ask}")
                 pass
             new_value = ""
             if cfg_type == "path":
@@ -210,20 +201,15 @@ def ask_preferred_browser():
         elif pref_browser.upper() == 'F':
             return 'firefox'
         elif pref_browser.upper() == 'E':
-            print("Visit:")
-            print("\thttps://www.google.com/chrome/")
-            print("\thttps://www.mozilla.org/en-US/firefox/new/")
-
+            pass
 
 def validate_cfg_images():
     # Gets edited image location from the config and checks that it exists and has at least one valid file
     images_folder = read_config("edited images location")
     if images_folder == "":
-        print("Edited images folder missing from config.cfg. Set it up before reporting.")
         return ""
     for is_this_image in os.listdir(images_folder):
         if fnmatch.fnmatch(is_this_image, "*.jpg") or fnmatch.fnmatch(is_this_image, "*.gif"):
             return images_folder
     else:
-        print("Edited pictures folder doesn't contain any .jpg or .gif files. Did you select the right one?")
         return ""

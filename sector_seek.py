@@ -20,10 +20,8 @@ def request_sector_owner(sector_to_find, game):
     js = reply.json()
     try:
         sector_owner = js[sector_to_find]["owner"]["svn_name"]
-        print(f"Owner of sector ({sector_to_find}) found: {sector_owner}")
         return sector_owner
     except KeyError:
-        print(f"Owner of sector {sector_to_find} not found!")
         return ""
 
 
@@ -48,9 +46,7 @@ def get_asset_assign_dict():
 
 def ask_asset_type():
     # Asks user for what type of asset the bug is. Used when asset type is not specified in bugs.txt line
-    print("What kind of asset is this?")
     while True:
-        print("r: roads, v: vegetation, c: animated characters, a:other")
         type_of_asset = input("> ")
         if type_of_asset in ["r", "v", "c", "a"]:
             return type_of_asset
@@ -63,7 +59,6 @@ def find_assign_to(line, chosen_game):
 
     if bug_type == "m":
         get_owner_of_this = clean_sector(line)
-        print(f"Looking for owner of sector ({get_owner_of_this})")
         assign_to = request_sector_owner(get_owner_of_this, chosen_game)
     elif bug_type in ["ar", "av", "ac", "aa"]:
         ass_dict = get_asset_assign_dict()

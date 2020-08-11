@@ -11,10 +11,10 @@ def check_batch_images(all_bugs):
             if bug[0][0] not in [';', '!']:
                 img = get_image(bug[0])
                 if not img:
-                    print(f"Image not found for bug: {bug[0][:-1]}")
+
                     img_missing = True
         if img_missing:
-            print("Would you like to try again or quit to menu? ")
+
             while True:
                 ans = input("Y/N/Q\n> ")
                 if ans.upper() == "Y":

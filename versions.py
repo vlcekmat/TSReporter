@@ -11,13 +11,11 @@ def get_project_from_user():
     # All bugs will be reported into that project
     projects = ['Return to menu', 'ATS - INTERNAL', 'ATS - PUBLIC', 'ATS - PUBLIC - SENIORS', 'ETS 2 - INTERNAL',
                 'ETS 2 - PUBLIC', 'ETS 2 - PUBLIC - SENIORS']
-    print('Choose a project')
     for i in range(len(projects)):
-        print(f"{i}: {projects[i]}")
+        pass
     while True:
         project = input('> ')
         if not (is_int(project) and 6 >= int(project) >= 0):
-            print('Invalid project, choose a number between 0 and 6')
             continue
         else:
             return projects[int(project)]
@@ -35,7 +33,6 @@ def find_game_version(log_path):
             version_0 = _line.split("ver.")[1]
             version_1 = version_0.split(" ")[0]
             return version_1
-    print("Game version not found in game log!")
     return -1
 
 
@@ -50,7 +47,6 @@ def find_trunk_version(game, trunk_path):
         trunk_ver = current.read()
         current.close()
     except FileNotFoundError:
-        print(f"CURRENT not found in file: {c_path}")
         return -1
     ver_out = f"[trunk at revision {trunk_ver[:-1]}]"
     return ver_out
@@ -65,7 +61,6 @@ def find_version(game):
     else:
         log_path = read_config("documents location") + "/Euro Truck Simulator 2/game.log.txt"
     if not os.path.isfile(log_path):
-        print(f"game.log.txt not found in path {log_path}")
         return -1
     found_version = find_game_version(log_path)
     if found_version == -1:

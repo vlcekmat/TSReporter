@@ -11,7 +11,7 @@ def get_asset_name(game):
     else:
         log_path = _doc_read[1][:-1] + "/Euro Truck Simulator 2/game.log.txt"
     if not os.path.isfile(log_path):
-        print(f"game.log.txt not found in path {log_path}")
+
         return -1
 
     f = open(log_path, "r", encoding='UTF-8')

@@ -12,7 +12,6 @@ def report_bug(project, log_lines, version, assign, username, password, _driver_
                browser='chrome', priority=None, severity=None, late_image=None):
     # uploads stuff to Mantis or calls other methods to do that
     log_first = log_lines.popleft()
-    print(f'CURRENT BUG: {log_first}')
     log_lines.appendleft(log_first)
     category = determine_bug_category(log_first)
 
@@ -59,11 +58,8 @@ def batch_report_bugs(project, bugs_stack, version, username, password, browser=
     prefix = ask_for_prefix()
     if prefix == "":
         return False
-    print("Starting headless browser instance...")
     reporter_driver = DriverHandler(headless=True, browser=browser)
-    print("Logging in to Mantis...")
     log_into_mantis(reporter_driver.get_driver(), username, password)
-    print("Logged in successfully!")
     while len(bugs_stack) > 0:
         current_bug = bugs_stack.popleft()
         split_bug = current_bug[0].split('_', maxsplit=1)

@@ -8,14 +8,12 @@ from information_compile import generate_description, get_image, generate_no_ver
 
 def ask_for_missing_image(line_to_process):
     while True:
-        print('No image found, try again? (Y/N)')
         answer = input('> ')
         if answer.upper() == 'Y':
             image_to_return = get_image(line_to_process)
         elif answer.upper() == 'N':
             return ""
         else:
-            print('Answer Y or N')
             continue
         if image_to_return:
             return image_to_return
@@ -62,7 +60,7 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
         if not image_to_append and not priority:
             image_to_append = ask_for_missing_image(line_to_process)
         elif not image_to_append and priority:
-            print(f"No image added to bug: {line_to_process}")
+            pass
         if image_to_append:
             images.append(image_to_append)
 
@@ -107,7 +105,7 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
         try:
             driver.find_element_by_xpath(f"//option[text()='{assign_to}']").click()
         except WebDriverException:
-            print(f'Unable to find user named: {assign_to}, leaving blank')
+            pass
     driver.find_element_by_xpath(f"//option[text()='always']").click()
 
     if category == 'm':
