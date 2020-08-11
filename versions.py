@@ -27,7 +27,7 @@ def find_game_version(log_path):
     # Finds the game version from game.log.txt and returns it
     # Uses a Regexp to find the line and then extracts the version
     # Returns -1 if no version is found (eg. when game crashes too soon)
-    with open(log_path, "r") as f:
+    with open(log_path, "r", encoding='UTF-8') as f:
         f_lines = f.readlines()
     for _line in f_lines:
         ver_line = re.search("00:\d\d:\d\d.\d\d\d : [^0]* Truck Simulator [2\s]*init ver.[\d.]+", _line)
@@ -46,7 +46,7 @@ def find_trunk_version(game, trunk_path):
     else:
         c_path = Path(trunk_path + "/ETS2/CURRENT")
     try:
-        current = c_path.open(mode='r', encoding='utf-8')
+        current = c_path.open(mode='r', encoding='UTF-8')
         trunk_ver = current.read()
         current.close()
     except FileNotFoundError:

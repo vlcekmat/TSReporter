@@ -11,6 +11,7 @@ from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowE
 import win32gui, win32con
 
 import main
+from information_compile import determine_bug_category
 from password import get_password
 from versions import find_version
 import bugs
@@ -283,7 +284,7 @@ class Application(Frame):
             img_panel.place(x=0, y=0)
             img_panel.pack(pady=100, side=BOTTOM)
 
-            with open('version.txt', 'r') as version_file:
+            with open('version.txt', 'r', encoding='UTF-8') as version_file:
                 # Reads the version and displays it on the screen
                 version = version_file.readline()
             version_label = Label(bottom_frame, text=version,
@@ -725,6 +726,8 @@ class Application(Frame):
 
         late_image = None
 
+        category = None
+
         def __init__(self, project, bug_handler, reported=False):
             super().__init__()
 
@@ -744,9 +747,13 @@ class Application(Frame):
 
             self.bug_in_process = current_bug
 
+            self.category = determine_bug_category(current_bug[0].line)
+            print(self.category)
+
             self.already_reported = reported
             self.pack(fill=BOTH, expand=True)
             self.init_widgets(current_bug)
+
 
         def go_to_reported(self):
             self.pack_forget()
@@ -777,7 +784,8 @@ class Application(Frame):
                 self.asset_path_input = text_input
 
         def submit_asset_info(self):
-            reporter.asset_path = self.asset_path_input.get()
+            if self.asset_path_input.get() != "Enter asset path/debug info":
+                reporter.asset_path = self.asset_path_input.get()
 
         def go_to_main_menu(self):
             self.pack_forget()
@@ -831,10 +839,9 @@ class Application(Frame):
             # TODO: get rid of the error message when you close the browser in the process
 
             asset_path = None
-            if bug_line[0] == 'a':
+            if self.category == 'a' and self.asset_path_input.get() != "Enter asset path/debug info":
                 self.submit_asset_info()
-                if self.asset_path_input.get() != "Enter asset path/debug info":
-                    asset_path = self.asset_path_input.get()
+                asset_path = self.asset_path_input.get()
 
             while True:
                 error_message = "Do not interact with the browser during the process"
@@ -995,7 +1002,7 @@ class Application(Frame):
 
             # TODO: Make some widgets for the sidebar here
 
-            if current_bug_summary[0] == 'a':
+            if self.category == 'a':
                 self.show_text_input(frame)
 
             priority_choices = ['Low', 'Normal', 'High', 'Urgent', 'Immediate']
@@ -1019,10 +1026,10 @@ class Application(Frame):
             Label(frame, text="Severity", bg=Application.current_color_theme[3], fg=Application.current_color_theme[1],
                   font="Helvetica 13 bold").grid(row=2, column=0)
             severity_menu.grid(row=2, column=1, sticky=W+E)
-            if current_bug_summary[0] == 'm':
+            if self.category == 'm':
                 severity_menu['state'] = DISABLED
 
-            if current_bug_summary[0] == 'a':
+            if self.category == 'a':
                 priority_menu['state'] = DISABLED
                 self.priority_var.set(priority_choices[1])
                 self.severity_var.set(severity_choices[0])

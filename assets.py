@@ -3,7 +3,7 @@ import re
 
 
 def get_asset_name(game):
-    _cfg_file = open("./config.cfg", "r")
+    _cfg_file = open("./config.cfg", "r", encoding='UTF-8')
     _doc_read = _cfg_file.readlines()
     _cfg_file.close()
     if game == 'A':
@@ -14,7 +14,7 @@ def get_asset_name(game):
         print(f"game.log.txt not found in path {log_path}")
         return -1
 
-    f = open(log_path, "r")
+    f = open(log_path, "r", encoding='UTF-8')
     for _line in f:
         ver_line = re.search("00:\d\d:\d\d.\d\d\d : DEBUG INFO:", _line)
         if ver_line is not None:

@@ -30,6 +30,7 @@ def determine_bug_category(log):
     if "_" not in split_log[0]:
         return ""
     category = split_log[0].split('_', maxsplit=1)[0]
+
     if category in ["m", "a"]:
         return category
     elif category in ["aa", "ar", "av", "ac"]:

@@ -42,7 +42,7 @@ class ConfigHandler:
         if not os.path.isfile(config_path):
             ConfigHandler.gui_config_setup()  # changed from config_setup()
         else:
-            cfg_file = open(config_path, "r")
+            cfg_file = open(config_path, "r", encoding='utf-8')
             cfg_lines = cfg_file.readlines()
             for i in enumerate(cfg_lines):
                 cfg_lines[i[0]] = cfg_lines[i[0]][:-1]
@@ -85,7 +85,7 @@ class ConfigHandler:
     @staticmethod
     def save_config(o_stream=None):
         # Saves content of dictionary to config.cfg in correct format
-        cfg_file = open("./config.cfg", "w")
+        cfg_file = open("./config.cfg", "w", encoding='UTF-8')
         for key in ConfigHandler.cfg_dict:
             cfg_file.write(f'"{key}" : "{ConfigHandler.cfg_dict[key]}"\n')
         if o_stream:

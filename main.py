@@ -104,7 +104,7 @@ def report_option(use_mode, password):
         )
         if not reported:
             return None
-        with open(game_path + "/bugs_archive.txt", "a") as archive:
+        with open(game_path + "/bugs_archive.txt", "a", encoding='UTF-8') as archive:
             archive.writelines(bug_lines)
-        with open(game_path + "/bugs.txt", "w"):
+        with open(game_path + "/bugs.txt", "w", encoding='UTF-8'):
             pass

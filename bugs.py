@@ -12,7 +12,7 @@ def read_bugs_file(game_path, o_stream):
             f"bugs.txt not found in {game_path}. Change config or report some bugs first.\n")
         return None
 
-    bugs_file = open(game_path + "/bugs.txt", "r", encoding="utf-8")
+    bugs_file = open(game_path + "/bugs.txt", "r", encoding='UTF-8')
     bug_lines = bugs_file.readlines()
     bugs_file.close()
 
@@ -32,14 +32,14 @@ def read_bugs_file(game_path, o_stream):
 def archive_bug(current_bug, game_path):
     # Writes the bug deque line by line into archive and removes and removes lines from bugs.txt
     bugs_location = game_path + "/bugs.txt"
-    with open(game_path + "/bugs_archive.txt", "a") as archive:
+    with open(game_path + "/bugs_archive.txt", "a", encoding='UTF-8') as archive:
         while len(current_bug) > 0:
             line_to_archive = current_bug.popleft()
             archive.write(line_to_archive)
-            with open(bugs_location, 'r') as bugs_file:
+            with open(bugs_location, 'r', encoding='UTF-8') as bugs_file:
                 bugs_source = bugs_file.read()
                 bugs_removed = bugs_source.replace(line_to_archive, '')
-            with open(bugs_location, 'w') as bugs_file:
+            with open(bugs_location, 'w', encoding='UTF-8') as bugs_file:
                 bugs_file.write(bugs_removed)
 
 
@@ -75,8 +75,8 @@ def count_bugs():
     documents_location = config.read_config('documents location')
     ats_bugs_path = f"{documents_location}/American Truck Simulator/bugs.txt"
     ets_bugs_path = f"{documents_location}/Euro Truck Simulator 2/bugs.txt"
-    ats_bugs = open(ats_bugs_path, encoding='utf8')
-    ets_bugs = open(ets_bugs_path, encoding='utf8')
+    ats_bugs = open(ats_bugs_path, encoding='UTF-8')
+    ets_bugs = open(ets_bugs_path, encoding='UTF-8')
 
     for line in ats_bugs:
         if ';' in line and line[0] not in ['!', ';', '.']:
