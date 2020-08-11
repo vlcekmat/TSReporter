@@ -31,7 +31,8 @@ class ConfigHandler:
             "mantis username": "text",
             "preferred browser": "browser",
             "save password": "yn",
-            "s_password": "secret"
+            "s_password": "secret",
+            "current_theme": "secret"
     }
 
     def __init__(self, debug=False):
@@ -133,16 +134,13 @@ class ConfigHandler:
         line_selection = index
         if entered_text is not None:
             ConfigHandler.cfg_dict[cfg_layout[line_selection]] = ConfigHandler.ask_config_line(
-                cfg_layout[line_selection]
-                , entered_text=entered_text)
+                cfg_layout[line_selection], entered_text=entered_text)
         elif yes_no_value is not None:
             ConfigHandler.cfg_dict[cfg_layout[line_selection]] = ConfigHandler.ask_config_line(
-                cfg_layout[line_selection]
-                , yes_no_value=yes_no_value)
+                cfg_layout[line_selection], yes_no_value=yes_no_value)
         elif browser_chosen is not None:
             ConfigHandler.cfg_dict[cfg_layout[line_selection]] = ConfigHandler.ask_config_line(
-                cfg_layout[line_selection]
-                , preferred_browser=browser_chosen)
+                cfg_layout[line_selection], preferred_browser=browser_chosen)
         else:
             ConfigHandler.cfg_dict[cfg_layout[line_selection]] = ConfigHandler.ask_config_line(
                 cfg_layout[line_selection])
@@ -165,8 +163,11 @@ class ConfigHandler:
     def gui_config_setup():
         cfg_layout = ConfigHandler.config_layout.keys()
         for entry in cfg_layout:
+            print(entry)
             if ConfigHandler.config_layout[entry] == "secret":
                 ConfigHandler.cfg_dict[entry] = ""
+                if entry == "current_theme":
+                    ConfigHandler.cfg_dict[entry] = "ph"
             elif ConfigHandler.config_layout[entry] == "path":
                 ConfigHandler.cfg_dict[entry] = "ENTER A PATH"
             elif ConfigHandler.config_layout[entry] == "text":

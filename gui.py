@@ -74,7 +74,9 @@ def get_theme(theme):
             4: '#271D26'  # Background
         }
     }
-    if theme_dict[theme]:
+    if theme == 'all':
+        return theme_dict
+    elif theme_dict[theme]:
         return theme_dict[theme]
     else:
         return theme_dict["ph_theme"]
@@ -111,7 +113,8 @@ class Application(Frame):
             if config.read_config("save password") == "True":
                 self.password = get_password()
 
-    current_color_theme = get_theme("ph")
+    c_handler = config.ConfigHandler()
+    current_color_theme = get_theme(config.read_config("current_theme"))
 
     class Page(Frame):
         # All pages inherit from this class
@@ -192,6 +195,42 @@ class Application(Frame):
 
         # endregion
 
+        class ThemeOption:
+            theme_name = None
+            button = None
+
+            def __init__(self, theme, master, row):
+                super().__init__()
+                self.theme_name = theme
+                self.build_button(master, row)
+
+            def _on_click(self, _):
+                app.current_color_theme = get_theme(self.theme_name)
+                Application.current_color_theme = get_theme(self.theme_name)
+                config.write_config('current_theme', self.theme_name)
+                app.main_menu.go_to_settings()
+                app.settings_menu.go_to_main_menu()
+
+            def build_button(self, master, row):
+                button = Button(master=master, width=15)
+                button['state'] = DISABLED
+                button['relief'] = RAISED
+
+                self.button = button
+
+                color_theme = get_theme(theme=self.theme_name)
+
+                for i in range(4):
+                    label = Label(button, bg=color_theme[i+1], width=3, state=DISABLED)
+                    label.bind('<Button-1>', self._on_click)
+                    label.grid(column=i, row=0)
+
+                button.grid(column=0, row=row, pady=10, padx=10)
+                return button
+
+        def show_color_themes(self):
+            pass
+
         def set_up_menu(self):
             # Think of this as HTML, but much more messy and frustrating
 
@@ -214,6 +253,21 @@ class Application(Frame):
             top_frame = Frame(background_frame, bg=Application.current_color_theme[4])
             top_frame.pack(side=TOP, fill=X)
             # duh
+
+            color_button_frame = Frame(top_frame, bg=Application.current_color_theme[4])
+            color_button_frame.pack(side=RIGHT, fill=Y, padx=30, pady=30)
+
+           # color_button = Application.AppButton(text="Color Theme", frame=color_button_frame, side=TOP,
+           #                                      color1=Application.current_color_theme[2],
+           #                                      color2=Application.current_color_theme[2], offy=20, offx=20)
+
+            theme_selection_frame = Frame(color_button_frame, bg=Application.current_color_theme[3])
+            theme_selection_frame.pack()
+
+            index = 0
+            for color_theme in get_theme('all'):
+                theme_option = self.ThemeOption(color_theme, master=theme_selection_frame, row=index)
+                index +=1
 
             left_frame = Frame(top_frame, bg=Application.current_color_theme[3])
             left_frame.pack(expand=False, fill=Y, side=LEFT, pady=10, padx=30)
