@@ -748,7 +748,6 @@ class Application(Frame):
             self.bug_in_process = current_bug
 
             self.category = determine_bug_category(current_bug[0].line)
-            print(self.category)
 
             self.already_reported = reported
             self.pack(fill=BOTH, expand=True)
