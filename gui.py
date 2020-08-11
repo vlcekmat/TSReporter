@@ -79,6 +79,14 @@ def get_theme(theme):
             2: '#C3BBD2',  # Quit Button, text
             3: '#3F384F',  # Integrated Frames
             4: '#1A1E26'  # Background
+        },
+
+        "grayscale": {
+            # Change the values below to change the overall color theme of the app
+            1: '#838383',  # Regular Buttons, bugs counter text
+            2: '#D9D9D9',  # Quit Button, text
+            3: '#404040',  # Integrated Frames
+            4: '#262626'  # Background
         }
     }
     if theme == 'all':
