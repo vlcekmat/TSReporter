@@ -20,7 +20,7 @@ def report_bug(project, log_lines, version, images_folder_path, assign, username
     duplicate_found = False
     d_info = None
     a_path = asset_path
-    if 'A' in category.upper():
+    if 'A' in category.upper() and a_path != None:
         # a_path = input('Enter DEBUG INFO or path to the asset:\n> ')
         if 'DEBUG INFO' in a_path or 'Position' in a_path or 'Object' in a_path:  # To accommodate only partial debug i.
             d_info = a_path
