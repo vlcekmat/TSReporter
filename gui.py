@@ -125,6 +125,9 @@ class Application(Frame):
                 config.write_config("current_theme", "ph")
 
         else:
+            config.ConfigHandler()
+            self.current_color_theme = get_theme(config.read_config("current_theme"))
+            Application.current_color_theme = get_theme(config.read_config("current_theme"))
             self.main_menu = self.MainMenu()
             if config.read_config("save password") == "True":
                 self.password = get_password()
