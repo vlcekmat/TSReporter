@@ -229,7 +229,7 @@ class Application(Frame):
                     label.bind('<Button-1>', self._on_click)
                     label.grid(column=i, row=0)
 
-                button.grid(column=0, row=row, pady=10, padx=10)
+                button.grid(column=0, row=row, pady=5, padx=10)
                 return button
 
         def show_color_themes(self):
