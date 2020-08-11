@@ -26,7 +26,7 @@ import reporter
 
 def get_theme(theme):
     theme_dict = {
-        "ph_theme": {
+        "ph": {
             # Change the values below to change the overall color theme of the app
             1: 'white',  # Regular Buttons, bugs counter text
             2: '#ffa500',  # Quit Button, text
@@ -34,7 +34,7 @@ def get_theme(theme):
             4: '#2B2B2B'  # Background
         },
 
-        "that_ass_theme": {
+        "that_ass": {
             # Change the values below to change the overall color theme of the app
             1: '#D9C5C1',  # Regular Buttons, bugs counter text
             2: '#F2B694',  # Quit Button, text
@@ -50,7 +50,7 @@ def get_theme(theme):
             4: '#33081E'  # Background
         },
 
-        "pastel_theme": {
+        "pastel": {
             # Change the values below to change the overall color theme of the app
             1: '#94FFD0',  # Regular Buttons, bugs counter text
             2: '#F9B1FF',  # Quit Button, text
@@ -58,7 +58,7 @@ def get_theme(theme):
             4: '#7C9EFF'  # Background
         },
 
-        "forest_theme": {
+        "forest": {
             # Change the values below to change the overall color theme of the app
             1: '#D4D93D',  # Regular Buttons, bugs counter text
             2: '#99BF0F',  # Quit Button, text
@@ -66,7 +66,7 @@ def get_theme(theme):
             4: '#214001'  # Background
         },
 
-        "red_black_theme": {
+        "purple_rain": {
             # Change the values below to change the overall color theme of the app
             1: '#ECE8E1',  # Regular Buttons, bugs counter text
             2: '#FF4655',  # Quit Button, text
@@ -111,7 +111,7 @@ class Application(Frame):
             if config.read_config("save password") == "True":
                 self.password = get_password()
 
-    current_color_theme = get_theme("ph_theme")
+    current_color_theme = get_theme("ph")
 
     class Page(Frame):
         # All pages inherit from this class
@@ -241,7 +241,7 @@ class Application(Frame):
 
             quit_button = Application.AppButton('QUIT', color1=Application.current_color_theme[2],
                                                 color2=Application.current_color_theme[2],
-                                                frame=left_frame, font_color='white', command=sys.exit)
+                                                frame=left_frame, command=sys.exit)
 
             # region BUG COUNTER
             bugs_count_frame = Frame(top_frame, bg=Application.current_color_theme[3])
@@ -736,7 +736,6 @@ class Application(Frame):
             self.pack(fill=BOTH, expand=True)
             self.init_widgets(current_bug)
 
-
         def go_to_reported(self):
             self.pack_forget()
             last_bug = self.bug_handler.get_current()
@@ -746,7 +745,6 @@ class Application(Frame):
             app.reporting = None
 
         dialog_activated = False
-
         asset_path_input = None
 
         def show_text_input(self, master):
@@ -1122,7 +1120,6 @@ class Application(Frame):
             frame_for_sidebar = Frame(right_frame, bg=Application.current_color_theme[3])  # Frame for the sidebar
 
             # These two frames will be filled and then alternated between in show_canvas and show_sidebar
-
             right_buttons_frame = Frame(right_frame, bg=Application.current_color_theme[3])
             right_buttons_frame.pack(side=BOTTOM, fill=X)
             bottom_frame = Frame(background_frame, bg=Application.current_color_theme[4])
