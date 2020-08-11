@@ -248,13 +248,16 @@ class Application(Frame):
             bugs_count_frame.pack(side=TOP, pady=10)
             subtitle_font = Font(size=15)
             reports_count_text = Label(bugs_count_frame, text=f'Number of bugs in bugs.txt',
-                                       bg=Application.current_color_theme[4], fg=Application.current_color_theme[2], font=subtitle_font)
+                                       bg=Application.current_color_theme[4],
+                                       fg=Application.current_color_theme[2], font=subtitle_font)
             reports_count_text.pack()
             ETS2_bugs_count = Label(bugs_count_frame, text=f'ETS 2: {ets_bugs_count}',
-                                    bg=Application.current_color_theme[3], fg=Application.current_color_theme[1], font=subtitle_font)
+                                    bg=Application.current_color_theme[3],
+                                    fg=Application.current_color_theme[1], font=subtitle_font)
             ETS2_bugs_count.pack()
             ATS_bugs_count = Label(bugs_count_frame, text=f'ATS: {ats_bugs_count}',
-                                   bg=Application.current_color_theme[3], fg=Application.current_color_theme[1], font=subtitle_font)
+                                   bg=Application.current_color_theme[3],
+                                   fg=Application.current_color_theme[1], font=subtitle_font)
             ATS_bugs_count.pack()
             # endregion
 
