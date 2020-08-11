@@ -14,5 +14,6 @@ PyInstaller.__main__.run([
 
 shutil.copyfile('chromedriver.exe', 'dist/chromedriver.exe')
 shutil.copyfile('geckodriver.exe', 'dist/geckodriver.exe')
-shutil.copyfile('version.txt', 'dist/version.txt')
 shutil.copyfile('README.md', 'dist/README.md')
+
+shutil.copytree('resources', 'dist/resources')

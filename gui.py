@@ -10,7 +10,6 @@ from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowE
 
 import win32gui, win32con
 
-import main
 from information_compile import determine_bug_category
 from password import get_password
 from versions import find_version
@@ -80,6 +79,9 @@ def get_theme(theme):
         return theme_dict[theme]
     else:
         return theme_dict["ph_theme"]
+
+
+version = "0.3.4"
 
 
 class Application(Frame):
@@ -328,9 +330,6 @@ class Application(Frame):
             img_panel.place(x=0, y=0)
             img_panel.pack(pady=100, side=BOTTOM)
 
-            with open('version.txt', 'r', encoding='UTF-8') as version_file:
-                # Reads the version and displays it on the screen
-                version = version_file.readline()
             version_label = Label(bottom_frame, text=version,
                                   bg=Application.current_color_theme[4],
                                   fg=Application.current_color_theme[2])
@@ -844,7 +843,9 @@ class Application(Frame):
         def show_next_report(self, archive):
             if archive:
                 self.bug_handler.archive()
-            self.bug_handler.read_next()
+                self.bug_handler.read_next()
+            else:
+                self.bug_handler.read_next(archive_comments=False)
             if not self.bug_handler.get_current():
                 self.go_to_main_menu()
                 return
