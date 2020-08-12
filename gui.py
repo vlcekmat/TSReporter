@@ -254,9 +254,6 @@ class Application(Frame):
                 button.grid(column=0, row=row, pady=5, padx=10)
                 return button
 
-        def show_color_themes(self):
-            pass
-
         def set_up_menu(self):
             # Think of this as HTML, but much more messy and frustrating
 
@@ -290,6 +287,7 @@ class Application(Frame):
             for color_theme in get_theme('all'):
                 theme_option = self.ThemeOption(color_theme, master=theme_selection_frame, row=index)
                 index += 1
+
 
             left_frame = Frame(top_frame, bg=Application.current_color_theme[3])
             left_frame.pack(expand=False, fill=Y, side=LEFT, pady=10, padx=30)
@@ -844,8 +842,9 @@ class Application(Frame):
                 if self.prefix not in ['Enter prefix', '']:
                     opt_prefix = f"{self.prefix} - "
 
-            if self.asset_path_input.get() not in ['Enter asset path/debug info', ''] and self.asset_path_input:
-                opt_asset = f"{extract_asset_name(self.asset_path_input.get())} - "
+            if self.asset_path_input:
+                if self.asset_path_input.get() not in ['Enter asset path/debug info', '']:
+                    opt_asset = f"{extract_asset_name(self.asset_path_input.get())} - "
             current = self.bug_handler.get_current()[0][:-1]
             current = current.split(';')[0]
 
@@ -1293,6 +1292,8 @@ class Application(Frame):
             if '_' in current:
                 category = f"{current.split('_')[0]}_"
                 current = current.split('_')[1]
+                current = current.split(';')[0]
+            else:
                 current = current.split(';')[0]
 
             current_raw_summary = f"{current_raw}"
