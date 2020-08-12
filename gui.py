@@ -973,7 +973,6 @@ class Application(Frame):
 
         def open_report(self, bug_line):
             # This is called when the 'Report' button is pressed, reporting will happen starting here
-            # TODO: also maybe make it use a new thread?
 
             asset_path = None
             prefix = None
@@ -1076,7 +1075,6 @@ class Application(Frame):
             thumbnail_canvas.grid(row=0, column=0, sticky="news")
 
             # Make a Scrollbar if there are more than 5 images (bug head and 4 extra)
-            # TODO: Fix this, it doesn't want to scroll
             if bug_len > 5:
                 sb = Scrollbar(frame, orient="vertical")
                 sb.grid(row=0, column=1, sticky="ns")
@@ -1113,8 +1111,6 @@ class Application(Frame):
         def make_options_sidebar(self, frame, current_bug_summary):
             # The report options sidebar is created here.
             # It is not displayed at first, only when show_sidebar() is called
-
-            # TODO: Make some widgets for the sidebar here
 
             if self.category == 'a':
                 self.show_text_input_asset_path(frame)
@@ -1174,8 +1170,14 @@ class Application(Frame):
 
             prefix_checkbox = Checkbutton(master=checkbox_frame, bg=app.current_color_theme[3],
                                           activebackground=app.current_color_theme[3], variable=prefix_checked,
-                                          command=lambda: self.check_prefix(value=prefix_checked))
+                                          command=lambda: self.check_prefix(value=prefix_checked),
+                                          selectcolor=app.current_color_theme[3], fg=app.current_color_theme[2],
+                                          activeforeground=app.current_color_theme[2])
             prefix_checkbox.pack(side=RIGHT)
+
+            bug_summary_text = Text(checkbox_frame, font=Font(size=8), bg=app.current_color_theme[3],
+                                        bd=0, height=1, width=15, fg=app.current_color_theme[1])
+            #bug_summary_text.grid
 
             self.prefix_check_button = prefix_checkbox
 
