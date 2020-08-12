@@ -113,12 +113,8 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
     elif category == 'a':
         driver.find_element_by_xpath(f"//option[text()='assets']").click()
 
-    if priority:
-        if priority != 'normal':
-            driver.find_element_by_xpath(f"//select[@name='priority']/option[text()='{priority}']").click()
-        if severity is not None:
-            if priority != "low":
-                driver.find_element_by_xpath(f"//select[@name='severity']/option[text()='major']").click()
+    driver.find_element_by_xpath(f"//select[@name='priority']/option[text()='{priority}']").click()
+    driver.find_element_by_xpath(f"//select[@name='severity']/option[text()='{severity}']").click()
     # endregion
 
     #if priority:  # if in batch reporter mode

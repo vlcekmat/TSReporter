@@ -1224,10 +1224,11 @@ class Application(Frame):
         def priority_callback(self, *args):
             # See severity_callback()
             # Below code is how automatic severity should work for map bugs
-            if self.priority_var.get() == "Low" and self.severity_var.get() == "Major":
-                self.severity_var.set("Minor")
-            elif self.priority_var.get() != "Low" and self.severity_var.get() == "Minor":
-                self.severity_var.set("Major")
+            if self.category == 'm':
+                if self.priority_var.get() == "Low" and self.severity_var.get() == "Major":
+                   self.severity_var.set("Minor")
+                elif self.priority_var.get() != "Low" and self.severity_var.get() == "Minor":
+                    self.severity_var.set("Major")
 
         def show_canvas(self, thumbnails_frame, options_frame, this_button, current_bug, image_labels,
                         image_location_text, image_path_button, try_again_button, thumbnail_canvas):
