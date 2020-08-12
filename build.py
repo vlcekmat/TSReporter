@@ -16,4 +16,5 @@ shutil.copyfile('chromedriver.exe', 'dist/chromedriver.exe')
 shutil.copyfile('geckodriver.exe', 'dist/geckodriver.exe')
 shutil.copyfile('README.md', 'dist/README.md')
 
+shutil.rmtree('dist/resources')
 shutil.copytree('resources', 'dist/resources')

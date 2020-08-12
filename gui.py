@@ -841,7 +841,7 @@ class Application(Frame):
         bug_priority = None
 
         small_img_size = (160, 100)  # Size, to which the BugEntry thumbnails its images
-        img_size = (520, 320)
+        img_size = (520, 315)
 
         late_image = None
 
@@ -982,12 +982,10 @@ class Application(Frame):
                 app.reporting = Application.Reporting(
                     Application.Reporting.selected_project, self.bug_handler, reported=True, prefix=self.prefix
                 )
-                app.reporting = None
             else:
                 app.reporting = Application.Reporting(
                     Application.Reporting.selected_project, self.bug_handler, reported=True
                 )
-                app.reporting = None
 
         def find_missing_image(self, image_label, bug_entry, try_again_button, find_img_button=None,
                                image_location_text=None):
@@ -1120,6 +1118,7 @@ class Application(Frame):
                     find_img_button.get_element().destroy()
                 image_location_text.insert(END, current_bug[0].image_location)
                 image_location_text.configure(state=DISABLED)
+                image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
             if self.bug_handler.images_good() and try_again_button:
                 try_again_button.get_element().pack_forget()
                 try_again_button.get_element().destroy()
@@ -1367,8 +1366,8 @@ class Application(Frame):
 
             current_raw_summary = f"{current_raw}"
             current_raw_text = Text(middle_frame, height=1, width=100, bg=Application.current_color_theme[3],
-                                    fg=Application.current_color_theme[1], bd=0, font="Helvetica 13")
-            current_raw_text.pack(side=TOP, fill=X, pady=5, padx=5)
+                                    fg=Application.current_color_theme[1], bd=0, font="Helvetica 10")
+            current_raw_text.pack(side=TOP, fill=X, pady=0, padx=5)
             current_raw_text.insert(END, current_raw_summary)
             current_raw_text.configure(state=DISABLED)
 
@@ -1405,7 +1404,7 @@ class Application(Frame):
             image_labels.append(head_img_label)
             image_location_text = Text(left_frame, height=1, width=60, bg=Application.current_color_theme[3],
                                        fg=Application.current_color_theme[1], bd=0, font="Helvetica 10")
-            image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
+            # image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
             # The scrollable canvas is created here
             thumbnail_canvas = self.make_scrollable_canvas(frame_for_canvas, len(current_bug), image_labels)
 
@@ -1424,7 +1423,8 @@ class Application(Frame):
             report_options_button = Application.AppButton("Report\noptions", right_buttons_frame, side=RIGHT)
 
             if not current_bug[0].image_location:
-                image_path_button = Application.AppButton("Find image", left_frame, side=BOTTOM)
+                image_path_button = Application.AppButton("Find image", left_frame, side=BOTTOM, pady=5,
+                                                          text_spacing=10)
             else:
                 image_path_button = None
 
@@ -1446,7 +1446,6 @@ class Application(Frame):
                 image_path_button.get_element()['command'] = lambda: self.find_missing_image(
                     head_img_label, current_bug[0], try_again_button, image_path_button, image_location_text
                 )  # Ignore the warning, this works!
-
 
             self.update_image_thumbnails(current_bug, image_labels, image_location_text, image_path_button,
                                          try_again_button, thumbnail_canvas)
@@ -1473,7 +1472,6 @@ class Application(Frame):
             button_skip_report = Application.AppButton(
                 "Skip report", bottom_frame, side=RIGHT, command=lambda: self.show_next_report(False)
             )
-
             # endregion Bottom
 
     class ReportedScreen(Page):
