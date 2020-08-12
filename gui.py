@@ -862,7 +862,7 @@ class Application(Frame):
                                font=Font(size=10))
             text_input.grid(row=4, column=1, pady=10)
             text_input.insert(END, "Enter prefix")
-            self.asset_path_input = text_input
+            self.prefix_box = text_input
             text_input.bind('<Button-1>', lambda x: Application.Reporting.clear_text_box(text_input))
 
         def submit_asset_info(self):
@@ -970,7 +970,12 @@ class Application(Frame):
             # TODO: also maybe make it use a new thread?
 
             asset_path = None
-            if self.category == 'a' and self.asset_path_input.get() != "Enter asset path/debug info":
+            prefix = None
+
+            if self.prefix_box.get() not in ["Enter prefix", ""]:
+                prefix = self.prefix_box.get()
+
+            if self.category == 'a' and self.asset_path_input.get() not in ["Enter asset path/debug info", ""]:
                 self.submit_asset_info()
                 asset_path = self.asset_path_input.get()
                 reporter.asset_path = asset_path
@@ -994,7 +999,7 @@ class Application(Frame):
             reporter.report_bug(project=project, log_lines=current_bug_deque, version=version,
                                 assign=assign_to, username=username, password=password,
                                 _driver_handler=self.driver_handler, priority=priority,
-                                severity=severity, late_image=self.late_image)
+                                severity=severity, late_image=self.late_image, prefix=prefix)
             self.late_image = None
             self.go_to_reported()
 
@@ -1089,7 +1094,14 @@ class Application(Frame):
 
         @staticmethod
         def clear_text_box(text_box):
-            text_box.delete(0, END)
+            if text_box.get() in ['Enter asset path/debug info', 'Enter prefix']:
+                text_box.delete(0, END)
+
+        remember_prefix = False
+        prefix_box = None
+
+        def check_prefix(self, value):
+            self.remember_prefix = value.get()
 
         def make_options_sidebar(self, frame, current_bug_summary):
             # The report options sidebar is created here.
@@ -1141,6 +1153,22 @@ class Application(Frame):
                 self.severity_var.set(severity_choices[0])
 
             self.show_prefix_input(frame)
+
+            checkbox_frame = Frame(master=frame, bg=app.current_color_theme[3])
+            checkbox_frame.grid(column=1, row=5, sticky=E)
+
+            checkbox_description = Text(checkbox_frame, font=Font(size=8), bg=app.current_color_theme[3],
+                                        bd=0, height=1, width=15, fg=app.current_color_theme[1])
+            checkbox_description.pack(side=LEFT)
+            checkbox_description.insert(END, "Remember prefix")
+            checkbox_description.configure(state=DISABLED)
+
+            prefix_checked = BooleanVar()
+
+            prefix_checkbox = Checkbutton(master=checkbox_frame, bg=app.current_color_theme[3],
+                                          activebackground=app.current_color_theme[3], variable=prefix_checked,
+                                          command=lambda: self.check_prefix(value=prefix_checked))
+            prefix_checkbox.pack(side=RIGHT)
 
             severity_menu.config(bg=Application.current_color_theme[3])
             severity_menu.config(fg=Application.current_color_theme[1])

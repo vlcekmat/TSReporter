@@ -39,7 +39,7 @@ def determine_bug_category(log):
         return ""
 
 
-def generate_description(line, version, category, asset=None, first_time=False):
+def generate_description(line, version, category, asset=None, first_time=False, prefix=None):
     # puts information from main in a cohesive report and returns it
     split_log = line.split(';')
     if '_' in split_log[0]:  # First join is there to convert array to string easily
@@ -49,11 +49,15 @@ def generate_description(line, version, category, asset=None, first_time=False):
     else:
         log_without_category = line
 
+    opt_prefix = ''
+    if prefix:
+        opt_prefix = f" - {prefix}"
+
     if category == 'a' and first_time and asset:
         first_time = False
-        report_description = f'{version} - {log_without_category}\nPATH TO THE ASSET: {asset}'
+        report_description = f'{version}{opt_prefix} - {log_without_category}\nPATH TO THE ASSET: {asset}'
     else:
-        report_description = f'''{version} - {log_without_category}'''
+        report_description = f'''{version}{opt_prefix} - {log_without_category}'''
     return report_description
 
 

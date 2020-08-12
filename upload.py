@@ -21,7 +21,7 @@ def ask_for_missing_image(line_to_process):
 
 def upload_to_mantis(version, category, log_lines, assign_to, project, username, password,
                      browser, path_to_asset=None, debug_info=None, web_driver=None, priority=None,
-                     severity=None, late_image=None):
+                     severity=None, late_image=None, prefix=None):
     # Opens chrome browser, connects to mantis and uploads all of the gathered information
     # If priority is not None, it will treat the report as a batch report = will not as for image if its missing and
     #       will submit it automatically
@@ -47,11 +47,11 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
                 first_path_to_asset = path_to_asset
                 first_loop = False
             bug_descriptions.append(
-                generate_description(line_to_process, version, category, path_to_asset, first_time=True)
+                generate_description(line_to_process, version, category, path_to_asset, first_time=True, prefix=prefix)
             )
         else:
             bug_descriptions.append(
-                generate_description(line_to_process, version, category, first_time=False)
+                generate_description(line_to_process, version, category, first_time=False, prefix=prefix)
             )
 
         image_to_append = get_image(line_to_process)
