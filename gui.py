@@ -847,13 +847,16 @@ class Application(Frame):
             if self.asset_path_input.get() not in ['Enter asset path/debug info', ''] and self.asset_path_input:
                 opt_asset = f"{extract_asset_name(self.asset_path_input.get())} - "
             current = self.bug_handler.get_current()[0][:-1]
+            current = current.split(';')[0]
 
             category = ''
             if '_' in current:
                 category = f"{current.split('_')[0]}_"
                 current = current.split('_')[1]
 
-            current_bug_summary = f"{category}{opt_prefix}{opt_asset}{current}"
+            game_version = find_version(Application.Reporting.selected_project[0])
+
+            current_bug_summary = f"Preview: {game_version} - {opt_prefix}{opt_asset}{current}"
             rewrite_textbox(current_bug_summary, self.bug_preview)
 
         def show_text_input_asset_path(self, master):
@@ -1263,8 +1266,8 @@ class Application(Frame):
             # region Frames
             background_frame = Frame(master=self, bg=Application.current_color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
-            version = find_version(Application.Reporting.selected_project[0])
-            version_line = f"Reporting in project [{Application.Reporting.selected_project}] at version {version}"
+            game_version = find_version(Application.Reporting.selected_project[0])
+            version_line = f"Reporting in project [{Application.Reporting.selected_project}] at version {game_version}"
 
             version_info_text = Text(background_frame, height=1, width=60, bg=Application.current_color_theme[4],
                                      fg=Application.current_color_theme[2], bd=0, font="Helvetica 12")
@@ -1284,13 +1287,21 @@ class Application(Frame):
                 opt_asset = f"{self.asset_path_input} - "
 
             current = self.bug_handler.get_current()[0][:-1]
-
+            current_raw = current
             category = ''
             if '_' in current:
                 category = f"{current.split('_')[0]}_"
                 current = current.split('_')[1]
+                current = current.split(';')[0]
 
-            current_bug_summary = f"{category}{opt_prefix}{opt_asset}{current}"
+            current_raw_summary = f"{current_raw}"
+            current_raw_text = Text(middle_frame, height=1, width=100, bg=Application.current_color_theme[3],
+                                    fg=Application.current_color_theme[1], bd=0, font="Helvetica 13")
+            current_raw_text.pack(side=TOP, fill=X, pady=5, padx=5)
+            current_raw_text.insert(END, current_raw_summary)
+            current_raw_text.configure(state=DISABLED)
+
+            current_bug_summary = f"Preview: {game_version} - {opt_prefix}{opt_asset}{current}"
             current_bug_text = Text(middle_frame, height=1, width=100, bg=Application.current_color_theme[3],
                                     fg=Application.current_color_theme[1], bd=0, font="Helvetica 13")
             current_bug_text.pack(side=TOP, fill=X, pady=5, padx=5)
