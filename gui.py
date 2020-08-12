@@ -831,7 +831,7 @@ class Application(Frame):
         dialog_activated = False
         asset_path_input = None
 
-        def show_text_input(self, master):
+        def show_text_input_asset_path(self, master):
             if not self.dialog_activated:
                 self.dialog_activated = True
 
@@ -848,6 +848,20 @@ class Application(Frame):
                 text_input.grid(row=0, column=1)
                 text_input.insert(END, "Enter asset path/debug info")
                 self.asset_path_input = text_input
+
+        def show_prefix_input(self, master):
+            asset_info_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[3],
+                                   bd=0, height=1,
+                                   width=10, fg=app.current_color_theme[1])
+            asset_info_text.grid(row=4, column=0)
+            asset_info_text.insert(END, "Prefix")
+            asset_info_text.configure(state=DISABLED)
+            text_input = Entry(master, bg=Application.current_color_theme[3],
+                               fg=Application.current_color_theme[2], width=25,
+                               font=Font(size=10))
+            text_input.grid(row=4, column=1, pady=10)
+            text_input.insert(END, "Enter prefix")
+            self.asset_path_input = text_input
 
         def submit_asset_info(self):
             if self.asset_path_input.get() != "Enter asset path/debug info":
@@ -1078,15 +1092,20 @@ class Application(Frame):
             # TODO: Make some widgets for the sidebar here
 
             if self.category == 'a':
-                self.show_text_input(frame)
+                self.show_text_input_asset_path(frame)
 
             priority_choices = ['Low', 'Normal', 'High', 'Urgent', 'Immediate']
             self.priority_var = StringVar(frame)
             self.priority_var.set(priority_choices[0])
 
             priority_menu = OptionMenu(frame, self.priority_var, *priority_choices)
-            Label(frame, text="Priority", bg=Application.current_color_theme[3], fg=Application.current_color_theme[1],
-                  font="Helvetica 13 bold").grid(row=1, column=0)
+            priority_text = Text(frame, font=Font(size=12), bg=Application.current_color_theme[3],
+                                   bd=0, height=1,
+                                   width=10, fg=app.current_color_theme[1])
+            priority_text.grid(row=1, column=0)
+            priority_text.insert(END, "Priority")
+            priority_text.configure(state=DISABLED)
+
             priority_menu.grid(row=1, column=1, sticky=W+E)
             priority_menu.config(bg=Application.current_color_theme[3])
             priority_menu.config(fg=Application.current_color_theme[1])
@@ -1098,8 +1117,14 @@ class Application(Frame):
             self.severity_var.set(severity_choices[0])
 
             severity_menu = OptionMenu(frame, self.severity_var, *severity_choices)
-            Label(frame, text="Severity", bg=Application.current_color_theme[3], fg=Application.current_color_theme[1],
-                  font="Helvetica 13 bold").grid(row=2, column=0)
+
+            severity_text = Text(frame, font=Font(size=12), bg=Application.current_color_theme[3],
+                                 bd=0, height=1,
+                                 width=10, fg=app.current_color_theme[1])
+            severity_text.grid(row=2, column=0)
+            severity_text.insert(END, "Severity")
+            severity_text.configure(state=DISABLED)
+
             severity_menu.grid(row=2, column=1, sticky=W+E)
             if self.category == 'm':
                 severity_menu['state'] = DISABLED
@@ -1108,6 +1133,8 @@ class Application(Frame):
                 priority_menu['state'] = DISABLED
                 self.priority_var.set(priority_choices[1])
                 self.severity_var.set(severity_choices[0])
+
+            self.show_prefix_input(frame)
 
             severity_menu.config(bg=Application.current_color_theme[3])
             severity_menu.config(fg=Application.current_color_theme[1])
