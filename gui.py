@@ -22,7 +22,7 @@ from chromedrivers import log_into_mantis
 import utils
 import reporter
 
-
+custom_theme = None
 def get_theme(theme):
     theme_dict = {
         "ph": {
@@ -87,6 +87,15 @@ def get_theme(theme):
             2: '#D9D9D9',  # Quit Button, text
             3: '#404040',  # Integrated Frames
             4: '#262626'  # Background
+        },
+
+
+        "custom": {
+            # Change the values below to change the overall color theme of the app
+            1: 'white',  # Regular Buttons, bugs counter text
+            2: 'white',  # Quit Button, text
+            3: 'white',  # Integrated Frames
+            4: 'white' # Background
         }
     }
     if theme == 'all':
@@ -225,8 +234,9 @@ class Application(Frame):
             theme_name = None
             button = None
 
-            def __init__(self, theme, master, row):
+            def __init__(self, theme, master, row, pady=5):
                 super().__init__()
+                self.pady = pady
                 self.theme_name = theme
                 self.build_button(master, row)
 
@@ -251,8 +261,51 @@ class Application(Frame):
                     label.bind('<Button-1>', self._on_click)
                     label.grid(column=i, row=0)
 
-                button.grid(column=0, row=row, pady=5, padx=10)
+                button.grid(column=0, row=row, pady=self.pady, padx=10)
                 return button
+
+        def configure_custom_theme(self):
+            custom_theme_root = Tk()
+            custom_theme_root.geometry('400x400')
+            custom_theme_root.minsize(width=400, height=400)
+            custom_theme_root.maxsize(width=400, height=400)
+            custom_theme_root.resizable(0, 0)
+            custom_theme_root.wm_iconbitmap('.//resources/icon.ico')
+            custom_theme_root.wm_title('TSReporter - Custom Theme')
+            background = Frame(master=custom_theme_root, bg=Application.current_color_theme[4])
+            background.pack(fill=BOTH, expand=True)
+
+            top_frame = Frame(master=background, bg=Application.current_color_theme[4], pady=10, padx=10)
+            top_frame.pack(fill=X, side=TOP)
+
+            color_entries = []
+            for i in range(4):
+                color_text = Label(master=top_frame, text=f"Color {i + 1}: ",
+                                   bg=Application.current_color_theme[4], fg=Application.current_color_theme[2])
+                color_text.grid(column=0, row=i, sticky=W, pady=10)
+                color_entry = Entry(master=top_frame, width=10,
+                                bg=Application.current_color_theme[3],
+                                fg=Application.current_color_theme[2]
+                )
+                color_entry.grid(column=1, row=i, sticky=W, pady=10)
+                color_entries.append(color_entry)
+
+            submit_button = Button(master=top_frame, text='Submit',
+                                         command=lambda: self.submit_custom_theme(entries=color_entries),
+                                   bg=Application.current_color_theme[4],
+                                   fg=Application.current_color_theme[2])
+            submit_button.grid(column=0, row=10, pady=10)
+
+            custom_theme_root.mainloop()
+
+        def submit_custom_theme(self, entries):
+            new_custom_dict = {
+                1: entries[0],
+                2: entries[1],
+                3: entries[2],
+                4: entries[4]
+            }
+            # TODO: CREATE CONFIG FOR THIS
 
         def set_up_menu(self):
             # Think of this as HTML, but much more messy and frustrating
@@ -285,9 +338,15 @@ class Application(Frame):
 
             index = 0
             for color_theme in get_theme('all'):
-                theme_option = self.ThemeOption(color_theme, master=theme_selection_frame, row=index)
-                index += 1
+                if color_theme != 'custom':
+                    theme_option = self.ThemeOption(color_theme, master=theme_selection_frame, row=index)
+                    index += 1
+            custom_theme_option = self.ThemeOption('custom', master=theme_selection_frame, row=index, pady=20)
 
+            custom_theme_button = Button(master=theme_selection_frame, text='Custom Theme',
+                                         command=self.configure_custom_theme, bg=Application.current_color_theme[4],
+                                         fg=Application.current_color_theme[2])
+            custom_theme_button.grid(column=0, row=10, pady=10)
 
             left_frame = Frame(top_frame, bg=Application.current_color_theme[3])
             left_frame.pack(expand=False, fill=Y, side=LEFT, pady=10, padx=30)
