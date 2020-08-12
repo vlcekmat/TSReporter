@@ -10,7 +10,7 @@ from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowE
 
 import win32gui, win32con
 
-from information_compile import determine_bug_category
+from information_compile import determine_bug_category, generate_description, extract_asset_name
 from password import get_password
 from versions import find_version
 import bugs
@@ -797,6 +797,10 @@ class Application(Frame):
 
         def __init__(self, project, bug_handler, reported=False, prefix=None):
             super().__init__()
+            if prefix:
+                self.prefix = prefix
+            else:
+                prefix = ''
             if not bug_handler:
                 raise ValueError
             else:
@@ -837,6 +841,26 @@ class Application(Frame):
         dialog_activated = False
         asset_path_input = None
 
+        def update_preview(self):
+            self.prefix = self.prefix_box.get()
+            opt_prefix = ''
+            opt_asset = ''
+            if self.prefix:
+                if self.prefix not in ['Enter prefix', '']:
+                    opt_prefix = f"{self.prefix} - "
+
+            if self.asset_path_input.get() not in ['Enter asset path/debug info', ''] and self.asset_path_input:
+                opt_asset = f"{extract_asset_name(self.asset_path_input.get())} - "
+            current = self.bug_handler.get_current()[0][:-1]
+
+            category = ''
+            if '_' in current:
+                category = f"{current.split('_')[0]}_"
+                current = current.split('_')[1]
+
+            current_bug_summary = f"{category}{opt_prefix}{opt_asset}{current}"
+            rewrite_textbox(current_bug_summary, self.bug_preview)
+
         def show_text_input_asset_path(self, master):
             if not self.dialog_activated:
                 self.dialog_activated = True
@@ -853,8 +877,9 @@ class Application(Frame):
                                    font=Font(size=10))
                 text_input.grid(row=0, column=1)
                 text_input.insert(END, "Enter asset path/debug info")
-                self.asset_path_input = text_input
                 text_input.bind('<Button-1>', lambda x: Application.Reporting.clear_text_box(text_input))
+                text_input.bind('<KeyRelease>', lambda x: self.update_preview())
+                self.asset_path_input = text_input
 
         def show_prefix_input(self, master):
             asset_info_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[3],
@@ -868,8 +893,9 @@ class Application(Frame):
                                font=Font(size=10))
             text_input.grid(row=4, column=1, pady=10)
             text_input.insert(END, "Enter prefix")
-            self.prefix_box = text_input
             text_input.bind('<Button-1>', lambda x: Application.Reporting.clear_text_box(text_input))
+            text_input.bind('<KeyRelease>', lambda x: self.update_preview())
+            self.prefix_box = text_input
 
         def submit_asset_info(self):
             if self.asset_path_input.get() != "Enter asset path/debug info":
@@ -1104,13 +1130,14 @@ class Application(Frame):
         remember_prefix = False
         prefix_box = None
         prefix_check_button = None
+        prefix = None
+        bug_preview = None
 
         def check_prefix(self, value):
             self.remember_prefix = value.get()
 
         def make_options_sidebar(self, frame, current_bug_summary):
             # The report options sidebar is created here.
-            # It is not displayed at first, only when show_sidebar() is called
 
             if self.category == 'a':
                 self.show_text_input_asset_path(frame)
@@ -1207,6 +1234,7 @@ class Application(Frame):
         def show_canvas(self, thumbnails_frame, options_frame, this_button, current_bug, image_labels,
                         image_location_text, image_path_button, try_again_button, thumbnail_canvas):
             # This switches the frame to the thumbnails_frame and updates all thumbnails and buttons
+            # It is not displayed at first, only when show_sidebar() is called
             options_frame.pack_forget()
             thumbnails_frame.pack()
             # This method oversees the transfer from bug options to image thumbnail preview
@@ -1252,12 +1280,28 @@ class Application(Frame):
             middle_frame = Frame(background_frame, bg=Application.current_color_theme[3])
             middle_frame.pack(anchor="center", pady=5, padx=15)
 
-            current_bug_summary = self.bug_handler.get_current()[0][:-1]
+            opt_prefix = ''
+            opt_asset = ''
+            if self.prefix not in ['Enter prefix', ''] and self.prefix:
+                opt_prefix = f"{self.prefix} - "
+
+            if self.asset_path_input not in ['Enter asset path/debug info', ''] and self.asset_path_input:
+                opt_asset = f"{self.asset_path_input} - "
+
+            current = self.bug_handler.get_current()[0][:-1]
+
+            category = ''
+            if '_' in current:
+                category = f"{current.split('_')[0]}_"
+                current = current.split('_')[1]
+
+            current_bug_summary = f"{category}{opt_prefix}{opt_asset}{current}"
             current_bug_text = Text(middle_frame, height=1, width=100, bg=Application.current_color_theme[3],
                                     fg=Application.current_color_theme[1], bd=0, font="Helvetica 13")
             current_bug_text.pack(side=TOP, fill=X, pady=5, padx=5)
             current_bug_text.insert(END, current_bug_summary)
             current_bug_text.configure(state=DISABLED)
+            self.bug_preview = current_bug_text
 
             left_frame = Frame(middle_frame, bg=Application.current_color_theme[3])
             left_frame.pack(anchor="w", side=LEFT, pady=0, padx=10)
@@ -1352,6 +1396,7 @@ class Application(Frame):
             button_skip_report = Application.AppButton(
                 "Skip report", bottom_frame, side=RIGHT, command=lambda: self.show_next_report(False)
             )
+
             # endregion Bottom
 
     class ReportedScreen(Page):
