@@ -97,7 +97,7 @@ def get_theme(theme):
         return theme_dict["ph_theme"]
 
 
-version = "0.3.4"
+version = "0.3.5"
 
 
 class Application(Frame):
@@ -919,10 +919,16 @@ class Application(Frame):
                 self.go_to_main_menu()
                 return
             self.pack_forget()
-            app.reporting = Application.Reporting(
-                Application.Reporting.selected_project, self.bug_handler, reported=True
-            )
-            app.reporting = None
+            if self.remember_prefix and self.prefix:
+                app.reporting = Application.Reporting(
+                    Application.Reporting.selected_project, self.bug_handler, reported=True, prefix=self.prefix
+                )
+                app.reporting = None
+            else:
+                app.reporting = Application.Reporting(
+                    Application.Reporting.selected_project, self.bug_handler, reported=True
+                )
+                app.reporting = None
 
         def find_missing_image(self, image_label, bug_entry, try_again_button, find_img_button=None,
                                image_location_text=None):
