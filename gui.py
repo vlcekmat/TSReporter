@@ -783,8 +783,8 @@ class Application(Frame):
 
         bug_priority = None
 
-        small_img_size = (160, 170)  # Size, to which the BugEntry thumbnails its images
-        img_size = (510, 525)
+        small_img_size = (160, 100)  # Size, to which the BugEntry thumbnails its images
+        img_size = (520, 320)
 
         late_image = None
 
