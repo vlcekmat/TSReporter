@@ -795,9 +795,8 @@ class Application(Frame):
 
         category = None
 
-        def __init__(self, project, bug_handler, reported=False):
+        def __init__(self, project, bug_handler, reported=False, prefix=None):
             super().__init__()
-
             if not bug_handler:
                 raise ValueError
             else:
@@ -819,13 +818,20 @@ class Application(Frame):
             self.already_reported = reported
             self.pack(fill=BOTH, expand=True)
             self.init_widgets(current_bug)
+            if prefix:
+                self.prefix_box.delete(0, END)
+                self.prefix_box.insert(END, prefix)
+                self.prefix_check_button.select()
+                self.remember_prefix = True
 
         def go_to_reported(self):
             self.pack_forget()
             last_bug = self.bug_handler.get_current()
             saved_report = deque(last_bug)
             self.bug_handler.archive()  # Must archive before moving on to next screen
-            app.reported = Application.ReportedScreen(self.bug_handler, saved_report, self.bug_handler.get_current())
+            prefix = self.prefix_box.get()
+            app.reported = Application.ReportedScreen(self.bug_handler, saved_report, self.bug_handler.get_current(),
+                                                      prefix=prefix, remember_prefix=self.remember_prefix)
             app.reporting = None
 
         dialog_activated = False
@@ -1099,6 +1105,7 @@ class Application(Frame):
 
         remember_prefix = False
         prefix_box = None
+        prefix_check_button = None
 
         def check_prefix(self, value):
             self.remember_prefix = value.get()
@@ -1169,6 +1176,8 @@ class Application(Frame):
                                           activebackground=app.current_color_theme[3], variable=prefix_checked,
                                           command=lambda: self.check_prefix(value=prefix_checked))
             prefix_checkbox.pack(side=RIGHT)
+
+            self.prefix_check_button = prefix_checkbox
 
             severity_menu.config(bg=Application.current_color_theme[3])
             severity_menu.config(fg=Application.current_color_theme[1])
@@ -1346,10 +1355,13 @@ class Application(Frame):
     class ReportedScreen(Page):
         bug_handler = None
         last_bug = None
+        prefix = None
 
-        def __init__(self, bug_handler, last_bug, next_bug):
+        def __init__(self, bug_handler, last_bug, next_bug, prefix, remember_prefix):
+
             super().__init__()
-
+            if remember_prefix and prefix not in ['', 'Enter prefix'] and prefix:
+                self.prefix = prefix
             self.last_bug = last_bug
             self.bug_handler = bug_handler
             self.pack(fill=BOTH, expand=True)
@@ -1363,7 +1375,7 @@ class Application(Frame):
             app.reported = None
             if self.bug_handler.get_current:
                 try:
-                    app.reporting = Application.Reporting(None, bug_handler=self.bug_handler, reported=True)
+                    app.reporting = Application.Reporting(None, bug_handler=self.bug_handler, reported=True, prefix=self.prefix)
                 except TypeError:
                     app.main_menu = Application.MainMenu()
             else:
