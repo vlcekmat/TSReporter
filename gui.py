@@ -283,17 +283,13 @@ class Application(Frame):
             color_button_frame = Frame(top_frame, bg=Application.current_color_theme[4])
             color_button_frame.pack(side=RIGHT, fill=Y, padx=30, pady=30)
 
-           # color_button = Application.AppButton(text="Color Theme", frame=color_button_frame, side=TOP,
-           #                                      color1=Application.current_color_theme[2],
-           #                                      color2=Application.current_color_theme[2], offy=20, offx=20)
-
             theme_selection_frame = Frame(color_button_frame, bg=Application.current_color_theme[3])
             theme_selection_frame.pack()
 
             index = 0
             for color_theme in get_theme('all'):
                 theme_option = self.ThemeOption(color_theme, master=theme_selection_frame, row=index)
-                index +=1
+                index += 1
 
             left_frame = Frame(top_frame, bg=Application.current_color_theme[3])
             left_frame.pack(expand=False, fill=Y, side=LEFT, pady=10, padx=30)
@@ -396,10 +392,12 @@ class Application(Frame):
                 app.login.logging_in_process = False
                 app.login.pack_forget()
                 if successfully_logged_in:
-                    app.login = Application.Login(app.login.current_mode, fail=False)
+                    # app.login = Application.Login(app.login.current_mode, fail=False)
+                    app.login.go_to_projects()
                 else:
                     app.login = Application.Login(app.login.current_mode, fail=True)
-                app.login.open_page()
+                    app.login.open_page()
+                # app.login.open_page()
 
         class LoginAnimation(Thread):
             master = None
@@ -409,22 +407,18 @@ class Application(Frame):
                 self.master = master
 
             def run(self):
-                loading_text = Label(self.master, bg=Application.current_color_theme[4], fg=Application.current_color_theme[2],
-                                     font=Font(size=15))
-                while app.login.logging_in_process:
+                loading_text = Label(self.master, bg=Application.current_color_theme[4],
+                                     fg=Application.current_color_theme[2], font=Font(size=15))
+                while app.login and app.login.logging_in_process:
                     loading_text['text'] = 'Logging in'
                     loading_text.pack(expand=True)
                     sleep(0.5)
-                    loading_text['text'] = 'Logging in.'
-                    sleep(0.5)
-                    loading_text['text'] = 'Logging in..'
-                    sleep(0.5)
-                    loading_text['text'] = 'Logging in...'
-                    sleep(0.5)
-
+                    for i in range(3):
+                        loading_text['text'] += '.'
+                        sleep(0.5)
         # region COMMANDS
 
-        def try_log_in(self, text_field, login_frame, event=None):
+        def try_log_in(self, text_field, login_frame):
             self.entered_password = text_field.get()
             login_frame.pack_forget()
             self.LoginThread(login_frame).start()
@@ -460,9 +454,10 @@ class Application(Frame):
             password_entry = Entry(login_frame, width=25, bg=Application.current_color_theme[1], font=Font(size=16), show="*")
             password_entry.pack(padx=10)
 
-            login_button = Application.AppButton(frame=login_frame,
-                                                 text="LOGIN",
-                                                 command=lambda password_entry=password_entry: self.try_log_in(text_field=password_entry, login_frame=login_border))
+            login_button = Application.AppButton(
+                frame=login_frame, text="LOGIN", command=lambda password_entry=password_entry: self.try_log_in(
+                    text_field=password_entry, login_frame=login_border))
+
             root.bind('<Return>',
                       lambda x: self.try_log_in(text_field=password_entry, login_frame=login_border))
 
