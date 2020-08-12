@@ -961,7 +961,7 @@ class Application(Frame):
 
         def open_duplicates(self, bug_line):
             asset_path = None
-            if self.category == 'a' and self.asset_path_input.get() != "Enter asset path/debug info":
+            if self.category == 'a' and self.asset_path_input.get() not in ["Enter asset path/debug info", ""]:
                 self.submit_asset_info()
                 asset_path = self.asset_path_input.get()
 
@@ -1388,12 +1388,12 @@ class Application(Frame):
 
             button_report = Application.AppButton(
                 "REPORT", bottom_frame, side=RIGHT,
-                command=lambda: self.ReportingThread(current_bug_summary).start()
+                command=lambda: self.ReportingThread(self.bug_handler.get_current()[0][:-1]).start()
             )
 
             button_find_duplicates = Application.AppButton(
                 "Find\nduplicates", bottom_frame, side=RIGHT,
-                command=lambda: self.DuplicatesThread(current_bug_summary).start()
+                command=lambda: self.DuplicatesThread(self.bug_handler.get_current()[0][:-1]).start()
             )
 
             button_skip_report = Application.AppButton(

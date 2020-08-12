@@ -50,7 +50,7 @@ def check_for_duplicates(username, password, bug_description=None,
 
     driver = driver_handler.get_driver()
     log_into_mantis(driver, username, password)
-    if asset_path is not None:
+    if asset_path and asset_path != '':
         final_filter = extract_asset_name(asset_path)
     else:
         final_filter = extract_location_filter(bug_description)
