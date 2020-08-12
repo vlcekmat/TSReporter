@@ -176,7 +176,7 @@ class Application(Frame):
             my_font = Font(size=font_size)
             button = Button(frame, text=text, height=1, width=8, bg=color1,
                             activebackground=color2, fg=font_color,
-                            padx=text_spacing, pady=pady)
+                            padx=text_spacing, pady=pady, cursor='hand2')
             self.element = button
             if command is not None:
                 button['command'] = command
@@ -248,7 +248,7 @@ class Application(Frame):
                 app.settings_menu.go_to_main_menu()
 
             def build_button(self, master, row):
-                button = Button(master=master, width=15)
+                button = Button(master=master, width=15, cursor='hand2')
                 button['state'] = DISABLED
                 button['relief'] = RAISED
 
@@ -1209,6 +1209,8 @@ class Application(Frame):
             self.priority_var.set(priority_choices[0])
 
             priority_menu = OptionMenu(frame, self.priority_var, *priority_choices)
+            priority_menu.configure(activebackground=Application.current_color_theme[4])
+            priority_menu.configure(highlightbackground=Application.current_color_theme[4])
             priority_text = Text(frame, font=Font(size=12), bg=Application.current_color_theme[3],
                                    bd=0, height=1,
                                    width=10, fg=app.current_color_theme[1])
@@ -1227,6 +1229,8 @@ class Application(Frame):
             self.severity_var.set(severity_choices[0])
 
             severity_menu = OptionMenu(frame, self.severity_var, *severity_choices)
+            severity_menu.configure(activebackground=Application.current_color_theme[4])
+            severity_menu.configure(highlightbackground=Application.current_color_theme[4])
 
             severity_text = Text(frame, font=Font(size=12), bg=Application.current_color_theme[3],
                                  bd=0, height=1,
