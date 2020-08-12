@@ -848,6 +848,7 @@ class Application(Frame):
                 text_input.grid(row=0, column=1)
                 text_input.insert(END, "Enter asset path/debug info")
                 self.asset_path_input = text_input
+                text_input.bind('<Button-1>', lambda x: Application.Reporting.clear_text_box(text_input))
 
         def show_prefix_input(self, master):
             asset_info_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[3],
@@ -862,6 +863,7 @@ class Application(Frame):
             text_input.grid(row=4, column=1, pady=10)
             text_input.insert(END, "Enter prefix")
             self.asset_path_input = text_input
+            text_input.bind('<Button-1>', lambda x: Application.Reporting.clear_text_box(text_input))
 
         def submit_asset_info(self):
             if self.asset_path_input.get() != "Enter asset path/debug info":
@@ -1084,6 +1086,10 @@ class Application(Frame):
             thumbnail_canvas.config(scrollregion=thumbnail_frame.bbox("all"))
             # return image_labels
             return thumbnail_canvas
+
+        @staticmethod
+        def clear_text_box(text_box):
+            text_box.delete(0, END)
 
         def make_options_sidebar(self, frame, current_bug_summary):
             # The report options sidebar is created here.
