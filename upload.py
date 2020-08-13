@@ -47,22 +47,23 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
                 first_path_to_asset = path_to_asset
                 first_loop = False
             bug_descriptions.append(
-                generate_description(line_to_process, version, category, path_to_asset, first_time=True, prefix=prefix)
+                generate_description(line_to_process, version, category, path_to_asset, first_time=True)
             )
         else:
             bug_descriptions.append(
-                generate_description(line_to_process, version, category, first_time=first_loop, prefix=prefix)
+                generate_description(line_to_process, version, category, first_time=first_loop)
             )
             first_loop = False
 
         image_to_append = get_image(line_to_process)
 
         # If an image is not found, gives the user the option to check for it again
-        if not image_to_append and not priority:
-            pass
-            #image_to_append = ask_for_missing_image(line_to_process)
-        elif not image_to_append and priority:
-            pass
+
+        # if not image_to_append and not priority:
+        #     pass
+        #     #image_to_append = ask_for_missing_image(line_to_process)
+        # elif not image_to_append and priority:
+        #     pass
         if image_to_append:
             images.append(image_to_append)
 
@@ -93,12 +94,15 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
             else:
                 description_box.send_keys(no_ver_description)
 
+    no_ver_summary = generate_no_version_des(bug_descriptions[0].split(';')[0])
+    summary = version
+    if prefix and category != 'a':
+        summary += f' - {prefix}'
     if 'a' in category and path_to_asset:
         asset_name = extract_asset_name(first_path_to_asset)
-        no_ver_summary = generate_no_version_des(bug_descriptions[0].split(';')[0])
-        summary = f'{version} - {asset_name} - {no_ver_summary}'
+        summary += f' - {asset_name} - {no_ver_summary}'
     else:
-        summary = bug_descriptions[0].split(';')[0]
+        summary += f' - {no_ver_summary}'
 
     summary_box = driver.find_element_by_xpath(f"//input[@name='summary']")
     summary_box.send_keys(summary)
@@ -119,15 +123,15 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
     driver.find_element_by_xpath(f"//select[@name='severity']/option[text()='{severity}']").click()
     # endregion
 
-    #if priority:  # if in batch reporter mode
-    #    sleep(1)
-    #    driver.find_element_by_xpath("//input[@value='Submit Issue']").click()
-    #    print(f'Reported bug "{summary.split("] - ")[1]}"')
-    #    sleep(1)
-    #else:
-    #    # This waits for the user to close the browser window after submitting the bug
-    #    while True:
-    #        try:
-    #            current_url = driver.current_url
-    #        except WebDriverException:
-    #            break
+    # if priority:  # if in batch reporter mode
+    #     sleep(1)
+    #     driver.find_element_by_xpath("//input[@value='Submit Issue']").click()
+    #     print(f'Reported bug "{summary.split("] - ")[1]}"')
+    #     sleep(1)
+    # else:
+    #     # This waits for the user to close the browser window after submitting the bug
+    #     while True:
+    #         try:
+    #             current_url = driver.current_url
+    #         except WebDriverException:
+    #             break
