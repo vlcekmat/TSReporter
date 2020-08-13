@@ -4,24 +4,23 @@ from upload import upload_to_mantis
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowException, WebDriverException
 from information_compile import determine_bug_category, extract_asset_path
 import copy
+from config import read_config
 
 asset_path = None
 
 
 def report_bug(project, log_lines, version, assign, username, password, _driver_handler,
-               browser='chrome', priority=None, severity=None, late_image=None, prefix=None):
+               priority=None, severity=None, late_image=None, prefix=None):
     # uploads stuff to Mantis or calls other methods to do that
+    browser = read_config("preferred browser")
     log_first = log_lines.popleft()
     log_lines.appendleft(log_first)
     category = determine_bug_category(log_first)
 
     error_message = "Don't interact with the browser during the process, trying again..."
-    tried_duplicates = False
-    duplicate_found = False
     d_info = None
     a_path = asset_path
     if 'A' in category.upper() and a_path:
-        # a_path = input('Enter DEBUG INFO or path to the asset:\n> ')
         if 'DEBUG INFO' in a_path or 'Position' in a_path or 'Object' in a_path:  # To accommodate only partial debug i.
             d_info = a_path
             a_path = extract_asset_path(a_path)

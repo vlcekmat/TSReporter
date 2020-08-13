@@ -22,7 +22,10 @@ from chromedrivers import log_into_mantis
 import utils
 import reporter
 
+
 custom_theme = None
+
+
 def get_theme(theme):
     theme_dict = {
         "ph": {
@@ -341,12 +344,12 @@ class Application(Frame):
                 if color_theme != 'custom':
                     theme_option = self.ThemeOption(color_theme, master=theme_selection_frame, row=index)
                     index += 1
-            custom_theme_option = self.ThemeOption('custom', master=theme_selection_frame, row=index, pady=20)
+            # custom_theme_option = self.ThemeOption('custom', master=theme_selection_frame, row=index, pady=20)
 
             custom_theme_button = Button(master=theme_selection_frame, text='Custom Theme',
                                          command=self.configure_custom_theme, bg=Application.current_color_theme[4],
                                          fg=Application.current_color_theme[2])
-            custom_theme_button.grid(column=0, row=10, pady=10)
+            # custom_theme_button.grid(column=0, row=10, pady=10)
 
             left_frame = Frame(top_frame, bg=Application.current_color_theme[3])
             left_frame.pack(expand=False, fill=Y, side=LEFT, pady=10, padx=30)
@@ -912,6 +915,9 @@ class Application(Frame):
                 category = f"{current.split('_')[0]}_"
                 current = current.split('_')[1]
 
+            if 'a' in category:
+                opt_prefix = ""
+
             game_version = find_version(Application.Reporting.selected_project[0])
 
             current_bug_summary = f"Preview: {game_version} - {opt_prefix}{opt_asset}{current}"
@@ -995,6 +1001,7 @@ class Application(Frame):
             if image_location_text:
                 image_location_text.insert(END, new_image_path)
                 image_location_text.configure(state=DISABLED)
+                image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
             if find_img_button:
                 find_img_button.get_element().pack_forget()
                 find_img_button.get_element().destroy()
@@ -1269,7 +1276,6 @@ class Application(Frame):
 
             bug_summary_text = Text(checkbox_frame, font=Font(size=8), bg=app.current_color_theme[3],
                                         bd=0, height=1, width=15, fg=app.current_color_theme[1])
-            #bug_summary_text.grid
 
             self.prefix_check_button = prefix_checkbox
 

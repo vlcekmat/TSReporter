@@ -54,10 +54,11 @@ def generate_description(line, version, category, asset=None, first_time=False, 
         opt_prefix = f" - {prefix}"
 
     if category == 'a' and first_time and asset:
-        first_time = False
-        report_description = f'{version}{opt_prefix} - {log_without_category}\nPATH TO THE ASSET: {asset}'
-    else:
+        report_description = f'{version} - {log_without_category}\nPATH TO THE ASSET: {asset}'
+    elif first_time:
         report_description = f'''{version}{opt_prefix} - {log_without_category}'''
+    else:
+        report_description = f'''{version} - {log_without_category}'''
     return report_description
 
 

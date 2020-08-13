@@ -79,7 +79,6 @@ def log_into_tsreporter(test_login_username, browser='chrome'):
     while True:
         password = input("PASSWORD: ")
         os.system('cls')
-        # password = getpass.getpass()
         # password = "CrYVhn7FSM"
         if password == "":
             return ""

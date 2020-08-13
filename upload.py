@@ -51,14 +51,16 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
             )
         else:
             bug_descriptions.append(
-                generate_description(line_to_process, version, category, first_time=False, prefix=prefix)
+                generate_description(line_to_process, version, category, first_time=first_loop, prefix=prefix)
             )
+            first_loop = False
 
         image_to_append = get_image(line_to_process)
 
         # If an image is not found, gives the user the option to check for it again
         if not image_to_append and not priority:
-            image_to_append = ask_for_missing_image(line_to_process)
+            pass
+            #image_to_append = ask_for_missing_image(line_to_process)
         elif not image_to_append and priority:
             pass
         if image_to_append:

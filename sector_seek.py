@@ -56,18 +56,12 @@ def find_assign_to(line, chosen_game):
     # Assignee is found here. Map bugs are found using the get_sector_owner page
     # assets are determined based on their game and asset type, other unknown reports are default blank
     bug_type = line.split('_', maxsplit=1)[0]
-
+    assign_to = ""
     if bug_type == "m":
         get_owner_of_this = clean_sector(line)
         assign_to = request_sector_owner(get_owner_of_this, chosen_game)
     elif bug_type in ["ar", "av", "ac", "aa"]:
         ass_dict = get_asset_assign_dict()
         assign_to = ass_dict[chosen_game][bug_type]
-    elif bug_type == "a":
-        bug_type += ask_asset_type()
-        ass_dict = get_asset_assign_dict()
-        assign_to = ass_dict[chosen_game][bug_type]
-    else:
-        assign_to = ""
 
     return assign_to
