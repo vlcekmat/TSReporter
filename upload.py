@@ -28,13 +28,12 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
 
     # region process information to insert in the form
     bug_descriptions = []
-    first_path_to_asset = ''
     images = []
-    first_loop = True
 
+    asset_info = f"PATH TO ASSET: {path_to_asset}"
     if debug_info:
         debug_info = clean_debug_info(debug_info)
-        path_to_asset = f"{path_to_asset}\n{debug_info}"
+        asset_info += f"\n{debug_info}"
     if late_image:
         images.append(late_image)
     while len(log_lines) > 0:
@@ -42,23 +41,14 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
             line_to_process = log_lines
         else:
             line_to_process = log_lines.popleft()
-        if category == 'a' and first_loop:
-            if first_loop:
-                first_path_to_asset = path_to_asset
-                first_loop = False
-            bug_descriptions.append(
-                generate_description(line_to_process, version, category, path_to_asset, first_time=True)
-            )
-        else:
-            bug_descriptions.append(
-                generate_description(line_to_process, version, category, first_time=first_loop)
-            )
-            first_loop = False
+
+        bug_descriptions.append(
+            generate_description(line_to_process, version)
+        )
 
         image_to_append = get_image(line_to_process)
 
         # If an image is not found, gives the user the option to check for it again
-
         # if not image_to_append and not priority:
         #     pass
         #     #image_to_append = ask_for_missing_image(line_to_process)
@@ -81,31 +71,24 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
     for upload_me in images:
         driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))  # upload an image
     description_box = driver.find_element_by_xpath("//textarea[@class='form-control']")
-    if len(bug_descriptions) <= 1:
-        no_ver_description = generate_no_version_des(bug_descriptions)
-        description_box.send_keys(str(no_ver_description) + '\n')
-    else:
-        first_time = True
-        for p in range(len(bug_descriptions)):
-            no_ver_description = generate_no_version_des(bug_descriptions[p])
-            if first_time:
-                description_box.send_keys(no_ver_description + '\n')
-                first_time = False
-            else:
-                description_box.send_keys(no_ver_description)
+
+    for p in range(len(bug_descriptions)):
+        no_ver_description = generate_no_version_des(bug_descriptions[p])
+        description_box.send_keys(no_ver_description)
+    if category == 'a':
+        description_box.send_keys('\n' + asset_info)
 
     no_ver_summary = generate_no_version_des(bug_descriptions[0].split(';')[0])
     summary = version
     if prefix and category != 'a':
         summary += f' - {prefix}'
     if 'a' in category and path_to_asset:
-        asset_name = extract_asset_name(first_path_to_asset)
+        asset_name = extract_asset_name(path_to_asset)
         summary += f' - {asset_name} - {no_ver_summary}'
     else:
         summary += f' - {no_ver_summary}'
 
-    summary_box = driver.find_element_by_xpath(f"//input[@name='summary']")
-    summary_box.send_keys(summary)
+    driver.find_element_by_xpath(f"//input[@name='summary']").send_keys(summary)
 
     if assign_to != "":
         try:
