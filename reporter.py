@@ -36,18 +36,21 @@ def report_bug(project, log_lines, version, assign, username, password, _driver_
                 severity=severity, late_image=late_image, prefix=prefix
             )
             break
-        except SessionNotCreatedException:
-            print(error_message + ' SessionNotCreatedException')
-        except NoSuchWindowException:
-            print(error_message + ' NoSuchWindowException')
-        except WebDriverException:
-            print(error_message + ' WebDriverException')
-        except AttributeError:
-            print(error_message + ' AttributeError')
-        except TypeError:
-            print(error_message + ' TypeError')
-        except NameError:
-            print(error_message + ' NameError')
+        # except SessionNotCreatedException:
+        #     print(error_message + ' SessionNotCreatedException')
+        # except NoSuchWindowException:
+        #     print(error_message + ' NoSuchWindowException')
+        # except WebDriverException:
+        #     print(error_message + ' WebDriverException')
+        # except AttributeError:
+        #     print(error_message + ' AttributeError')
+        # except TypeError:
+        #     print(error_message + ' TypeError')
+        # except NameError:
+        #     print(error_message + ' NameError')
+        except (SessionNotCreatedException, NoSuchWindowException, WebDriverException,
+                AttributeError, TypeError, NameError) as error:
+            print(f'{error_message} {error}')
     return True
 
 

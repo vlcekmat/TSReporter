@@ -10,7 +10,6 @@ class BugHandler:
     all_the_bugs = deque()  # Queue of bugs read from the bugs file, each bug is a stack of lines, the bug head on top
     current = deque()  # The current bug popped from the above queue
 
-
     # The current bug has its images stored here
     # The dictionary is "line": "image path", accessed by try_get_image()
     image_locations = {}

@@ -203,6 +203,7 @@ def ask_preferred_browser():
         elif pref_browser.upper() == 'E':
             pass
 
+
 def validate_cfg_images():
     # Gets edited image location from the config and checks that it exists and has at least one valid file
     images_folder = read_config("edited images location")

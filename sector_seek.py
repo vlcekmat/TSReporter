@@ -20,36 +20,29 @@ def request_sector_owner(sector_to_find, game):
     js = reply.json()
     try:
         sector_owner = js[sector_to_find]["owner"]["svn_name"]
-        return sector_owner
+        return sector_owner  # Timmy made the server part of this if something breaks, go see him
     except KeyError:
         return ""
 
 
-def get_asset_assign_dict():
+def get_asset_assign(chosen_game, bug_type):
     # This lists the people responsible for different types of assets in both games
-    # taken from the testing guide on wiki (currently at http://wiki.scs/wiki/User:Adam_Fojtik)
-    return(
-        {"A": {
-            "ar": "milan.lukes",
-            "av": "Arthur",
-            "ac": "ondrej.hejbal",
-            "aa": "jupiter"
-        },
-         "E": {
-             "ar": "jiri.dosedel",
-             "av": "Arthur",
-             "ac": "ondrej.hejbal",
-             "aa": "martin.vocet"
-         }}
-    )
-
-
-def ask_asset_type():
-    # Asks user for what type of asset the bug is. Used when asset type is not specified in bugs.txt line
-    while True:
-        type_of_asset = input("> ")
-        if type_of_asset in ["r", "v", "c", "a"]:
-            return type_of_asset
+    # taken from the testing guide on wiki (currently at http://wiki.scs/wiki/Testing_Guide)
+    ass_dict = {
+            "A": {
+                "ar": "milan.lukes",
+                "av": "Arthur",
+                "ac": "ondrej.hejbal",
+                "aa": "jupiter"
+            },
+            "E": {
+                "ar": "jiri.dosedel",
+                "av": "Arthur",
+                "ac": "ondrej.hejbal",
+                "aa": "martin.vocet"
+            }
+        }
+    return ass_dict[chosen_game][bug_type]
 
 
 def find_assign_to(line, chosen_game):
@@ -61,7 +54,5 @@ def find_assign_to(line, chosen_game):
         get_owner_of_this = clean_sector(line)
         assign_to = request_sector_owner(get_owner_of_this, chosen_game)
     elif bug_type in ["ar", "av", "ac", "aa"]:
-        ass_dict = get_asset_assign_dict()
-        assign_to = ass_dict[chosen_game][bug_type]
-
+        assign_to = get_asset_assign(chosen_game, bug_type)
     return assign_to

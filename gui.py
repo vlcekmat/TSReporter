@@ -128,7 +128,7 @@ class Application(Frame):
     current_color_theme = ""
 
     # It's important to keep in mind the class instances above,
-    # when gui is active, exactly one has to have a non Null value, cuz having more than one pages active
+    # when gui is active, exactly one has to have a non Null value, because having more than one pages active
     # at the same time is BS
 
     def __init__(self):
@@ -537,6 +537,7 @@ class Application(Frame):
     class SettingsMenu(Page):
         # The settings page where you can change, you guessed it, settings! AKA former config
         first_time = False
+        dialog_activated = False
 
         def __init__(self, first_time=False):
             super().__init__()
@@ -627,13 +628,11 @@ class Application(Frame):
             app.main_menu = Application.MainMenu()
             app.settings_menu = None
 
-        def submit(self, text_input, event=None):
+        def submit(self, text_input):
             username = text_input.get()
             config.ConfigHandler.gui_config_edit(3, entered_text=username)
             self.go_to_main_menu()
             app.main_menu.go_to_settings(first_time=self.first_time)
-
-        dialog_activated = False
 
         def show_text_input(self, master):
             if not self.dialog_activated:
@@ -678,14 +677,14 @@ class Application(Frame):
                 options = ["Chrome", "Firefox"]
                 frame = Frame(master, bg=Application.current_color_theme[3], padx=10, pady=10)
                 frame.pack()
-                dialog_text = Label(master=frame, text="Select your preferred browser", bg=Application.current_color_theme[3],
-                                    font=Font(size=10), fg=Application.current_color_theme[2])
+                dialog_text = Label(master=frame, text="Select your preferred browser", font=Font(size=10),
+                                    bg=Application.current_color_theme[3], fg=Application.current_color_theme[2])
                 dialog_text.pack(side=TOP)
                 for i in range(len(options)):
                     option_to_process = options[i].lower()
                     button = Application.AppButton(frame=frame, text=options[i], offx=5, offy=5, side=LEFT,
-                                                   command=lambda option_to_process=option_to_process:
-                                                   self.submit_browser_selection(option_to_process),
+                                                   command=lambda option=option_to_process:
+                                                   self.submit_browser_selection(option),
                                                    text_spacing=2, pady=2, font_size=10)
                     button.get_element().pack()
 
@@ -771,7 +770,6 @@ class Application(Frame):
                 rewrite_textbox(bug_handler.message, frame)
             else:
                 self.go_to_reporting(project, bug_handler)
-
         # endregion
 
         def init_widgets(self):
@@ -847,8 +845,8 @@ class Application(Frame):
         img_size = (520, 315)
 
         late_image = None
-
         category = None
+        text_input_frame = None
 
         def __init__(self, project, bug_handler, reported=False, prefix=None):
             super().__init__()
@@ -871,7 +869,6 @@ class Application(Frame):
                 current_bug.append(self.BugEntry(bug_line, self.bug_handler.try_get_image(bug_line)))
 
             self.bug_in_process = current_bug
-
             self.category = determine_bug_category(current_bug[0].line)
 
             self.already_reported = reported
@@ -1041,17 +1038,8 @@ class Application(Frame):
                     config.read_config("mantis username"), app.password, bug_line,
                     driver_handler=self.driver_handler, asset_path=asset_path
                 )
-            except SessionNotCreatedException:
-                self.driver_handler = None
-            except NoSuchWindowException:
-                self.driver_handler = None
-            except WebDriverException:
-                self.driver_handler = None
-            except AttributeError:
-                self.driver_handler = None
-            except TypeError:
-                self.driver_handler = None
-            except NameError:
+            except (SessionNotCreatedException, NoSuchWindowException, WebDriverException, AttributeError,
+                    TypeError, NameError):
                 self.driver_handler = None
 
         class ReportingThread(Thread):
@@ -1066,8 +1054,6 @@ class Application(Frame):
 
         def open_report(self, bug_line):
             # This is called when the 'Report' button is pressed, reporting will happen starting here
-
-            asset_path = None
             prefix = None
 
             if self.prefix_box.get() not in ["Enter prefix", ""]:
@@ -1075,12 +1061,11 @@ class Application(Frame):
 
             if self.category == 'a' and self.asset_path_input.get() not in ["Enter asset path/debug info", ""]:
                 self.submit_asset_info()
-                asset_path = self.asset_path_input.get()
-                reporter.asset_path = asset_path
+                reporter.asset_path = self.asset_path_input.get()
 
             project = self.selected_project
             game = project[0]
-            version = find_version(game=game)
+            game_version = find_version(game=game)
             current_bug_deque = self.bug_handler.get_current()
 
             assign_to = find_assign_to(bug_line, chosen_game=game)
@@ -1094,7 +1079,7 @@ class Application(Frame):
                 self.driver_handler = DriverHandler(config.read_config("preferred browser"))
                 log_into_mantis(self.driver_handler.get_driver(), username, password)
 
-            reporter.report_bug(project=project, log_lines=current_bug_deque, version=version,
+            reporter.report_bug(project=project, log_lines=current_bug_deque, version=game_version,
                                 assign=assign_to, username=username, password=password,
                                 _driver_handler=self.driver_handler, priority=priority,
                                 severity=severity, late_image=self.late_image, prefix=prefix)
@@ -1218,8 +1203,7 @@ class Application(Frame):
             priority_menu.configure(activebackground=Application.current_color_theme[4])
             priority_menu.configure(highlightbackground=Application.current_color_theme[4])
             priority_text = Text(frame, font=Font(size=12), bg=Application.current_color_theme[3],
-                                   bd=0, height=1,
-                                   width=10, fg=app.current_color_theme[1])
+                                 bd=0, height=1, width=10, fg=Application.current_color_theme[1])
             priority_text.grid(row=1, column=0)
             priority_text.insert(END, "Priority")
             priority_text.configure(state=DISABLED)
@@ -1248,34 +1232,34 @@ class Application(Frame):
             severity_menu.grid(row=2, column=1, sticky=W+E)
             if self.category == 'm':
                 severity_menu['state'] = DISABLED
-
-            if self.category == 'a':
+            elif self.category == 'a':
                 priority_menu['state'] = DISABLED
                 self.priority_var.set(priority_choices[1])
                 self.severity_var.set(severity_choices[0])
 
             self.show_prefix_input(frame)
 
-            checkbox_frame = Frame(master=frame, bg=app.current_color_theme[3])
+            checkbox_frame = Frame(master=frame, bg=Application.current_color_theme[3])
             checkbox_frame.grid(column=1, row=5, sticky=E)
 
-            checkbox_description = Text(checkbox_frame, font=Font(size=8), bg=app.current_color_theme[3],
-                                        bd=0, height=1, width=15, fg=app.current_color_theme[1])
+            checkbox_description = Text(checkbox_frame, font=Font(size=8), bg=Application.current_color_theme[3],
+                                        bd=0, height=1, width=15, fg=Application.current_color_theme[1])
             checkbox_description.pack(side=LEFT)
             checkbox_description.insert(END, "Remember prefix")
             checkbox_description.configure(state=DISABLED)
 
             prefix_checked = BooleanVar()
 
-            prefix_checkbox = Checkbutton(master=checkbox_frame, bg=app.current_color_theme[3],
-                                          activebackground=app.current_color_theme[3], variable=prefix_checked,
+            prefix_checkbox = Checkbutton(master=checkbox_frame, bg=Application.current_color_theme[3],
+                                          activebackground=Application.current_color_theme[3], variable=prefix_checked,
                                           command=lambda: self.check_prefix(value=prefix_checked),
-                                          selectcolor=app.current_color_theme[3], fg=app.current_color_theme[2],
-                                          activeforeground=app.current_color_theme[2])
+                                          selectcolor=Application.current_color_theme[3],
+                                          fg=Application.current_color_theme[2],
+                                          activeforeground=Application.current_color_theme[2])
             prefix_checkbox.pack(side=RIGHT)
 
-            bug_summary_text = Text(checkbox_frame, font=Font(size=8), bg=app.current_color_theme[3],
-                                        bd=0, height=1, width=15, fg=app.current_color_theme[1])
+            bug_summary_text = Text(checkbox_frame, font=Font(size=8), bg=Application.current_color_theme[3],
+                                    bd=0, height=1, width=15, fg=Application.current_color_theme[1])
 
             self.prefix_check_button = prefix_checkbox
 
@@ -1299,7 +1283,7 @@ class Application(Frame):
             # Below code is how automatic severity should work for map bugs
             if self.category == 'm':
                 if self.priority_var.get() == "Low" and self.severity_var.get() == "Major":
-                   self.severity_var.set("Minor")
+                    self.severity_var.set("Minor")
                 elif self.priority_var.get() != "Low" and self.severity_var.get() == "Minor":
                     self.severity_var.set("Major")
 
@@ -1334,7 +1318,6 @@ class Application(Frame):
                 thumbnails_frame, options_frame, this_button, current_bug, image_labels, image_location_text,
                 image_path_button, try_again_button, thumbnail_canvas
             )
-        text_input_frame = None
 
         def init_widgets(self, current_bug):
             # region Frames
@@ -1410,10 +1393,8 @@ class Application(Frame):
             image_labels.append(head_img_label)
             image_location_text = Text(left_frame, height=1, width=60, bg=Application.current_color_theme[3],
                                        fg=Application.current_color_theme[1], bd=0, font="Helvetica 10")
-            # image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
             # The scrollable canvas is created here
             thumbnail_canvas = self.make_scrollable_canvas(frame_for_canvas, len(current_bug), image_labels)
-
             self.make_options_sidebar(frame_for_sidebar, current_bug_summary)
 
             # endregion Frames
@@ -1429,8 +1410,8 @@ class Application(Frame):
             report_options_button = Application.AppButton("Report\noptions", right_buttons_frame, side=RIGHT)
 
             if not current_bug[0].image_location:
-                image_path_button = Application.AppButton("Find image", left_frame, side=BOTTOM, pady=5,
-                                                          text_spacing=10)
+                image_path_button = Application.AppButton("Find image", left_frame, side=BOTTOM,
+                                                          pady=5, text_spacing=10)
             else:
                 image_path_button = None
 
@@ -1446,7 +1427,7 @@ class Application(Frame):
             report_options_button.get_element()['command'] = lambda: self.show_sidebar(
                 frame_for_canvas, frame_for_sidebar, report_options_button, current_bug, image_labels,
                 image_location_text, image_path_button, try_again_button, thumbnail_canvas
-            )
+            )  # These are needed for the sidebar switching to be able to hide/show all the elements
 
             if image_path_button:
                 image_path_button.get_element()['command'] = lambda: self.find_missing_image(
@@ -1455,11 +1436,9 @@ class Application(Frame):
 
             self.update_image_thumbnails(current_bug, image_labels, image_location_text, image_path_button,
                                          try_again_button, thumbnail_canvas)
-
             self.show_sidebar(
                 frame_for_canvas, frame_for_sidebar, report_options_button, current_bug, image_labels,
                 image_location_text, image_path_button, try_again_button, thumbnail_canvas)
-
             # region Bottom
 
             button_report = Application.AppButton(
@@ -1503,7 +1482,8 @@ class Application(Frame):
             app.reported = None
             if self.bug_handler.get_current:
                 try:
-                    app.reporting = Application.Reporting(None, bug_handler=self.bug_handler, reported=True, prefix=self.prefix)
+                    app.reporting = Application.Reporting(None, bug_handler=self.bug_handler,
+                                                          reported=True, prefix=self.prefix)
                 except TypeError:
                     app.main_menu = Application.MainMenu()
             else:
@@ -1552,7 +1532,7 @@ class Application(Frame):
             self.init_widgets()
 
         def init_widgets(self):
-            # Placeholder screen to make app clickier lol
+            # Placeholder screen to make app clickier
             background_frame = Frame(master=self, bg=Application.current_color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
 
@@ -1579,8 +1559,8 @@ def rewrite_textbox(message, textbox):
 # region Program init
 # Creates the basic "box" in which you can put all of the GUI elements
 # It also takes care of misc stuff, s.a. fixed window size, title on the app window and the icon
-if os.path.isfile("TSReporter.exe"):
-    hide = win32gui.GetForegroundWindow()
+if os.path.isfile("TSReporter.exe"):  # this hides the console when launched from a .exe
+    hide = win32gui.GetForegroundWindow()  # If this code is run in PyCharm, it closes it lol
     win32gui.ShowWindow(hide, win32con.SW_HIDE)
 
 root = Tk()

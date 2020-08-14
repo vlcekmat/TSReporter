@@ -20,15 +20,3 @@ class TestSectorSeek(unittest.TestCase):
         with mock.patch('sys.stdout', new_callable=io.StringIO) as fake_stdout:
             owner = sector_seek.request_sector_owner("sec-0050-0000", "A")
             self.assertEqual(owner, "")
-
-    @mock.patch('builtins.input', side_effect=["r"])
-    def test_ask_asset_type_first(self, mock_input):
-        with mock.patch('sys.stdout', new_callable=io.StringIO) as fake_stdout:
-            a_type = sector_seek.ask_asset_type()
-            self.assertEqual(a_type, 'r')
-
-    @mock.patch('builtins.input', side_effect=["reeeeee", "1", "rvarcvrac", "r"])
-    def test_ask_asset_type_multiple(self, mock_input):
-        with mock.patch('sys.stdout', new_callable=io.StringIO) as fake_stdout:
-            a_type = sector_seek.ask_asset_type()
-            self.assertEqual(a_type, 'r')

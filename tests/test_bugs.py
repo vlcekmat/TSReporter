@@ -20,8 +20,8 @@ class TestReadBugLines(unittest.TestCase):
         ]
         all_bugs = bugs.read_bug_lines(bug_lines)
         self.assertEqual(len(all_bugs), 4)
-        self.assertEqual(len(all_bugs[1]), 2)
-        self.assertEqual(all_bugs[0][0][0], '!')
+        self.assertEqual(len(all_bugs[0]), 2)
+        self.assertEqual(all_bugs[1][0][0], '!')
 
 
 class TestReadBugsFile(unittest.TestCase):
