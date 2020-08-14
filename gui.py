@@ -10,7 +10,7 @@ from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowE
 
 import win32gui, win32con
 
-from information_compile import determine_bug_category, generate_description, extract_asset_name
+from information_compile import determine_bug_category, extract_asset_name
 from password import get_password
 from versions import find_version
 import bugs
@@ -114,16 +114,16 @@ version = "0.3.5"
 
 class Application(Frame):
     # The first GUI element put in the basic Win window, important for layout, everything sits on this
-    setup = None
-    main_menu = None
-    settings_menu = None
-    projects_page = None
+    setup = None  # These represent the active frame. Only one should exist and others should be None
+    main_menu = None  # We tried making just one variable current_frame instead of this
+    settings_menu = None  # But it didn't work due to some methods not recognising that their frame is current
+    projects_page = None  # So self didn't work properly
     reporting = None
     reported = None
     batch = None
     login = None
 
-    password = None
+    password = None  # Mantis password is saved here
 
     current_color_theme = ""
 
@@ -1510,6 +1510,8 @@ class Application(Frame):
                 app.main_menu = Application.MainMenu()
 
         def go_to_main_menu(self):
+            # If there is a comment in the last report, it is not archived!
+            # This also makes the program throw an IndexError if there is only a comment in bugs.txt
             self.pack_forget()
             app.main_menu = Application.MainMenu()
             app.reported = None

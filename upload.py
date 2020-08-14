@@ -1,22 +1,21 @@
 from selenium.common.exceptions import WebDriverException
-from time import sleep
 
 from chromedrivers import DriverHandler, log_into_mantis
 from information_compile import generate_description, get_image, generate_no_version_des, extract_asset_name, \
     clean_debug_info
 
 
-def ask_for_missing_image(line_to_process):
-    while True:
-        answer = input('> ')
-        if answer.upper() == 'Y':
-            image_to_return = get_image(line_to_process)
-        elif answer.upper() == 'N':
-            return ""
-        else:
-            continue
-        if image_to_return:
-            return image_to_return
+# def ask_for_missing_image(line_to_process):
+#     while True:
+#         answer = input('> ')
+#         if answer.upper() == 'Y':
+#             image_to_return = get_image(line_to_process)
+#         elif answer.upper() == 'N':
+#             return ""
+#         else:
+#             continue
+#         if image_to_return:
+#             return image_to_return
 
 
 def upload_to_mantis(version, category, log_lines, assign_to, project, username, password,
@@ -42,12 +41,9 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
         else:
             line_to_process = log_lines.popleft()
 
-        bug_descriptions.append(
-            generate_description(line_to_process, version)
-        )
+        bug_descriptions.append(generate_description(line_to_process))
 
         image_to_append = get_image(line_to_process)
-
         # If an image is not found, gives the user the option to check for it again
         # if not image_to_append and not priority:
         #     pass
@@ -56,8 +52,8 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
         #     pass
         if image_to_append:
             images.append(image_to_append)
-
     # endregion
+
     driver = web_driver.get_driver()
 
     if not web_driver.is_active():
@@ -73,20 +69,19 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
     description_box = driver.find_element_by_xpath("//textarea[@class='form-control']")
 
     for p in range(len(bug_descriptions)):
-        no_ver_description = generate_no_version_des(bug_descriptions[p])
-        description_box.send_keys(no_ver_description)
+        description_box.send_keys(bug_descriptions[p])
     if category == 'a':
         description_box.send_keys('\n' + asset_info)
 
-    no_ver_summary = generate_no_version_des(bug_descriptions[0].split(';')[0])
+    first_bug_name = bug_descriptions[0].split(';')[0]
     summary = version
     if prefix and category != 'a':
         summary += f' - {prefix}'
     if 'a' in category and path_to_asset:
         asset_name = extract_asset_name(path_to_asset)
-        summary += f' - {asset_name} - {no_ver_summary}'
+        summary += f' - {asset_name} - {first_bug_name}'
     else:
-        summary += f' - {no_ver_summary}'
+        summary += f' - {first_bug_name}'
 
     driver.find_element_by_xpath(f"//input[@name='summary']").send_keys(summary)
 

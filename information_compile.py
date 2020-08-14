@@ -39,18 +39,16 @@ def determine_bug_category(log):
         return ""
 
 
-def generate_description(line, version):
+def generate_description(line):
     # puts information from main in a cohesive report and returns it
     split_log = line.split(';')
     if '_' in split_log[0]:  # First join is there to convert array to string easily
         log_without_category = ''.join(split_log[0].split('_', maxsplit=1)[1]) + ';' + ';'.join(split_log[1:])
     elif '.' in split_log[0]:
-        log_without_category = ''.join(split_log[0].split('.', maxsplit=1)[1]) + ';' + ';'.join(split_log[1:])
+        log_without_category = ''.join(split_log[0][1:]) + ';' + ';'.join(split_log[1:])
     else:
         log_without_category = line
-    # This version is then later removed, not sure why its added here
-    report_description = f'''{version} - {log_without_category}'''
-    return report_description
+    return log_without_category
 
 
 def generate_no_version_des(description):
