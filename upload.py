@@ -22,7 +22,7 @@ from information_compile import generate_description, get_image, generate_no_ver
 
 def upload_to_mantis(version, category, log_lines, assign_to, project, username, password,
                      browser, path_to_asset=None, debug_info=None, web_driver=None, priority=None,
-                     severity=None, late_image=None, prefix=None):
+                     severity=None, late_image=None, prefix=None, rename_images=False, new_img_name=None):
     # Opens chrome browser, connects to mantis and uploads all of the gathered information
     # If priority is not None, it will treat the report as a batch report = will not as for image if its missing and
     #       will submit it automatically
@@ -101,23 +101,30 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
     driver.find_element_by_xpath(f"//select[@name='priority']/option[text()='{priority}']").click()
     driver.find_element_by_xpath(f"//select[@name='severity']/option[text()='{severity}']").click()
 
-    image_index = 0
-    for rename_me in images:
-        images.remove(rename_me)
-        old_name = rename_me.stem
-        old_extension = rename_me.suffix
-        directory = rename_me.parent
+    if rename_images:
+        image_index = 0
+        for rename_me in images:
+            images.remove(rename_me)
+            old_name = rename_me.stem
+            old_extension = rename_me.suffix
+            directory = rename_me.parent
 
-        if image_index > 0:
-            summary += f' ({image_index})'
+            if image_index > 0:
+                summary += f' ({image_index})'
 
-        new_name = summary + old_extension
-        rename_me = rename_me.rename(Path(directory, new_name))
-        images.insert(0, rename_me)
+            new_name = summary + old_extension
+            if new_img_name not in ['', 'Default - Bug Summary']:
+                new_name = new_img_name
+                if image_index > 0:
+                    new_name += f' ({image_index})'
+                new_name += old_extension
 
-        image_index += 1
+            rename_me = rename_me.rename(Path(directory, new_name))
+            images.insert(0, rename_me)
 
-    images.reverse()
+            image_index += 1
+
+        images.reverse()
 
     for upload_me in images:
         driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))  # upload an image

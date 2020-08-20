@@ -10,7 +10,7 @@ asset_path = None
 
 
 def report_bug(project, log_lines, version, assign, username, password, _driver_handler,
-               priority=None, severity=None, late_image=None, prefix=None):
+               priority=None, severity=None, late_image=None, prefix=None, rename_images=False, new_img_name=None):
     # uploads stuff to Mantis or calls other methods to do that
     browser = read_config("preferred browser")
     log_first = log_lines.popleft()
@@ -33,7 +33,8 @@ def report_bug(project, log_lines, version, assign, username, password, _driver_
                 version, category, use_log_lines,
                 assign, project, username, password, browser,
                 path_to_asset=a_path, debug_info=d_info, web_driver=driver_handler, priority=priority,
-                severity=severity, late_image=late_image, prefix=prefix
+                severity=severity, late_image=late_image, prefix=prefix,
+                rename_images=rename_images, new_img_name=new_img_name
             )
             break
         # except SessionNotCreatedException:

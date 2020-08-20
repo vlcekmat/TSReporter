@@ -956,6 +956,22 @@ class Application(Frame):
             text_input.bind('<KeyRelease>', lambda x: self.update_preview())
             self.prefix_box = text_input
 
+        rename_box = None
+        def show_rename_images_input(self, master):
+            rename_images_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[3],
+                                   bd=0, height=1,
+                                   width=10, fg=app.current_color_theme[1])
+            rename_images_text.grid(row=6, column=0)
+            rename_images_text.insert(END, "Rename img")
+            rename_images_text.configure(state=DISABLED)
+            text_input = Entry(master, bg=Application.current_color_theme[3],
+                               fg=Application.current_color_theme[2], width=25,
+                               font=Font(size=10))
+            text_input.grid(row=6, column=1, pady=10)
+            text_input.insert(END, "Default - Bug Summary")
+            text_input.bind('<Button-1>', lambda x: Application.Reporting.clear_text_box(text_input))
+            self.rename_box = text_input
+
         def submit_asset_info(self):
             if self.asset_path_input.get() != "Enter asset path/debug info":
                 reporter.asset_path = self.asset_path_input.get()
@@ -1082,7 +1098,8 @@ class Application(Frame):
             reporter.report_bug(project=project, log_lines=current_bug_deque, version=game_version,
                                 assign=assign_to, username=username, password=password,
                                 _driver_handler=self.driver_handler, priority=priority,
-                                severity=severity, late_image=self.late_image, prefix=prefix)
+                                severity=severity, late_image=self.late_image, prefix=prefix,
+                                rename_images=self.rename_images, new_img_name=self.rename_box.get())
             self.late_image = None
 
             self.go_to_reported()
@@ -1179,10 +1196,12 @@ class Application(Frame):
 
         @staticmethod
         def clear_text_box(text_box):
-            if text_box.get() in ['Enter asset path/debug info', 'Enter prefix']:
+            if text_box.get() in ['Enter asset path/debug info', 'Enter prefix', 'Default - Bug Summary']:
                 text_box.delete(0, END)
 
         remember_prefix = False
+        rename_images = False
+
         prefix_box = None
         prefix_check_button = None
         prefix = None
@@ -1190,6 +1209,9 @@ class Application(Frame):
 
         def check_prefix(self, value):
             self.remember_prefix = value.get()
+
+        def check_rename(self, value):
+            self.rename_images = value.get()
 
         def make_options_sidebar(self, frame, current_bug_summary):
             # The report options sidebar is created here.
@@ -1260,6 +1282,32 @@ class Application(Frame):
                                           activeforeground=Application.current_color_theme[2])
             prefix_checkbox.pack(side=RIGHT)
 
+
+
+
+
+
+            self.show_rename_images_input(frame)
+
+            rename_checkbox_frame = Frame(master=frame, bg=Application.current_color_theme[3])
+            rename_checkbox_frame.grid(column=1, row=7, sticky=E)
+
+            rename_checkbox_description = Text(rename_checkbox_frame, font=Font(size=8), bg=Application.current_color_theme[3],
+                                        bd=0, height=1, width=15, fg=Application.current_color_theme[1])
+            rename_checkbox_description.pack(side=LEFT)
+            rename_checkbox_description.insert(END, "Rename?")
+            rename_checkbox_description.configure(state=DISABLED)
+
+            rename_checked = BooleanVar()
+
+            rename_checkbox = Checkbutton(master=rename_checkbox_frame, bg=Application.current_color_theme[3],
+                                          activebackground=Application.current_color_theme[3], variable=rename_checked,
+                                          command=lambda: self.check_rename(value=rename_checked),
+                                          selectcolor=Application.current_color_theme[3],
+                                          fg=Application.current_color_theme[2],
+                                          activeforeground=Application.current_color_theme[2])
+            rename_checkbox.pack(side=RIGHT)
+
             bug_summary_text = Text(checkbox_frame, font=Font(size=8), bg=Application.current_color_theme[3],
                                     bd=0, height=1, width=15, fg=Application.current_color_theme[1])
 
@@ -1320,6 +1368,9 @@ class Application(Frame):
                 thumbnails_frame, options_frame, this_button, current_bug, image_labels, image_location_text,
                 image_path_button, try_again_button, thumbnail_canvas
             )
+
+        def disable_button(self, button):
+            button['state'] = DISABLED
 
         def init_widgets(self, current_bug):
             # region Frames
@@ -1445,7 +1496,7 @@ class Application(Frame):
 
             button_report = Application.AppButton(
                 "REPORT", bottom_frame, side=RIGHT,
-                command=lambda: self.ReportingThread(self.bug_handler.get_current()[0][:-1]).start()
+                command=lambda: [self.ReportingThread(self.bug_handler.get_current()[0][:-1]).start(), self.disable_button(button_report.get_element())]
             )
 
             button_find_duplicates = Application.AppButton(
@@ -1465,6 +1516,7 @@ class Application(Frame):
         bug_handler = None
         last_bug = None
         prefix = None
+        new_img_name = None
 
         def __init__(self, bug_handler, last_bug, next_bug, prefix, remember_prefix):
 
