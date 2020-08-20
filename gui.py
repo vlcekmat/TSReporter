@@ -36,17 +36,17 @@ def get_theme(theme):
             4: '#2B2B2B'  # Background
         },
 
-        "that_ass": {
+        "brownie": {
             # Change the values below to change the overall color theme of the app
-            1: '#D9C5C1',  # Regular Buttons, bugs counter text
-            2: '#F2B694',  # Quit Button, text
-            3: '#8C5C4A',  # Integrated Frames
-            4: '#593C36'  # Background
+            1: 'white',  # Regular Buttons, bugs counter text
+            2: '#BFADA8',  # Quit Button, text
+            3: '#734A3C',  # Integrated Frames
+            4: '#401F18'  # Background
         },
 
         "hazard_theme": {
             # Change the values below to change the overall color theme of the app
-            1: '#FF7237',  # Regular Buttons, bugs counter text
+            1: '#BD554A',  # Regular Buttons, bugs counter text
             2: '#CF423C',  # Quit Button, text
             3: '#570B2A',  # Integrated Frames
             4: '#33081E'  # Background
@@ -54,15 +54,15 @@ def get_theme(theme):
 
         "pastel": {
             # Change the values below to change the overall color theme of the app
-            1: '#94FFD0',  # Regular Buttons, bugs counter text
-            2: '#F9B1FF',  # Quit Button, text
+            1: '#94D9D0',  # Regular Buttons, bugs counter text
+            2: '#EBCFD2',  # Quit Button, text
             3: '#A382E8',  # Integrated Frames
-            4: '#7C9EFF'  # Background
+            4: '#7C82DC'  # Background
         },
 
         "forest": {
             # Change the values below to change the overall color theme of the app
-            1: '#D4D93D',  # Regular Buttons, bugs counter text
+            1: '#94B539',  # Regular Buttons, bugs counter text
             2: '#99BF0F',  # Quit Button, text
             3: '#467302',  # Integrated Frames
             4: '#214001'  # Background
