@@ -1,2 +1,3 @@
 SUGGESTION - archivovat i obrázky
 BUG updater.exe updatuje na staré verze
+When renaming bug pictures, split(' - ') is a problem, it erases them from the summary
