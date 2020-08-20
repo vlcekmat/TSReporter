@@ -106,7 +106,7 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
     if rename_images:
         image_index = 0
         summary = summary.split(' - ')[1:]
-        summary = ''.join(summary)
+        summary = ' - '.join(summary)
         for rename_me in images:
             images.remove(rename_me)
             old_name = rename_me.stem
