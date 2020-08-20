@@ -1,3 +1,5 @@
 SUGGESTION - vyblít nějaký feedback, když nejde assignovat
 SUGGESTION - archivovat i obrázky
 CLEANUP - u assetových bugů tam máš sice možnost zadat prefix, ale reálně to nic nezapíše, což je asi v pohodě, já nevím
+
+BUG updater.exe updatuje na staré verze

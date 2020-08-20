@@ -1084,7 +1084,9 @@ class Application(Frame):
                                 _driver_handler=self.driver_handler, priority=priority,
                                 severity=severity, late_image=self.late_image, prefix=prefix)
             self.late_image = None
+
             self.go_to_reported()
+
 
         def look_for_images_again(self, current_bug):
             # Handles mass looking for images and updates them

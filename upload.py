@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from selenium.common.exceptions import WebDriverException
 
 from chromedrivers import DriverHandler, log_into_mantis
@@ -64,8 +66,7 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
     driver.get('https://qa.scssoft.com/login_select_proj_page.php?ref=bug_report_page.php')
     driver.find_element_by_xpath(f"//select[1]/option[text()='{project}']").click()
     driver.find_element_by_xpath("//input[@type='submit']").click()
-    for upload_me in images:
-        driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))  # upload an image
+
     description_box = driver.find_element_by_xpath("//textarea[@class='form-control']")
 
     for p in range(len(bug_descriptions)):
@@ -99,6 +100,28 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
 
     driver.find_element_by_xpath(f"//select[@name='priority']/option[text()='{priority}']").click()
     driver.find_element_by_xpath(f"//select[@name='severity']/option[text()='{severity}']").click()
+
+    image_index = 0
+    for rename_me in images:
+        images.remove(rename_me)
+        old_name = rename_me.stem
+        old_extension = rename_me.suffix
+        directory = rename_me.parent
+
+        if image_index > 0:
+            summary += f' ({image_index})'
+
+        new_name = summary + old_extension
+        rename_me = rename_me.rename(Path(directory, new_name))
+        images.insert(0, rename_me)
+
+        image_index += 1
+
+    images.reverse()
+
+    for upload_me in images:
+        driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))  # upload an image
+
     # endregion
 
     # if priority:  # if in batch reporter mode
