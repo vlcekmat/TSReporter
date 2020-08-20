@@ -1396,6 +1396,19 @@ class Application(Frame):
             version_info_text.insert(END, version_line)
             version_info_text.configure(state=DISABLED)
 
+            game = Application.Reporting.selected_project[0]
+            assign_to = find_assign_to(current_bug[0].line, self.selected_project[0])
+
+            assign_info_text = Text(background_frame, height=1, width=60, bg=Application.current_color_theme[4],
+                                     fg=Application.current_color_theme[2], bd=0, font="Helvetica 12")
+
+            if assign_to == '':
+                assign_info_text.insert(END, "Couldn't find any suitable person to assign this bug to...")
+            else:
+                assign_info_text.insert(END, f"Assigning to {assign_to}")
+            assign_info_text.pack(anchor="nw", pady=5, padx=5, side=TOP)
+            assign_info_text.configure(state=DISABLED)
+
             middle_frame = Frame(background_frame, bg=Application.current_color_theme[3])
             middle_frame.pack(anchor="center", pady=5, padx=15)
 
