@@ -109,7 +109,7 @@ def get_theme(theme):
         return theme_dict["ph_theme"]
 
 
-version = "0.3.5"
+version = "0.3.6"
 
 
 class Application(Frame):
