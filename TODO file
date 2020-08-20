@@ -1,4 +1,4 @@
 SUGGESTION - vyblít nějaký feedback, když nejde assignovat
 SUGGESTION - archivovat i obrázky
-BUG - píše to prefix do descriptionu
 BUG - najde to stejný obrázek, když uděláš screenshot na podobném místě ve stejné minutě
+CLEANUP - u assetových bugů tam máš sice možnost zadat prefix, ale reálně to nic nezapíše, což je asi v pohodě, já nevím
