@@ -968,7 +968,7 @@ class Application(Frame):
                                fg=Application.current_color_theme[2], width=25,
                                font=Font(size=10))
             text_input.grid(row=6, column=1, pady=10)
-            text_input.insert(END, "Default - Bug Summary")
+            text_input.insert(END, "Bug Summary (Default)")
             text_input.bind('<Button-1>', lambda x: Application.Reporting.clear_text_box(text_input))
             self.rename_box = text_input
 
@@ -1196,7 +1196,7 @@ class Application(Frame):
 
         @staticmethod
         def clear_text_box(text_box):
-            if text_box.get() in ['Enter asset path/debug info', 'Enter prefix', 'Default - Bug Summary']:
+            if text_box.get() in ['Enter asset path/debug info', 'Enter prefix', 'Bug Summary (Default)']:
                 text_box.delete(0, END)
 
         remember_prefix = False
