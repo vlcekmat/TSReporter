@@ -944,19 +944,22 @@ class Application(Frame):
             asset_info_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[3],
                                    bd=0, height=1,
                                    width=10, fg=app.current_color_theme[1])
-            asset_info_text.grid(row=4, column=0)
+            if self.category == 'm':
+                asset_info_text.grid(row=4, column=0)
             asset_info_text.insert(END, "Prefix")
             asset_info_text.configure(state=DISABLED)
             text_input = Entry(master, bg=Application.current_color_theme[3],
                                fg=Application.current_color_theme[2], width=25,
                                font=Font(size=10))
-            text_input.grid(row=4, column=1, pady=10)
+            if self.category == 'm':
+                text_input.grid(row=4, column=1, pady=10)
             text_input.insert(END, "Enter prefix")
             text_input.bind('<Button-1>', lambda x: Application.Reporting.clear_text_box(text_input))
             text_input.bind('<KeyRelease>', lambda x: self.update_preview())
             self.prefix_box = text_input
 
         rename_box = None
+
         def show_rename_images_input(self, master):
             rename_images_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[3],
                                    bd=0, height=1,
@@ -1261,14 +1264,17 @@ class Application(Frame):
                 self.priority_var.set(priority_choices[1])
                 self.severity_var.set(severity_choices[0])
 
+
+
+
             self.show_prefix_input(frame)
 
             checkbox_frame = Frame(master=frame, bg=Application.current_color_theme[3])
-            checkbox_frame.grid(column=1, row=5, sticky=E)
+
 
             checkbox_description = Text(checkbox_frame, font=Font(size=8), bg=Application.current_color_theme[3],
                                         bd=0, height=1, width=15, fg=Application.current_color_theme[1])
-            checkbox_description.pack(side=LEFT)
+
             checkbox_description.insert(END, "Remember prefix")
             checkbox_description.configure(state=DISABLED)
 
@@ -1280,7 +1286,12 @@ class Application(Frame):
                                           selectcolor=Application.current_color_theme[3],
                                           fg=Application.current_color_theme[2],
                                           activeforeground=Application.current_color_theme[2])
-            prefix_checkbox.pack(side=RIGHT)
+            if self.category == 'm':
+                checkbox_frame.grid(column=1, row=5, sticky=E)
+                checkbox_description.pack(side=LEFT)
+                prefix_checkbox.pack(side=RIGHT)
+
+
 
 
 

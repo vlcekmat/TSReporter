@@ -30,8 +30,10 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
     # region process information to insert in the form
     bug_descriptions = []
     images = []
+    asset_info = ''
 
-    asset_info = f"PATH TO ASSET: {path_to_asset}"
+    if path_to_asset:
+        asset_info = f"PATH TO ASSET: {path_to_asset}"
     if debug_info:
         debug_info = clean_debug_info(debug_info)
         asset_info += f"\n{debug_info}"
