@@ -33,7 +33,7 @@ class ConfigHandler:
             "save password": "yn",
             "s_password": "secret",
             "current_theme": "secret",
-            "renamed images location": "path"
+            # "renamed images location": "path"
     }
 
     def __init__(self, debug=False):

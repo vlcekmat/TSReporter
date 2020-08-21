@@ -134,9 +134,9 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
     for upload_me in images:
         driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))  # upload an image
 
-    if rename_images and isAdmin():
-        for replace_me in images:
-            replace_me.replace(config.read_config('renamed images location'))
+    # if rename_images and isAdmin():
+    #     for replace_me in images:
+    #         replace_me.replace(config.read_config('renamed images location'))
 
     # endregion
 
