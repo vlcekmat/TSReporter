@@ -968,12 +968,15 @@ class Application(Frame):
             rename_images_text.insert(END, "Rename img")
             rename_images_text.configure(state=DISABLED)
             text_input = Entry(master, bg=Application.current_color_theme[3],
+                               disabledbackground=Application.current_color_theme[4],
                                fg=Application.current_color_theme[2], width=25,
                                font=Font(size=10))
             text_input.grid(row=6, column=1, pady=10)
             text_input.insert(END, "Bug Summary (Default)")
             text_input.bind('<Button-1>', lambda x: Application.Reporting.clear_text_box(text_input))
             self.rename_box = text_input
+            if not self.rename_images:
+                text_input['state'] = DISABLED
 
         def submit_asset_info(self):
             if self.asset_path_input.get() != "Enter asset path/debug info":
@@ -1215,6 +1218,10 @@ class Application(Frame):
 
         def check_rename(self, value):
             self.rename_images = value.get()
+            if self.rename_images:
+                self.rename_box['state'] = NORMAL
+            else:
+                self.rename_box['state'] = DISABLED
 
         def make_options_sidebar(self, frame, current_bug_summary):
             # The report options sidebar is created here.
@@ -1290,13 +1297,6 @@ class Application(Frame):
                 checkbox_frame.grid(column=1, row=5, sticky=E)
                 checkbox_description.pack(side=LEFT)
                 prefix_checkbox.pack(side=RIGHT)
-
-
-
-
-
-
-
 
             self.show_rename_images_input(frame)
 
