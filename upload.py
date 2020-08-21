@@ -119,6 +119,8 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
 
             if image_index > 0:
                 summary = bug_descriptions[image_index].split(';')[0]
+                if prefix:
+                    summary = prefix + ' - ' + bug_descriptions[image_index].split(';')[0]
                 summary += f' ({image_index})'
 
             new_name = summary + old_extension
