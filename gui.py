@@ -1019,6 +1019,9 @@ class Application(Frame):
             new_image_path = utils.find_image_path()
             self.bug_handler.set_image(bug_entry.line, new_image_path)
             bug_entry.reload_image(self.bug_handler)
+
+
+
             if image_location_text:
                 image_location_text.insert(END, new_image_path)
                 image_location_text.configure(state=DISABLED)
@@ -1036,6 +1039,7 @@ class Application(Frame):
             if try_again_button and self.bug_handler.images_good():
                 try_again_button.get_element().pack_forget()
                 try_again_button.get_element().destroy()
+                self.duplicates_button.get_element()['font'] = Font(size=15)
 
             self.late_image = new_image_path
 
@@ -1171,6 +1175,7 @@ class Application(Frame):
                 # Tries to get image location from the bug_handler and if it does, gets its image as well
                 self.image_location = bug_handler.try_get_image(self.line)
                 if self.image_location:
+                    app.reporting.duplicates_button.get_element()['font'] = Font(size=15)
                     self.image = Image.open(self.image_location)
 
         def make_scrollable_canvas(self, frame, bug_len, image_labels):
@@ -1389,6 +1394,8 @@ class Application(Frame):
         def disable_button(self, button):
             button['state'] = DISABLED
 
+        find_duplicates_button = None
+
         def init_widgets(self, current_bug):
             # region Frames
             background_frame = Frame(master=self, bg=Application.current_color_theme[4])
@@ -1533,6 +1540,11 @@ class Application(Frame):
                 "Find\nduplicates", bottom_frame, side=RIGHT,
                 command=lambda: self.DuplicatesThread(self.bug_handler.get_current()[0][:-1]).start()
             )
+
+            if image_path_button:
+                button_find_duplicates.get_element()['font'] = Font(size=10)
+
+            self.duplicates_button = button_find_duplicates
 
             button_skip_report = Application.AppButton(
                 "Delete report", bottom_frame, side=RIGHT, command=lambda: self.show_next_report(True)
