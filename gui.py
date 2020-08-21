@@ -848,8 +848,9 @@ class Application(Frame):
         category = None
         text_input_frame = None
 
-        def __init__(self, project, bug_handler, reported=False, prefix=None):
+        def __init__(self, project, bug_handler, reported=False, prefix=None, last_time_rename_checked=False):
             super().__init__()
+            self.rename_images = last_time_rename_checked
             if prefix:
                 self.prefix = prefix
             else:
@@ -887,7 +888,8 @@ class Application(Frame):
             self.bug_handler.archive()  # Must archive before moving on to next screen
             prefix = self.prefix_box.get()
             app.reported = Application.ReportedScreen(self.bug_handler, saved_report, self.bug_handler.get_current(),
-                                                      prefix=prefix, remember_prefix=self.remember_prefix)
+                                                      prefix=prefix, remember_prefix=self.remember_prefix,
+                                                      remember_rename=self.rename_images)
             app.reporting = None
 
         dialog_activated = False
@@ -1303,11 +1305,15 @@ class Application(Frame):
             rename_checkbox_frame = Frame(master=frame, bg=Application.current_color_theme[3])
             rename_checkbox_frame.grid(column=1, row=7, sticky=E)
 
-            rename_checkbox_description = Text(rename_checkbox_frame, font=Font(size=8), bg=Application.current_color_theme[3],
+            rename_checkbox_description = Text(rename_checkbox_frame, font=Font(size=8),
+                                               bg=Application.current_color_theme[3],
                                         bd=0, height=1, width=15, fg=Application.current_color_theme[1])
             rename_checkbox_description.pack(side=LEFT)
             rename_checkbox_description.insert(END, "Rename?")
             rename_checkbox_description.configure(state=DISABLED)
+
+            if self.rename_images:
+                rename_checkbox_description.configure(state=NORMAL)
 
             rename_checked = BooleanVar()
 
@@ -1541,13 +1547,14 @@ class Application(Frame):
         last_bug = None
         prefix = None
         new_img_name = None
+        rename_images = False
 
-        def __init__(self, bug_handler, last_bug, next_bug, prefix, remember_prefix):
-
+        def __init__(self, bug_handler, last_bug, next_bug, prefix, remember_prefix, remember_rename=False):
             super().__init__()
             if remember_prefix and prefix not in ['', 'Enter prefix'] and prefix:
                 self.prefix = prefix
             self.last_bug = last_bug
+            self.rename_images = remember_rename
             self.bug_handler = bug_handler
             self.pack(fill=BOTH, expand=True)
             self.init_widgets()
@@ -1561,7 +1568,8 @@ class Application(Frame):
             if self.bug_handler.get_current:
                 try:
                     app.reporting = Application.Reporting(None, bug_handler=self.bug_handler,
-                                                          reported=True, prefix=self.prefix)
+                                                          reported=True, prefix=self.prefix,
+                                                          last_time_rename_checked=self.rename_images)
                 except TypeError:
                     app.main_menu = Application.MainMenu()
             else:
