@@ -896,31 +896,32 @@ class Application(Frame):
         asset_path_input = None
 
         def update_preview(self):
-            self.prefix = self.prefix_box.get()
-            opt_prefix = ''
-            opt_asset = ''
-            if self.prefix:
-                if self.prefix not in ['Enter prefix', '']:
-                    opt_prefix = f"{self.prefix} - "
+            if app.reporting:
+                self.prefix = self.prefix_box.get()
+                opt_prefix = ''
+                opt_asset = ''
+                if self.prefix:
+                    if self.prefix not in ['Enter prefix', '']:
+                        opt_prefix = f"{self.prefix} - "
 
-            if self.asset_path_input:
-                if self.asset_path_input.get() not in ['Enter asset path/debug info', '']:
-                    opt_asset = f"{extract_asset_name(self.asset_path_input.get())} - "
-            current = self.bug_handler.get_current()[0][:-1]
-            current = current.split(';')[0]
+                if self.asset_path_input:
+                    if self.asset_path_input.get() not in ['Enter asset path/debug info', '']:
+                        opt_asset = f"{extract_asset_name(self.asset_path_input.get())} - "
+                current = self.bug_handler.get_current()[0][:-1]
+                current = current.split(';')[0]
 
-            category = ''
-            if '_' in current:
-                category = f"{current.split('_')[0]}_"
-                current = current.split('_')[1]
+                category = ''
+                if '_' in current:
+                    category = f"{current.split('_')[0]}_"
+                    current = current.split('_')[1]
 
-            if 'a' in category:
-                opt_prefix = ""
+                if 'a' in category:
+                    opt_prefix = ""
 
-            game_version = find_version(Application.Reporting.selected_project[0])
+                game_version = find_version(Application.Reporting.selected_project[0])
 
-            current_bug_summary = f"Preview: {game_version} - {opt_prefix}{opt_asset}{current}"
-            rewrite_textbox(current_bug_summary, self.bug_preview)
+                current_bug_summary = f"Preview: {game_version} - {opt_prefix}{opt_asset}{current}"
+                rewrite_textbox(current_bug_summary, self.bug_preview)
 
         def show_text_input_asset_path(self, master):
             if not self.dialog_activated:
