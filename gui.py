@@ -1021,8 +1021,6 @@ class Application(Frame):
             self.bug_handler.set_image(bug_entry.line, new_image_path)
             bug_entry.reload_image(self.bug_handler)
 
-
-
             if image_location_text:
                 image_location_text.insert(END, new_image_path)
                 image_location_text.configure(state=DISABLED)
@@ -1116,7 +1114,6 @@ class Application(Frame):
             self.late_image = None
 
             self.go_to_reported()
-
 
         def look_for_images_again(self, current_bug):
             # Handles mass looking for images and updates them
@@ -1280,13 +1277,9 @@ class Application(Frame):
                 self.priority_var.set(priority_choices[1])
                 self.severity_var.set(severity_choices[0])
 
-
-
-
             self.show_prefix_input(frame)
 
             checkbox_frame = Frame(master=frame, bg=Application.current_color_theme[3])
-
 
             checkbox_description = Text(checkbox_frame, font=Font(size=8), bg=Application.current_color_theme[3],
                                         bd=0, height=1, width=15, fg=Application.current_color_theme[1])
@@ -1319,9 +1312,6 @@ class Application(Frame):
             rename_checkbox_description.insert(END, "Rename?")
             rename_checkbox_description.configure(state=DISABLED)
 
-            if self.rename_images:
-                rename_checkbox_description.configure(state=NORMAL)
-
             rename_checked = BooleanVar()
 
             rename_checkbox = Checkbutton(master=rename_checkbox_frame, bg=Application.current_color_theme[3],
@@ -1330,8 +1320,11 @@ class Application(Frame):
                                           selectcolor=Application.current_color_theme[3],
                                           fg=Application.current_color_theme[2],
                                           activeforeground=Application.current_color_theme[2])
-            rename_checkbox.pack(side=RIGHT)
 
+            if self.rename_images:
+                rename_checkbox.select()
+
+            rename_checkbox.pack(side=RIGHT)
             bug_summary_text = Text(checkbox_frame, font=Font(size=8), bg=Application.current_color_theme[3],
                                     bd=0, height=1, width=15, fg=Application.current_color_theme[1])
 
