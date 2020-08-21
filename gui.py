@@ -1175,7 +1175,8 @@ class Application(Frame):
                 # Tries to get image location from the bug_handler and if it does, gets its image as well
                 self.image_location = bug_handler.try_get_image(self.line)
                 if self.image_location:
-                    app.reporting.duplicates_button.get_element()['font'] = Font(size=15)
+                    if app.reporting:
+                        app.reporting.duplicates_button.get_element()['font'] = Font(size=15)
                     self.image = Image.open(self.image_location)
 
         def make_scrollable_canvas(self, frame, bug_len, image_labels):
