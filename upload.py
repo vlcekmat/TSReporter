@@ -111,9 +111,8 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
         summary = ' - '.join(summary)
         for rename_me in images:
             images.remove(rename_me)
-            old_name = rename_me.stem
-            old_extension = rename_me.suffix
-            directory = rename_me.parent
+            old_extension = Path(rename_me).suffix
+            directory = Path(rename_me).parent
 
             if new_img_name not in ['', 'Bug Summary (Default)']:
                 summary = new_img_name
@@ -124,6 +123,7 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
 
             new_name = summary + old_extension
 
+            rename_me = Path(rename_me)
             rename_me = rename_me.rename(Path(directory, new_name))
             images.insert(0, rename_me)
 
