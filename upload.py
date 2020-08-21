@@ -109,6 +109,7 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
         image_index = 0
         summary = summary.split(' - ')[1:]
         summary = ' - '.join(summary)
+        summary = ' '.join(summary.split(' ')[:-1])
         for rename_me in images:
             images.remove(rename_me)
             old_extension = Path(rename_me).suffix
@@ -116,12 +117,14 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
 
             if new_img_name not in ['', 'Bug Summary (Default)']:
                 summary = new_img_name
+                summary = ' '.join(summary.split(' ')[:-1])
 
             if image_index > 0:
                 summary = bug_descriptions[image_index].split(';')[0]
+                summary = ' '.join(summary.split(' ')[:-1])
                 if prefix:
-                    summary = prefix + ' - ' + bug_descriptions[image_index].split(';')[0]
-                summary += f' ({image_index})'
+                    summary = prefix + ' - ' + summary
+                #summary += f' ({image_index})'
 
             new_name = summary + old_extension
 
