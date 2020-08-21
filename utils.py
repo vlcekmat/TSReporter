@@ -1,3 +1,5 @@
+import ctypes
+import os
 from tkinter import Tk
 from tkinter import filedialog
 
@@ -9,6 +11,13 @@ def find_path():
     dir_path = filedialog.askdirectory()
     return dir_path
 
+def isAdmin():
+    # Checks if the program is running as an administrator
+    try:
+        is_admin = (os.getuid() == 0)
+    except AttributeError:
+        is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+    return is_admin
 
 def find_image_path():
     # Opens dialogue window and returns the selected jpg or gif

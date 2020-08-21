@@ -2,6 +2,7 @@ from pathlib import Path
 
 from selenium.common.exceptions import WebDriverException
 
+import config
 from chromedrivers import DriverHandler, log_into_mantis
 from information_compile import generate_description, get_image, generate_no_version_des, extract_asset_name, \
     clean_debug_info
@@ -18,6 +19,7 @@ from information_compile import generate_description, get_image, generate_no_ver
 #             continue
 #         if image_to_return:
 #             return image_to_return
+from utils import isAdmin
 
 
 def upload_to_mantis(version, category, log_lines, assign_to, project, username, password,
@@ -131,6 +133,10 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
 
     for upload_me in images:
         driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))  # upload an image
+
+    if rename_images and isAdmin():
+        for replace_me in images:
+            replace_me.replace(config.read_config('renamed images location'))
 
     # endregion
 

@@ -32,7 +32,8 @@ class ConfigHandler:
             "preferred browser": "browser",
             "save password": "yn",
             "s_password": "secret",
-            "current_theme": "secret"
+            "current_theme": "secret",
+            "renamed images location": "path"
     }
 
     def __init__(self, debug=False):

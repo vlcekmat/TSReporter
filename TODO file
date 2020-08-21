@@ -1,3 +1,4 @@
 SUGGESTION - archivovat i obrázky
 BUG updater.exe updatuje na staré verze
-When there is no image found, the "find duplicates button looks weird"
+BUG When there is no image found, the "find duplicates button looks weird"
+BUG doesnt work with blank lines in bugs.txt
