@@ -74,27 +74,6 @@ def check_for_duplicates(username, password, bug_description=None,
                 pass
 
 
-def log_into_tsreporter(test_login_username, browser='chrome'):
-    # first try to log into mantis, so we now that the login credentials are correct
-    while True:
-        password = input("PASSWORD: ")
-        os.system('cls')
-        # password = "CrYVhn7FSM"
-        if password == "":
-            return ""
-        driver = DriverHandler(browser=browser, headless=True).get_driver()
-        try:
-            log_into_mantis(driver, test_login_username, password)
-            driver.find_element_by_id('sidebar-btn')
-        except NoSuchElementException:
-            return ""
-        else:
-            driver.quit()
-            if read_config("save password") == "True":
-                save_password(password)
-            return password
-
-
 def gui_login(username, password):
     driver_handler = DriverHandler(config.read_config("preferred browser"), headless=True)
     log_into_mantis(driver_handler.get_driver(), username, password)

@@ -9,7 +9,7 @@ from config import read_config
 asset_path = None
 
 
-def report_bug(project, log_lines, version, assign, username, password, _driver_handler,
+def report_bug(project, log_lines, version, username, password, _driver_handler,
                priority=None, severity=None, late_image=None, prefix=None, rename_images=False, new_img_name=None):
     # uploads stuff to Mantis or calls other methods to do that
     browser = read_config("preferred browser")
@@ -30,25 +30,12 @@ def report_bug(project, log_lines, version, assign, username, password, _driver_
             driver_handler = _driver_handler
             use_log_lines = copy.deepcopy(log_lines)
             upload_to_mantis(
-                version, category, use_log_lines,
-                assign, project, username, password, browser,
+                version, category, use_log_lines, project, username, password, browser,
                 path_to_asset=a_path, debug_info=d_info, web_driver=driver_handler, priority=priority,
                 severity=severity, late_image=late_image, prefix=prefix,
                 rename_images=rename_images, new_img_name=new_img_name
             )
             break
-        # except SessionNotCreatedException:
-        #     print(error_message + ' SessionNotCreatedException')
-        # except NoSuchWindowException:
-        #     print(error_message + ' NoSuchWindowException')
-        # except WebDriverException:
-        #     print(error_message + ' WebDriverException')
-        # except AttributeError:
-        #     print(error_message + ' AttributeError')
-        # except TypeError:
-        #     print(error_message + ' TypeError')
-        # except NameError:
-        #     print(error_message + ' NameError')
         except (SessionNotCreatedException, NoSuchWindowException, WebDriverException,
                 AttributeError, TypeError, NameError) as error:
             print(f'{error_message} {error}')

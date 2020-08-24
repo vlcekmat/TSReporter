@@ -366,13 +366,13 @@ class Application(Frame):
 
             report_button = Application.AppButton('Report Bugs', frame=left_frame,
                                                   command=lambda: self.go_to_projects("normal"))
-            batch_report_button = Application.AppButton('Batch Report \n (WIP)', frame=left_frame,
-                                                        command=lambda: self.go_to_projects("batch"))
+            # batch_report_button = Application.AppButton('Batch Report \n (WIP)', frame=left_frame,
+            #                                             command=lambda: self.go_to_projects("batch"))
             settings_button = Application.AppButton('Settings', frame=left_frame,
                                                     command=self.go_to_settings)
 
             placeholder_frame = Frame(left_frame, bg=Application.current_color_theme[3])
-            placeholder_frame.pack(fill=BOTH, pady=70)
+            placeholder_frame.pack(fill=BOTH, pady=110)
             # This is only for creating the gap between regular buttons and the quit button
 
             quit_button = Application.AppButton('QUIT', color1=Application.current_color_theme[2],
@@ -1107,7 +1107,7 @@ class Application(Frame):
                 log_into_mantis(self.driver_handler.get_driver(), username, password)
 
             reporter.report_bug(project=project, log_lines=current_bug_deque, version=game_version,
-                                assign=assign_to, username=username, password=password,
+                                username=username, password=password,
                                 _driver_handler=self.driver_handler, priority=priority,
                                 severity=severity, late_image=self.late_image, prefix=prefix,
                                 rename_images=self.rename_images, new_img_name=self.rename_box.get())
@@ -1398,24 +1398,22 @@ class Application(Frame):
             game_version = find_version(Application.Reporting.selected_project[0])
             version_line = f"Reporting in project [{Application.Reporting.selected_project}] at version {game_version}"
 
-            version_info_text = Text(background_frame, height=1, width=60, bg=Application.current_color_theme[4],
+            version_info_text = Text(background_frame, height=1, width=100, bg=Application.current_color_theme[4],
                                      fg=Application.current_color_theme[2], bd=0, font="Helvetica 12")
             version_info_text.pack(anchor="nw", pady=5, padx=5, side=TOP)
             version_info_text.insert(END, version_line)
-            version_info_text.configure(state=DISABLED)
+            # version_info_text.configure(state=DISABLED)
 
-            game = Application.Reporting.selected_project[0]
             assign_to = find_assign_to(current_bug[0].line, self.selected_project[0])
 
-            assign_info_text = Text(background_frame, height=1, width=60, bg=Application.current_color_theme[4],
-                                     fg=Application.current_color_theme[2], bd=0, font="Helvetica 12")
-
-            if assign_to == '':
-                assign_info_text.insert(END, "Couldn't find any suitable person to assign this bug to...")
-            else:
-                assign_info_text.insert(END, f"Assigning to {assign_to}")
-            assign_info_text.pack(anchor="nw", pady=5, padx=5, side=TOP)
-            assign_info_text.configure(state=DISABLED)
+            # assign_info_text = Text(background_frame, height=1, width=60, bg=Application.current_color_theme[4],
+            #                         fg=Application.current_color_theme[2], bd=0, font="Helvetica 12")
+            if assign_to == "":
+                assign_to = "unknown"
+            version_info_text.insert(END, f"\t- Assigning to {assign_to}")
+            # assign_info_text.pack(anchor="nw", pady=5, padx=5, side=TOP)
+            # assign_info_text.configure(state=DISABLED)
+            version_info_text.configure(state=DISABLED)
 
             middle_frame = Frame(background_frame, bg=Application.current_color_theme[3])
             middle_frame.pack(anchor="center", pady=5, padx=15)
@@ -1536,8 +1534,8 @@ class Application(Frame):
                 command=lambda: self.DuplicatesThread(self.bug_handler.get_current()[0][:-1]).start()
             )
 
-            if image_path_button:
-                button_find_duplicates.get_element()['font'] = Font(size=10)
+            # if image_path_button:
+            #     button_find_duplicates.get_element()['font'] = Font(size=10)
 
             self.duplicates_button = button_find_duplicates
 
