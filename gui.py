@@ -10,7 +10,6 @@ from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowE
 
 import win32gui, win32con
 
-import gif_generator
 from information_compile import determine_bug_category, extract_asset_name
 from password import get_password
 from versions import find_version
@@ -22,6 +21,7 @@ from sector_seek import find_assign_to
 from chromedrivers import log_into_mantis
 import utils
 import reporter
+import gif_generator
 
 
 custom_theme = None
@@ -110,7 +110,7 @@ def get_theme(theme):
         return theme_dict["ph_theme"]
 
 
-version = "0.3.7"
+version = "0.3.8"
 
 
 class Application(Frame):
@@ -235,7 +235,8 @@ class Application(Frame):
 
         def go_to_gif_generator(self):
             self.pack_forget()
-            app.gif_page = gif_generator.GifGeneratorPage(app=app)
+            app.gif_page = gif_generator.GifGeneratorPage(app=app,
+                                                          location=config.read_config("edited images location"))
             app.main_menu = None
 
         # endregion
