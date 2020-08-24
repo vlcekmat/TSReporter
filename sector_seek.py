@@ -8,7 +8,7 @@ def clean_sector(log_line):
     return sector
 
 
-def request_sector_owner(sector_to_find, game):
+def request_sector_owner(sector_to_find, game, svn_not_found=False):
     # Requests the sector owner from the games' url using POST
     if game == 'A':
         get_owner_url = "http://map.scs/usa/get_sector_owner.php?"
@@ -18,11 +18,14 @@ def request_sector_owner(sector_to_find, game):
     data = {"sectors": sector_to_find}
     reply = requests.post(get_owner_url, headers=headers, data=data)
     js = reply.json()
-    try:
-        sector_owner = js[sector_to_find]["owner"]["svn_name"]
-        return sector_owner  # Timmy made the server part of this if something breaks, go see him
+    try:  # Timmy made the server part of this if something breaks, go see him
+        if svn_not_found:
+            sector_owner = js[sector_to_find]["owner"]["username"]
+        else:
+            sector_owner = js[sector_to_find]["owner"]["svn_name"]
     except KeyError:
         return ""
+    return sector_owner
 
 
 def get_asset_assign(chosen_game, bug_type):
@@ -45,14 +48,15 @@ def get_asset_assign(chosen_game, bug_type):
     return ass_dict[chosen_game][bug_type]
 
 
-def find_assign_to(line, chosen_game):
+def find_assign_to(line, chosen_game, svn_not_found=False):
     # Assignee is found here. Map bugs are found using the get_sector_owner page
     # assets are determined based on their game and asset type, other unknown reports are default blank
-    bug_type = line.split('_', maxsplit=1)[0]
     assign_to = ""
-    if bug_type == "m":
-        get_owner_of_this = clean_sector(line)
-        assign_to = request_sector_owner(get_owner_of_this, chosen_game)
-    elif bug_type in ["ar", "av", "ac", "aa"]:
-        assign_to = get_asset_assign(chosen_game, bug_type)
+    if '_' in line:
+        bug_type = line.split('_', maxsplit=1)[0]
+        if bug_type == "m":
+            get_owner_of_this = clean_sector(line)
+            assign_to = request_sector_owner(get_owner_of_this, chosen_game, svn_not_found=svn_not_found)
+        elif bug_type in ["ar", "av", "ac", "aa"]:
+            assign_to = get_asset_assign(chosen_game, bug_type)
     return assign_to

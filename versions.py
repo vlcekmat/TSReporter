@@ -6,21 +6,6 @@ from utils import is_int
 from config import read_config
 
 
-def get_project_from_user():
-    # Asks user which project they want their reports will go into and returns project name as string
-    # All bugs will be reported into that project
-    projects = ['Return to menu', 'ATS - INTERNAL', 'ATS - PUBLIC', 'ATS - PUBLIC - SENIORS', 'ETS 2 - INTERNAL',
-                'ETS 2 - PUBLIC', 'ETS 2 - PUBLIC - SENIORS']
-    for i in range(len(projects)):
-        pass
-    while True:
-        project = input('> ')
-        if not (is_int(project) and 6 >= int(project) >= 0):
-            continue
-        else:
-            return projects[int(project)]
-
-
 def find_game_version(log_path):
     # Finds the game version from game.log.txt and returns it
     # Uses a Regexp to find the line and then extracts the version

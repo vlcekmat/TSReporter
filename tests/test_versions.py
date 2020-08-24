@@ -7,22 +7,6 @@ from unittest import mock
 import versions
 
 
-class TestAskProject(unittest.TestCase):
-    def test_get_project_good(self):
-        with mock.patch('sys.stdout', new_callable=io.StringIO) as fake_stdout:
-            user_input = "1"
-            with mock.patch('builtins.input', side_effect=user_input):
-                version = versions.get_project_from_user()
-            self.assertEqual(version, "ATS - INTERNAL")
-
-    def test_get_project_repeated(self):
-        with mock.patch('sys.stdout', new_callable=io.StringIO) as fake_stdout:
-            user_input = "9\nabc\n4"
-            with mock.patch('builtins.input', side_effect=user_input):
-                version = versions.get_project_from_user()
-            self.assertEqual(version, "ETS 2 - INTERNAL")
-
-
 class TestFindGameVersion(unittest.TestCase):
     def test_find_game_version_missing(self):
         with mock.patch('sys.stdout', new_callable=io.StringIO) as fake_stdout:

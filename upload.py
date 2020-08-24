@@ -2,10 +2,9 @@ from pathlib import Path
 
 from selenium.common.exceptions import WebDriverException
 
-import config
+from sector_seek import find_assign_to
 from chromedrivers import DriverHandler, log_into_mantis
-from information_compile import generate_description, get_image, generate_no_version_des, extract_asset_name, \
-    clean_debug_info
+from information_compile import generate_description, get_image, extract_asset_name, clean_debug_info
 
 
 # def ask_for_missing_image(line_to_process):
@@ -22,7 +21,7 @@ from information_compile import generate_description, get_image, generate_no_ver
 from utils import isAdmin
 
 
-def upload_to_mantis(version, category, log_lines, assign_to, project, username, password,
+def upload_to_mantis(version, category, log_lines, project, username, password,
                      browser, path_to_asset=None, debug_info=None, web_driver=None, priority=None,
                      severity=None, late_image=None, prefix=None, rename_images=False, new_img_name=None):
     # Opens chrome browser, connects to mantis and uploads all of the gathered information
@@ -90,11 +89,17 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
 
     driver.find_element_by_xpath(f"//input[@name='summary']").send_keys(summary)
 
+    assign_to = find_assign_to(f"{category}_{bug_descriptions[0]}", project[0])
     if assign_to != "":
         try:
             driver.find_element_by_xpath(f"//option[text()='{assign_to}']").click()
         except WebDriverException:
-            pass
+            try:
+                assign_to = find_assign_to(f"{category}_{bug_descriptions[0]}", project[0], svn_not_found=True)
+                driver.find_element_by_xpath(f"//option[text()='{assign_to}']").click()
+            except WebDriverException:
+                pass
+
     driver.find_element_by_xpath(f"//option[text()='always']").click()
 
     if category == 'm':
@@ -139,7 +144,6 @@ def upload_to_mantis(version, category, log_lines, assign_to, project, username,
                 rename_me = rename_me.rename(Path(directory, new_name))
 
             images.insert(0, rename_me)
-
             image_index += 1
 
         images.reverse()
