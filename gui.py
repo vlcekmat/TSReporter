@@ -10,6 +10,7 @@ from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowE
 
 import win32gui, win32con
 
+import gif_generator
 from information_compile import determine_bug_category, extract_asset_name
 from password import get_password
 from versions import find_version
@@ -122,6 +123,7 @@ class Application(Frame):
     reported = None
     batch = None
     login = None
+    gif_page = None
 
     password = None  # Mantis password is saved here
 
@@ -230,6 +232,11 @@ class Application(Frame):
                 app.projects_page = Application.SelectProject(use_mode)
                 app.projects_page.open_page()
                 app.main_menu = None
+
+        def go_to_gif_generator(self):
+            self.pack_forget()
+            app.gif_page = gif_generator.GifGeneratorPage(app=app)
+            app.main_menu = None
 
         # endregion
 
@@ -371,8 +378,10 @@ class Application(Frame):
             settings_button = Application.AppButton('Settings', frame=left_frame,
                                                     command=self.go_to_settings)
 
+            gif_button = Application.AppButton('GIF\nGenerator', frame=left_frame, command=self.go_to_gif_generator)
+
             placeholder_frame = Frame(left_frame, bg=Application.current_color_theme[3])
-            placeholder_frame.pack(fill=BOTH, pady=110)
+            placeholder_frame.pack(fill=BOTH, pady=70)
             # This is only for creating the gap between regular buttons and the quit button
 
             quit_button = Application.AppButton('QUIT', color1=Application.current_color_theme[2],
