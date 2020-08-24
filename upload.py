@@ -136,7 +136,7 @@ def upload_to_mantis(version, category, log_lines, project, username, password,
 
             rename_me = Path(rename_me)
 
-            if old_extension is not '.gif':
+            if old_extension != '.gif':
                 try:
                     rename_me = rename_me.rename(Path(directory, new_name))
                 except FileExistsError:
