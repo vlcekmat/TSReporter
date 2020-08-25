@@ -376,11 +376,11 @@ class Application(Frame):
                                                   command=lambda: self.go_to_projects("normal"))
             # batch_report_button = Application.AppButton('Batch Report \n (WIP)', frame=left_frame,
             #                                             command=lambda: self.go_to_projects("batch"))
-            settings_button = Application.AppButton('Settings', frame=left_frame,
-                                                    command=self.go_to_settings)
 
             gif_button = Application.AppButton('GIF\nGenerator', frame=left_frame, command=self.go_to_gif_generator)
 
+            settings_button = Application.AppButton('Settings', frame=left_frame,
+                                                    command=self.go_to_settings)
             placeholder_frame = Frame(left_frame, bg=Application.current_color_theme[3])
             placeholder_frame.pack(fill=BOTH, pady=70)
             # This is only for creating the gap between regular buttons and the quit button

@@ -3,6 +3,7 @@ from tkinter.font import Font
 from PIL import Image
 import imageio
 from tkinter import filedialog
+import os
 
 
 class GifMaker:
@@ -22,6 +23,10 @@ class GifMaker:
 
     def remove_frame(self, index):
         self.frames.pop(index)
+
+    def clear_frames(self):
+        self.frames.clear()
+        self.gif_name = ""
 
     def save_gif(self, fps):
         imageio.mimwrite(self.gif_name, self.frames, fps=fps)
@@ -48,17 +53,30 @@ class GifGeneratorPage(Frame):
         self.app.gif_page = None
 
     def find_image(self):
-        self.gif_maker.add_frame(filedialog.askopenfile().name)
+        new_img = filedialog.askopenfile()
+        if new_img:
+            new_img_name = new_img.name
+            if new_img_name[-4:] == ".png":
+                new_name = new_img_name[:-4] + ".jpg"
+                with Image.open(new_img_name) as convert_me:
+                    convert_me.save(new_name, optimize=True, quality=85)
+                new_img_name = new_name
+            self.gif_maker.add_frame(new_img_name)
+
+    def clear_gif_frames(self):
+        self.gif_maker.clear_frames()
 
     def convert_to_gif(self):
         self.gif_maker.save_gif(self.duration)
 
     def callback(self, dur_var):
-        # TODO: make sure dur_var is float
         dv = dur_var.get()
-        if dv == '':
-            self.duration = 1
-        else:
+        self.duration = 1
+        try:
+            float(dv)
+        except ValueError:
+            return
+        if dv != '':
             self.duration = 1000/int(dv)
 
     def init_widgets(self):
@@ -72,7 +90,7 @@ class GifGeneratorPage(Frame):
         bottom_frame.pack(fill=X, side=BOTTOM)
 
         images_list_frame = Frame(master=top_frame, bg=self.current_color_theme[3])
-        images_list_frame.pack(side=LEFT, padx=20)
+        # images_list_frame.pack(side=LEFT, padx=20)
 
         for i in range(10):
             Label(master=images_list_frame, bg=self.current_color_theme[3], fg=self.current_color_theme[2],
@@ -84,12 +102,15 @@ class GifGeneratorPage(Frame):
                                             command=self.convert_to_gif, side=RIGHT)
         find_button = self.app.AppButton('Find', frame=bottom_frame,
                                          command=self.find_image, side=RIGHT)
+        clear_button = self.app.AppButton('Clear', frame=bottom_frame,
+                                          command=self.clear_gif_frames, side=RIGHT)
         fps_frame = Frame(master=bottom_frame, bg=self.current_color_theme[4])
         fps_frame.pack(side=RIGHT, padx=10)
 
         fps_text = Label(master=fps_frame, bg=self.current_color_theme[4], fg=self.current_color_theme[2],
                          text='Delay', font=Font(size=15)).grid(row=0, column=0)
         dur_var = StringVar()
+        dur_var.set(1000)
         dur_var.trace("w", lambda name, index, mode, var=dur_var: self.callback(var))
         fps_entry = Entry(master=fps_frame, bg=self.current_color_theme[3], fg=self.current_color_theme[2],
                           width=10, font=Font(size=15), textvariable=dur_var).grid(row=1, column=0)
