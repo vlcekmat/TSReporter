@@ -18,7 +18,6 @@ from information_compile import generate_description, get_image, extract_asset_n
 #             continue
 #         if image_to_return:
 #             return image_to_return
-from utils import isAdmin
 
 
 def upload_to_mantis(version, category, log_lines, project, username, password,
