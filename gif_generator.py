@@ -84,7 +84,7 @@ class GifGeneratorPage(Frame):
         background.pack(fill=BOTH, expand=True)
 
         top_frame = Frame(master=background, bg=self.current_color_theme[3])
-        top_frame.pack(fill=BOTH, expand=True, pady=10, padx=10)
+        top_frame.pack(fill=BOTH, expand=True, pady=20, padx=20)
 
         bottom_frame = Frame(master=background, bg=self.current_color_theme[4])
         bottom_frame.pack(fill=X, side=BOTTOM)

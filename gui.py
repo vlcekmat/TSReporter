@@ -858,6 +858,17 @@ class Application(Frame):
         category = None
         text_input_frame = None
 
+        dialog_activated = False
+        asset_path_input = None
+
+        remember_prefix = False
+        rename_images = False
+
+        prefix_box = None
+        prefix_check_button = None
+        prefix = None
+        bug_preview = None
+
         def __init__(self, project, bug_handler, reported=False, prefix=None, last_time_rename_checked=False):
             super().__init__()
             self.rename_images = last_time_rename_checked
@@ -901,9 +912,6 @@ class Application(Frame):
                                                       prefix=prefix, remember_prefix=self.remember_prefix,
                                                       remember_rename=self.rename_images)
             app.reporting = None
-
-        dialog_activated = False
-        asset_path_input = None
 
         def update_preview(self):
             if app.reporting:
@@ -1018,11 +1026,13 @@ class Application(Frame):
             self.pack_forget()
             if self.remember_prefix and self.prefix:
                 app.reporting = Application.Reporting(
-                    Application.Reporting.selected_project, self.bug_handler, reported=True, prefix=self.prefix
+                    Application.Reporting.selected_project, self.bug_handler, reported=True, prefix=self.prefix,
+                    last_time_rename_checked=self.rename_images
                 )
             else:
                 app.reporting = Application.Reporting(
-                    Application.Reporting.selected_project, self.bug_handler, reported=True
+                    Application.Reporting.selected_project, self.bug_handler, reported=True,
+                    last_time_rename_checked=self.rename_images
                 )
 
         def find_missing_image(self, image_label, bug_entry, try_again_button, find_img_button=None,
@@ -1220,14 +1230,6 @@ class Application(Frame):
         def clear_text_box(text_box):
             if text_box.get() in ['Enter asset path/debug info', 'Enter prefix', 'Bug Summary (Default)']:
                 text_box.delete(0, END)
-
-        remember_prefix = False
-        rename_images = False
-
-        prefix_box = None
-        prefix_check_button = None
-        prefix = None
-        bug_preview = None
 
         def check_prefix(self, value):
             self.remember_prefix = value.get()
