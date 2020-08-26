@@ -91,6 +91,8 @@ def gui_login(username, password):
 
 def log_into_mantis(driver, username, password):
     # uses the given credentials to log into mantis
+    # CrYVhn7FSM
+    print(password)
     driver.get('https://qa.scssoft.com/login_page.php')
     username_box = driver.find_element_by_id('username')
     username_box.send_keys(username)

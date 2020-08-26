@@ -163,11 +163,10 @@ class Application(Frame):
             self.pack_forget()
 
     class AppButton:
-        text = None
-        element = None
-
         # The basic template that is used for most buttons in the app
         # Create an instance of this class to quickly create a new button
+        text = None
+        element = None
 
         def __init__(self, text, frame, color1=None, color2=None, font_color='black', command=None,
                      offx=10, offy=10, font_size=15, text_spacing=20, side=None, pady=10, anchor=None):
