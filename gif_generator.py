@@ -5,6 +5,9 @@ import imageio
 from tkinter import filedialog
 import os
 
+from numpy import iterable
+
+
 def rewrite_textbox(message, textbox):
     # use this to clear a textbox and display a message
     textbox.configure(state=NORMAL)
@@ -65,22 +68,26 @@ class GifGeneratorPage(Frame):
         self.app.gif_page = None
 
     def find_image(self):
-        with filedialog.askopenfile(
+
+        img_tuple = filedialog.askopenfilenames(
             filetypes=[
                 ("image", ".png"),
                 ("image", ".jpg")
             ]
-        ) as old_img:
-            if old_img:
-                old_img_name = old_img.name
+        )
+        if img_tuple:
+            img_list = []
+            for img in img_tuple:
+                img_list.append(img)
+            del img_tuple
+            for img in img_list:
+                old_img_name = img
                 new_img_name = old_img_name
                 if old_img_name[-4:] == ".png":
                     new_img_name = old_img_name[:-4] + ".jpg"
                     with Image.open(old_img_name) as convert_me:
                         convert_me.save(new_img_name, optimize=True, quality=85)
                 self.gif_maker.add_frame(new_img_name)
-        if old_img_name and old_img_name[-4:] == ".png":
-            os.remove(old_img_name)
 
     def clear_gif_frames(self):
         self.gif_maker.clear_frames()
