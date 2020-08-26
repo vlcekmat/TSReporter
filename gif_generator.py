@@ -41,7 +41,7 @@ class GifMaker:
             if len(self.frames) == 0:
                 self.gif_name = ""
             else:  # Set the gif name to be the new gif head
-                self.gif_name = self.save_gifs_here + '/' + self.frames[0].split('/')[-1][0:-4] + ".gif"
+                self.gif_name = self.save_gifs_here + '/' + self.frames[0][0].filename.split('/')[-1][0:-4] + ".gif"
 
     def clear_frames(self):
         while len(self.frames) > 0:
@@ -101,9 +101,14 @@ class GifGeneratorPage(Frame):
                     with Image.open(old_img_name) as convert_me:
                         convert_me.save(new_img_name, optimize=True, quality=85)
                 self.gif_maker.add_frame(new_img_name, was_png)
+        self.update_image_list_box(master=self.app.gif_page.images_paths_frame, page=self.app.gif_page)
 
-    def clear_gif_frames(self):
+    def clear_gif_frames(self, images_frame):
         self.gif_maker.clear_frames()
+        images_frame['bg'] = self.app.current_color_theme[3]
+        for list in self.widgets_to_update:
+            for index in range(3):
+                list[index].destroy()
 
     def convert_to_gif(self):
         self.gif_maker.save_gif(self.duration)
@@ -118,14 +123,34 @@ class GifGeneratorPage(Frame):
         if dv != '':
             self.duration = 1000/int(dv)
 
-    def update_image_list_box(self, master, page):
-        images_list_frame = None
-        page = None
-        for img_path in [f[0].filename for f in self.gif_maker.frames]:
-            print(img_path)
-            # Label(master=images_list_frame, bg=self.current_color_theme[4], fg=self.current_color_theme[2],
-            #       text=f'Image {index}: ', font=Font(size=10)).grid(row=index, column=0)
+    widgets_to_update = []
 
+    def update_image_list_box(self, master, page):
+        index = 1
+        for img_path in [f[0].filename for f in self.gif_maker.frames]:
+            delete_image_button = Button(master=master, bg=page.current_color_theme[3], fg=page.current_color_theme[2],
+                                         text="Delete", activebackground=page.current_color_theme[3],
+                                         padx=5, pady=2, activeforeground=page.current_color_theme[2])
+            img_label = Label(master=master, bg=page.current_color_theme[4], fg=page.current_color_theme[2],
+                   text=f'Image {index}: ', font=Font(size=10))
+            img_path_text = Text(master=master, bg=page.current_color_theme[4], fg=page.current_color_theme[2],
+                            font=Font(size=10), width=40, height=1, borderwidth=0)
+            self.widgets_to_update.append([img_label, img_path_text, delete_image_button])
+            delete_image_button.grid(row=index, column=0)
+            img_label.grid(row=index, column=1)
+            img_path_text.grid(row=index, column=2)
+            img_path_text.insert(END, img_path.split('/')[-1])
+            img_path_text['state'] = DISABLED
+            master['bg'] = self.app.current_color_theme[4]
+
+            index += 1
+
+        index = 0
+        for button in [widget_list[2] for widget_list in self.widgets_to_update]:
+            button['command'] = self.gif_maker.remove_frame(index)
+            index += 1
+
+    images_paths_frame = None
 
     def init_widgets(self):
         background = Frame(master=self, bg=self.current_color_theme[4])
@@ -141,7 +166,8 @@ class GifGeneratorPage(Frame):
         bottom_frame.pack(fill=X, side=BOTTOM)
 
         images_list_frame = Frame(master=top_frame, bg=self.current_color_theme[4], pady=20, padx=20)
-        images_list_frame.pack(side=LEFT, padx=20)
+        images_list_frame.pack(side=LEFT, padx=10)
+        self.images_paths_frame = images_list_frame
 
         self.update_image_list_box(master=images_list_frame, page=self)
 
@@ -152,7 +178,7 @@ class GifGeneratorPage(Frame):
         find_button = self.app.AppButton('Find', frame=bottom_frame,
                                          command=self.find_image, side=RIGHT)
         clear_button = self.app.AppButton('Clear', frame=bottom_frame,
-                                          command=self.clear_gif_frames, side=RIGHT)
+                                          command=lambda: self.clear_gif_frames(images_list_frame), side=RIGHT)
         fps_frame = Frame(master=bottom_frame, bg=self.current_color_theme[4])
         fps_frame.pack(side=RIGHT, padx=10)
 
