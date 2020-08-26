@@ -7,19 +7,6 @@ from chromedrivers import DriverHandler, log_into_mantis
 from information_compile import generate_description, get_image, extract_asset_name, clean_debug_info
 
 
-# def ask_for_missing_image(line_to_process):
-#     while True:
-#         answer = input('> ')
-#         if answer.upper() == 'Y':
-#             image_to_return = get_image(line_to_process)
-#         elif answer.upper() == 'N':
-#             return ""
-#         else:
-#             continue
-#         if image_to_return:
-#             return image_to_return
-
-
 def upload_to_mantis(version, category, log_lines, project, username, password,
                      browser, path_to_asset=None, debug_info=None, web_driver=None, priority=None,
                      severity=None, late_image=None, prefix=None, rename_images=False, new_img_name=None):

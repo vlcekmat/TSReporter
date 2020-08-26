@@ -17,34 +17,47 @@ def rewrite_textbox(message, textbox):
 
 
 class GifMaker:
-    frames = []
-    gif_name = ""
-    save_gifs_here = ""
+    # This class handles the frames of the gif and the gif generation
+    frames = []  # list of tuples of frames that will be in the gif
+    # frames[0] are PIL Images from Image.open()
+    # frames[1] is a bool if the image was a png and therefore a .jpg was generated and needs to be deleted
+    gif_name = ""  # this is the name that the gif will be saved under, same as first frame but .gif
+    save_gifs_here = ""  # folder where the gif will be saved, should be "edited images location" from cfg
 
     def set_save_location(self, location):
         self.save_gifs_here = location
 
-    def add_frame(self, image_location):
+    def add_frame(self, image_location, was_png):
         if len(self.frames) == 0:
             self.gif_name = self.save_gifs_here + '/' + image_location.split('/')[-1][0:-4] + ".gif"
         new_frame = Image.open(image_location)
         new_frame.thumbnail((1200, 700))
-        self.frames.append(new_frame)
+        self.frames.append((new_frame, was_png))
 
     def remove_frame(self, index):
-        self.frames.pop(index)
+        remove_me = self.frames.pop(index)
+        remove_me[0].close()
+        if remove_me[1]:
+            os.remove(remove_me[0].filename)
         if index == 0:
             if len(self.frames) == 0:
                 self.gif_name = ""
-            else:
+            else:  # Set the gif name to be the new gif head
                 self.gif_name = self.save_gifs_here + '/' + self.frames[0].split('/')[-1][0:-4] + ".gif"
 
     def clear_frames(self):
-        self.frames.clear()
+        while len(self.frames) > 0:
+            remove_me = self.frames.pop()
+            remove_me[0].close()
+            if remove_me[1]:
+                os.remove(remove_me[0].filename)
+
         self.gif_name = ""
 
     def save_gif(self, fps):
-        imageio.mimwrite(self.gif_name, self.frames, fps=fps)
+        if self.gif_name != "" and len(self.frames) > 0:
+            imageio.mimwrite(self.gif_name, [fr[0] for fr in self.frames], fps=fps)
+            # The [...] takes makes list of 0th tuple member from self.frames (the images themselves)
 
 
 class GifGeneratorPage(Frame):
@@ -63,12 +76,12 @@ class GifGeneratorPage(Frame):
         self.init_widgets()
 
     def go_to_main_menu(self):
+        self.gif_maker.clear_frames()
         self.pack_forget()
         self.app.main_menu = self.app.MainMenu()
         self.app.gif_page = None
 
     def find_image(self):
-
         img_tuple = filedialog.askopenfilenames(
             filetypes=[
                 ("image", ".png"),
@@ -83,11 +96,13 @@ class GifGeneratorPage(Frame):
             for img in img_list:
                 old_img_name = img
                 new_img_name = old_img_name
+                was_png = False
                 if old_img_name[-4:] == ".png":
+                    was_png = True
                     new_img_name = old_img_name[:-4] + ".jpg"
                     with Image.open(old_img_name) as convert_me:
                         convert_me.save(new_img_name, optimize=True, quality=85)
-                self.gif_maker.add_frame(new_img_name)
+                self.gif_maker.add_frame(new_img_name, was_png)
 
     def clear_gif_frames(self):
         self.gif_maker.clear_frames()
