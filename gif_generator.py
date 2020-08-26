@@ -107,8 +107,9 @@ class GifGeneratorPage(Frame):
         self.gif_maker.clear_frames()
         images_frame['bg'] = self.app.current_color_theme[3]
         for list in self.widgets_to_update:
-            for index in range(3):
+            for index in range(2):
                 list[index].destroy()
+        self.widgets_to_update = []
 
     def convert_to_gif(self):
         self.gif_maker.save_gif(self.duration)
@@ -125,30 +126,44 @@ class GifGeneratorPage(Frame):
 
     widgets_to_update = []
 
+    def destroy_widgets(self):
+        for w_tuple in self.widgets_to_update:
+            for item in w_tuple:
+                item.destroy()
+        self.widgets_to_update = []
+
     def update_image_list_box(self, master, page):
-        index = 1
+        self.destroy_widgets()
+        index = 0
         for img_path in [f[0].filename for f in self.gif_maker.frames]:
             delete_image_button = Button(master=master, bg=page.current_color_theme[3], fg=page.current_color_theme[2],
                                          text="Delete", activebackground=page.current_color_theme[3],
                                          padx=5, pady=2, activeforeground=page.current_color_theme[2])
-            img_label = Label(master=master, bg=page.current_color_theme[4], fg=page.current_color_theme[2],
-                   text=f'Image {index}: ', font=Font(size=10))
             img_path_text = Text(master=master, bg=page.current_color_theme[4], fg=page.current_color_theme[2],
                             font=Font(size=10), width=40, height=1, borderwidth=0)
-            self.widgets_to_update.append([img_label, img_path_text, delete_image_button])
+            self.widgets_to_update.append((img_path_text, delete_image_button))
             delete_image_button.grid(row=index, column=0)
-            img_label.grid(row=index, column=1)
             img_path_text.grid(row=index, column=2)
             img_path_text.insert(END, img_path.split('/')[-1])
             img_path_text['state'] = DISABLED
             master['bg'] = self.app.current_color_theme[4]
 
             index += 1
-
-        index = 0
-        for button in [widget_list[2] for widget_list in self.widgets_to_update]:
-            button['command'] = self.gif_maker.remove_frame(index)
-            index += 1
+        # buttons = [widget_list[1] for widget_list in self.widgets_to_update]
+        # for button in buttons:
+        #     button['command'] = lambda index=buttons.index(button), b=button: [
+        #         self.gif_maker.remove_frame(index),
+        #         self.destroy_widget_tuple(b),
+        #         self.update_image_list_box(master, page)
+        #     ]
+        # buttons = [widget_list[1] for widget_list in self.widgets_to_update]
+        for widget_tuple in self.widgets_to_update:
+            widget_tuple[1]['command'] = lambda i=self.widgets_to_update.index(widget_tuple): [
+                self.gif_maker.remove_frame(i),
+                self.update_image_list_box(master, page)
+            ]
+        if len(self.widgets_to_update) == 0:
+            self.clear_gif_frames(master)
 
     images_paths_frame = None
 
@@ -168,8 +183,6 @@ class GifGeneratorPage(Frame):
         images_list_frame = Frame(master=top_frame, bg=self.current_color_theme[4], pady=20, padx=20)
         images_list_frame.pack(side=LEFT, padx=10)
         self.images_paths_frame = images_list_frame
-
-        self.update_image_list_box(master=images_list_frame, page=self)
 
         back_button = self.app.AppButton('Main Menu', frame=bottom_frame,
                                          command=self.go_to_main_menu, side=LEFT)
