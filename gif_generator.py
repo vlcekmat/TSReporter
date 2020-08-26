@@ -118,22 +118,32 @@ class GifGeneratorPage(Frame):
         if dv != '':
             self.duration = 1000/int(dv)
 
+    def update_image_list_box(self, master, page):
+        images_list_frame = None
+        page = None
+        for img_path in [f[0].filename for f in self.gif_maker.frames]:
+            print(img_path)
+            # Label(master=images_list_frame, bg=self.current_color_theme[4], fg=self.current_color_theme[2],
+            #       text=f'Image {index}: ', font=Font(size=10)).grid(row=index, column=0)
+
+
     def init_widgets(self):
         background = Frame(master=self, bg=self.current_color_theme[4])
         background.pack(fill=BOTH, expand=True)
 
-        top_frame = Frame(master=background, bg=self.current_color_theme[3])
-        top_frame.pack(fill=BOTH, expand=True, pady=20, padx=20)
+        middle_frame = Frame(master=background, bg=self.current_color_theme[3])
+        middle_frame.pack(fill=BOTH, expand=True, pady=20, padx=20)
+
+        top_frame = Frame(master=middle_frame, bg=self.current_color_theme[3])
+        top_frame.pack(fill=BOTH, expand=False, pady=20, padx=20, side=TOP)
 
         bottom_frame = Frame(master=background, bg=self.current_color_theme[4])
         bottom_frame.pack(fill=X, side=BOTTOM)
 
-        images_list_frame = Frame(master=top_frame, bg=self.current_color_theme[3])
-        # images_list_frame.pack(side=LEFT, padx=20)
+        images_list_frame = Frame(master=top_frame, bg=self.current_color_theme[4], pady=20, padx=20)
+        images_list_frame.pack(side=LEFT, padx=20)
 
-        for i in range(10):
-            Label(master=images_list_frame, bg=self.current_color_theme[3], fg=self.current_color_theme[2],
-                  text=f'Image {i+1}: ', font=Font(size=10)).grid(row=i, column=0)
+        self.update_image_list_box(master=images_list_frame, page=self)
 
         back_button = self.app.AppButton('Main Menu', frame=bottom_frame,
                                          command=self.go_to_main_menu, side=LEFT)
