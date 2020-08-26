@@ -5,8 +5,6 @@ import imageio
 from tkinter import filedialog
 import os
 
-from numpy import iterable
-
 
 def rewrite_textbox(message, textbox):
     # use this to clear a textbox and display a message
