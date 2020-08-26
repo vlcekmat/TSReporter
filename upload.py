@@ -134,17 +134,15 @@ def upload_to_mantis(version, category, log_lines, project, username, password,
 
             rename_me = Path(rename_me)
 
-            if old_extension != '.gif':
-                try:
-                    rename_me = rename_me.rename(Path(directory, new_name))
-                except FileExistsError:
-                    summary += f' ({dupl_index})'
-                    new_name = summary + old_extension
-                    dupl_index += 1
-                    rename_me = rename_me.rename(Path(directory, new_name))
-
-                images.insert(0, rename_me)
-                image_index += 1
+            try:
+                rename_me = rename_me.rename(Path(directory, new_name))
+            except FileExistsError:
+                summary += f' ({dupl_index})'
+                new_name = summary + old_extension
+                dupl_index += 1
+                rename_me = rename_me.rename(Path(directory, new_name))
+            images.insert(0, rename_me)
+            image_index += 1
 
         images.reverse()
 

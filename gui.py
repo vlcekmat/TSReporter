@@ -1152,6 +1152,7 @@ class Application(Frame):
                     image_to_show = ImageTk.PhotoImage(current_bug[i].get_small_image())
                 thumbnails[i].configure(image=image_to_show)
                 thumbnails[i].image = image_to_show
+                current_bug[i].get_image().close()
             if current_bug[0].image_location:
                 if find_img_button:
                     find_img_button.get_element().pack_forget()
