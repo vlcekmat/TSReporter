@@ -1,5 +1,3 @@
-import os
-
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException, NoSuchElementException
 
@@ -41,7 +39,7 @@ class DriverHandler:
 
 
 def check_for_duplicates(username, password, bug_description=None,
-                         asset_path=None, driver_handler=None, ask_input=False):
+                         asset_path=None, driver_handler=None):
     # opens mantis so the user can check for duplicates
 
     if not driver_handler.is_active():
@@ -61,17 +59,6 @@ def check_for_duplicates(username, password, bug_description=None,
     driver.find_element_by_id('filter-search-txt').send_keys(final_filter)  # filter box
     driver.find_element_by_xpath("//input[@value='Apply Filter']").click()  # apply filter button
 
-    if ask_input:
-        while True:
-            answer = input('> ')
-            if answer.upper() == 'N':
-                return 0
-            elif answer.upper() == 'Y':
-                return 1
-            elif answer.upper() == 'Q':
-                return -1
-            else:
-                pass
 
 
 def gui_login(username, password):

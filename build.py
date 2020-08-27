@@ -9,7 +9,7 @@ PyInstaller.__main__.run([
     '--name=TSReporter',
     '--onefile',
     '--icon=resources/icon.ico',
-    '--noconsole',
+    '--windowed',
     "gui.py"
 ])
 

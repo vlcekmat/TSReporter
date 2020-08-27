@@ -164,15 +164,19 @@ class GifGeneratorPage(Frame):
 
     def callback(self, dur_var):
         dv = dur_var.get()
-        self.duration = 1
-        self.preview_thread.duration = 1
-        try:
-            int(dv)
-        except ValueError:
-            return
-        if dv != '' and int(dv) > 0:
-            self.duration = 1000/int(dv)
-            self.preview_thread.duration = int(dv)/1000
+        if dv != '':
+            try:
+                int(dv)
+            except ValueError:
+                dur_var.set('1000')
+                dv = '1000'
+        if dv == '' or int(dv) == 0:
+            dv = '1000'
+        if int(dv) > 5000:
+            dv = 5000
+            dur_var.set('5000')
+        self.duration = 1000/int(dv)
+        self.preview_thread.duration = int(dv)/1000
 
     def destroy_widgets(self):
         for w_tuple in self.widgets_to_update:
