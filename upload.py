@@ -34,8 +34,12 @@ def upload_to_mantis(version, category, log_lines, project, username, password,
         bug_descriptions.append(generate_description(line_to_process))
 
         image_to_append = get_image(line_to_process)
-        if image_to_append and Path(image_to_append) != Path(late_image):
-            images.append(image_to_append)
+        if image_to_append:
+            if late_image:
+                if Path(image_to_append) == Path(late_image):
+                    continue
+            else:
+                images.append(image_to_append)
     # endregion
 
     driver = web_driver.get_driver()
