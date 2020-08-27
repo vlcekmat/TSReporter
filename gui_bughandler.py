@@ -69,4 +69,8 @@ class BugHandler:
         return True
 
     def set_image(self, line, path):
-        self.image_locations[line] = path
+        for image in self.image_locations:
+            if image == path:
+                return
+            else:
+                self.image_locations[line] = path

@@ -6,7 +6,6 @@ from sector_seek import find_assign_to
 from chromedrivers import DriverHandler, log_into_mantis
 from information_compile import generate_description, get_image, extract_asset_name, clean_debug_info
 
-
 def upload_to_mantis(version, category, log_lines, project, username, password,
                      browser, path_to_asset=None, debug_info=None, web_driver=None, priority=None,
                      severity=None, late_image=None, prefix=None, rename_images=False, new_img_name=None):
@@ -35,7 +34,7 @@ def upload_to_mantis(version, category, log_lines, project, username, password,
         bug_descriptions.append(generate_description(line_to_process))
 
         image_to_append = get_image(line_to_process)
-        if image_to_append:
+        if image_to_append and Path(image_to_append) != Path(late_image):
             images.append(image_to_append)
     # endregion
 
@@ -128,5 +127,8 @@ def upload_to_mantis(version, category, log_lines, project, username, password,
         images.reverse()
 
     for upload_me in images:
-        driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))  # upload an image
+        if late_image == upload_me:
+            continue
+        else:
+            driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))  # upload an image
     # endregion
