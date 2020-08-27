@@ -9,7 +9,8 @@ PyInstaller.__main__.run([
     '--name=TSReporter',
     '--onefile',
     '--icon=resources/icon.ico',
-    "gui.py",
+    '--noconsole',
+    "gui.py"
 ])
 
 shutil.copyfile('chromedriver.exe', 'dist/chromedriver.exe')

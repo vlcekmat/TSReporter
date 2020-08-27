@@ -110,7 +110,7 @@ def get_theme(theme):
         return theme_dict["ph_theme"]
 
 
-version = "0.3.8"
+version = "0.3.9"
 
 
 class Application(Frame):
@@ -220,12 +220,10 @@ class Application(Frame):
 
         def go_to_projects(self, use_mode):
             app.password = get_password()
-            password = app.password
             if app.password is None or app.password == '':
                 self.pack_forget()
                 app.login = Application.Login(use_mode, fail=False)
                 app.main_menu = None
-                placeholder = -1
             else:
                 self.pack_forget()
                 app.projects_page = Application.SelectProject(use_mode)
@@ -267,7 +265,7 @@ class Application(Frame):
                 color_theme = get_theme(theme=self.theme_name)
 
                 for i in range(4):
-                    label = Label(button, bg=color_theme[i+1], width=3, state=DISABLED)
+                    label = Label(button, bg=color_theme[i + 1], width=3, state=DISABLED)
                     label.bind('<Button-1>', self._on_click)
                     label.grid(column=i, row=0)
 
@@ -461,12 +459,10 @@ class Application(Frame):
                 app.login.logging_in_process = False
                 app.login.pack_forget()
                 if successfully_logged_in:
-                    # app.login = Application.Login(app.login.current_mode, fail=False)
                     app.login.go_to_projects()
                 else:
                     app.login = Application.Login(app.login.current_mode, fail=True)
                     app.login.open_page()
-                # app.login.open_page()
 
         class LoginAnimation(Thread):
             master = None
@@ -1628,14 +1624,14 @@ class Application(Frame):
                 offx=40, offy=30, text_spacing=25, color1=Application.current_color_theme[2]
             )
 
-    class Batch(Page):
+    class Batch(Page):  # This might not get used
         def __init__(self, project):
             super().__init__()
             self.pack(fill=BOTH, expand=True)
             self.init_widgets()
 
         def init_widgets(self):
-            # Placeholder screen to make app clickier
+            # Placeholder screen for batch reporting
             background_frame = Frame(master=self, bg=Application.current_color_theme[4])
             background_frame.pack(fill=BOTH, expand=True)
 
@@ -1662,9 +1658,6 @@ def rewrite_textbox(message, textbox):
 # region Program init
 # Creates the basic "box" in which you can put all of the GUI elements
 # It also takes care of misc stuff, s.a. fixed window size, title on the app window and the icon
-if os.path.isfile("TSReporter.exe"):  # this hides the console when launched from a .exe
-    hide = win32gui.GetForegroundWindow()  # If this code is run in PyCharm, it closes it lol
-    win32gui.ShowWindow(hide, win32con.SW_HIDE)
 
 root = Tk()
 root.geometry('960x540')
