@@ -84,9 +84,11 @@ class GifGeneratorPage(Frame):
         frames_to_show = []
         label = None
         stop = False
+        app = None
 
-        def __init__(self, label):
+        def __init__(self, label, app):
             super().__init__()
+            self.app = app
             self.label = label
 
         def add_frame(self, frame_path):
@@ -104,7 +106,7 @@ class GifGeneratorPage(Frame):
 
         def run(self):
             try:
-                while True:
+                while self.app.gif_page is not None:
                     if len(self.frames_to_show) == 0:
                         self.label.configure(image='')
                         sleep(0.5)
@@ -228,7 +230,7 @@ class GifGeneratorPage(Frame):
 
         preview_label = Label(master=preview_frame, padx=0, pady=0, bg=self.current_color_theme[3])
         preview_label.pack()
-        self.preview_thread = self.GifPreviewThread(preview_label)
+        self.preview_thread = self.GifPreviewThread(preview_label, self.app)
         self.preview_thread.start()
 
         self.update_image_list_box(master=images_list_frame, page=self)
