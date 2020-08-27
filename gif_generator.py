@@ -103,17 +103,20 @@ class GifGeneratorPage(Frame):
             self.frames_to_show.clear()
 
         def run(self):
-            while True:
-                if len(self.frames_to_show) == 0:
-                    self.label.configure(image='')
-                    sleep(0.5)
-                    continue
-                for frame in self.frames_to_show:
-                    self.label.configure(image=frame)
-                    self.label.image = frame
-                    sleep(self.duration)
-                if self.stop:
-                    break
+            try:
+                while True:
+                    if len(self.frames_to_show) == 0:
+                        self.label.configure(image='')
+                        sleep(0.5)
+                        continue
+                    for frame in self.frames_to_show:
+                        self.label.configure(image=frame)
+                        self.label.image = frame
+                        sleep(self.duration)
+                    if self.stop:
+                        break
+            except RuntimeError:
+                pass
 
     def go_to_main_menu(self):
         self.preview_thread.stop = True
