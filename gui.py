@@ -55,10 +55,10 @@ def get_theme(theme):
 
         "candle": {
             # Change the values below to change the overall color theme of the app
-            1: '#F2C4B3',  # Regular Buttons
-            2: '#F2ECEB',  # Quit Button, text
-            3: '#A6212C',  # Integrated Frames
-            4: '#8C0303'  # Background
+            1: '#6EAFB5',  # Regular Buttons
+            2: '#FD9F75',  # Quit Button, text
+            3: '#185572',  # Integrated Frames
+            4: '#05395E'  # Background
         },
 
         "navy": {
