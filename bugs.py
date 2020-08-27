@@ -72,20 +72,22 @@ def read_bug_lines(bug_lines):
     return all_bugs
 
 
-def count_bugs():
-    ets_bugs_count = 0
-    ats_bugs_count = 0
+def count_bugs(game):
     cfg_handler = config.ConfigHandler()
     documents_location = config.read_config('documents location')
-    ats_bugs_path = f"{documents_location}/American Truck Simulator/bugs.txt"
-    ets_bugs_path = f"{documents_location}/Euro Truck Simulator 2/bugs.txt"
-    ats_bugs = open(ats_bugs_path, encoding='UTF-8')
-    ets_bugs = open(ets_bugs_path, encoding='UTF-8')
-
-    for line in ats_bugs:
-        if ';' in line and line[0] not in ['!', ';', '.']:
-            ats_bugs_count += 1
-    for line in ets_bugs:
-        if ';' in line and line[0] not in ['!', ';', '.']:
-            ets_bugs_count += 1
-    return [ats_bugs_count, ets_bugs_count]
+    if game == "ets":
+        ets_bugs_count = 0
+        ets_bugs_path = f"{documents_location}/Euro Truck Simulator 2/bugs.txt"
+        ets_bugs = open(ets_bugs_path, encoding='UTF-8')
+        for line in ets_bugs:
+            if ';' in line and line[0] not in ['!', ';', '.']:
+                ets_bugs_count += 1
+        return ets_bugs_count
+    elif game == "ats":
+        ats_bugs_count = 0
+        ats_bugs_path = f"{documents_location}/American Truck Simulator/bugs.txt"
+        ats_bugs = open(ats_bugs_path, encoding='UTF-8')
+        for line in ats_bugs:
+            if ';' in line and line[0] not in ['!', ';', '.']:
+                ats_bugs_count += 1
+        return ats_bugs_count

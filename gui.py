@@ -320,13 +320,13 @@ class Application(Frame):
 
             try:
                 # Handles the variables needed for the bug counter for ATS
-                ats_bugs_count = bugs.count_bugs()[0]
+                ats_bugs_count = bugs.count_bugs("ats")
             except FileNotFoundError:
                 ats_bugs_count = 'N/A'
 
             try:
                 # Same but for ETS
-                ets_bugs_count = bugs.count_bugs()[1]
+                ets_bugs_count = bugs.count_bugs("ets")
             except FileNotFoundError:
                 ets_bugs_count = 'N/A'
 
