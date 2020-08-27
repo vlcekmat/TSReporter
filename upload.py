@@ -35,12 +35,6 @@ def upload_to_mantis(version, category, log_lines, project, username, password,
         bug_descriptions.append(generate_description(line_to_process))
 
         image_to_append = get_image(line_to_process)
-        # If an image is not found, gives the user the option to check for it again
-        # if not image_to_append and not priority:
-        #     pass
-        #     #image_to_append = ask_for_missing_image(line_to_process)
-        # elif not image_to_append and priority:
-        #     pass
         if image_to_append:
             images.append(image_to_append)
     # endregion
@@ -135,22 +129,4 @@ def upload_to_mantis(version, category, log_lines, project, username, password,
 
     for upload_me in images:
         driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))  # upload an image
-
-    # if rename_images and isAdmin():
-    #     for replace_me in images:
-    #         replace_me.replace(config.read_config('renamed images location'))
-
     # endregion
-
-    # if priority:  # if in batch reporter mode
-    #     sleep(1)
-    #     driver.find_element_by_xpath("//input[@value='Submit Issue']").click()
-    #     print(f'Reported bug "{summary.split("] - ")[1]}"')
-    #     sleep(1)
-    # else:
-    #     # This waits for the user to close the browser window after submitting the bug
-    #     while True:
-    #         try:
-    #             current_url = driver.current_url
-    #         except WebDriverException:
-    #             break

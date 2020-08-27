@@ -31,47 +31,47 @@ def get_theme(theme):
     theme_dict = {
         "ph": {
             # Change the values below to change the overall color theme of the app
-            1: 'white',  # Regular Buttons, bugs counter text
+            1: 'white',  # Regular Buttons
             2: '#ffa500',  # Quit Button, text
             3: '#484848',  # Integrated Frames
             4: '#2B2B2B'  # Background
         },
 
-        "brownie": {
+        "campfire": {
             # Change the values below to change the overall color theme of the app
-            1: 'white',  # Regular Buttons, bugs counter text
-            2: '#BFADA8',  # Quit Button, text
-            3: '#734A3C',  # Integrated Frames
-            4: '#401F18'  # Background
+            1: '#03A678',  # Regular Buttons
+            2: '#F28C0F',  # Quit Button, text
+            3: '#02735E',  # Integrated Frames
+            4: '#014040'  # Background
         },
 
         "hazard_theme": {
             # Change the values below to change the overall color theme of the app
-            1: '#BD554A',  # Regular Buttons, bugs counter text
+            1: '#BD554A',  # Regular Buttons
             2: '#CF423C',  # Quit Button, text
             3: '#570B2A',  # Integrated Frames
             4: '#33081E'  # Background
         },
 
-        "pastel": {
+        "candle": {
             # Change the values below to change the overall color theme of the app
-            1: '#94D9D0',  # Regular Buttons, bugs counter text
-            2: '#EBCFD2',  # Quit Button, text
-            3: '#A382E8',  # Integrated Frames
-            4: '#7C82DC'  # Background
+            1: '#F2C4B3',  # Regular Buttons
+            2: '#F2ECEB',  # Quit Button, text
+            3: '#A6212C',  # Integrated Frames
+            4: '#8C0303'  # Background
         },
 
-        "forest": {
+        "navy": {
             # Change the values below to change the overall color theme of the app
-            1: '#94B539',  # Regular Buttons, bugs counter text
-            2: '#99BF0F',  # Quit Button, text
-            3: '#467302',  # Integrated Frames
-            4: '#214001'  # Background
+            1: '#387097',  # Regular Buttons
+            2: 'white',  # Quit Button, text
+            3: '#1F384C',  # Integrated Frames
+            4: '#1B2838'  # Background
         },
 
         "purple_rain": {
             # Change the values below to change the overall color theme of the app
-            1: '#ECE8E1',  # Regular Buttons, bugs counter text
+            1: '#ECE8E1',  # Regular Buttons
             2: '#FF4655',  # Quit Button, text
             3: '#8C3243',  # Integrated Frames
             4: '#271D26'  # Background
@@ -79,7 +79,7 @@ def get_theme(theme):
 
         "storm": {
             # Change the values below to change the overall color theme of the app
-            1: '#908CAC',  # Regular Buttons, bugs counter text
+            1: '#908CAC',  # Regular Buttons
             2: '#C3BBD2',  # Quit Button, text
             3: '#3F384F',  # Integrated Frames
             4: '#1A1E26'  # Background
@@ -87,7 +87,7 @@ def get_theme(theme):
 
         "grayscale": {
             # Change the values below to change the overall color theme of the app
-            1: '#838383',  # Regular Buttons, bugs counter text
+            1: '#838383',  # Regular Buttons
             2: '#D9D9D9',  # Quit Button, text
             3: '#404040',  # Integrated Frames
             4: '#262626'  # Background
@@ -96,7 +96,7 @@ def get_theme(theme):
 
         "custom": {
             # Change the values below to change the overall color theme of the app
-            1: 'white',  # Regular Buttons, bugs counter text
+            1: 'white',  # Regular Buttons
             2: 'white',  # Quit Button, text
             3: 'white',  # Integrated Frames
             4: 'white' # Background
@@ -398,12 +398,12 @@ class Application(Frame):
 
             ATS_bugs_count = Label(bugs_count_frame, text=f'ATS: {ats_bugs_count}',
                                    bg=Application.current_color_theme[3],
-                                   fg=Application.current_color_theme[1], font=subtitle_font)
+                                   fg=Application.current_color_theme[2], font=subtitle_font)
             ATS_bugs_count.pack()
 
             ETS2_bugs_count = Label(bugs_count_frame, text=f'ETS 2: {ets_bugs_count}',
                                     bg=Application.current_color_theme[3],
-                                    fg=Application.current_color_theme[1], font=subtitle_font)
+                                    fg=Application.current_color_theme[2], font=subtitle_font)
             ETS2_bugs_count.pack()
 
             # endregion
