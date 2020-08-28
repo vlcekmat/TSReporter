@@ -315,6 +315,19 @@ class Application(Frame):
             }
             # TODO: CREATE CONFIG FOR THIS
 
+        def refresh_counter(self, ats_text, ets_text):
+            ats_new_count = str(bugs.count_bugs('ats'))
+            ets_new_count = str(bugs.count_bugs('ets'))
+
+            ats_text['state'] = NORMAL
+            ets_text['state'] = NORMAL
+
+            rewrite_textbox(f"ATS: {ats_new_count}", ats_text)
+            rewrite_textbox(f"ETS 2: {ets_new_count}", ets_text)
+
+            ats_text['state'] = DISABLED
+            ets_text['state'] = DISABLED
+
         def set_up_menu(self):
             # Think of this as HTML, but much more messy and frustrating
 
@@ -396,16 +409,26 @@ class Application(Frame):
 
             reports_count_text.pack()
 
-            ATS_bugs_count = Label(bugs_count_frame, text=f'ATS: {ats_bugs_count}',
+            ATS_bugs_count = Text(bugs_count_frame, width=10, height=1, borderwidth=0,
                                    bg=Application.current_color_theme[3],
                                    fg=Application.current_color_theme[2], font=subtitle_font)
+            ATS_bugs_count.insert(END, f'ATS: {ats_bugs_count}')
+            ATS_bugs_count['state'] = DISABLED
             ATS_bugs_count.pack()
 
-            ETS2_bugs_count = Label(bugs_count_frame, text=f'ETS 2: {ets_bugs_count}',
+            ETS2_bugs_count = Text(bugs_count_frame, width=10, height=1, borderwidth=0,
                                     bg=Application.current_color_theme[3],
                                     fg=Application.current_color_theme[2], font=subtitle_font)
+            ETS2_bugs_count.insert(END, f'ETS 2: {ets_bugs_count}')
+            ETS2_bugs_count['state'] = DISABLED
             ETS2_bugs_count.pack()
 
+            refresh_button = Application.AppButton(frame=top_frame, text="Refresh", font_size=10,
+                                                   pady=2, offy=1, text_spacing=1,
+                                                   command=lambda: self.refresh_counter(
+                                                       ats_text=ATS_bugs_count,
+                                                       ets_text=ETS2_bugs_count)
+                                                   )
             # endregion
 
             bottom_frame = Frame(background_frame, bg=Application.current_color_theme[4])
