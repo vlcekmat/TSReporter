@@ -1032,30 +1032,35 @@ class Application(Frame):
 
         def find_missing_image(self, image_label, bug_entry, try_again_button, find_img_button=None,
                                image_location_text=None):
-            new_image_path = utils.find_image_path()
-            self.bug_handler.set_image(bug_entry.line, new_image_path)
-            bug_entry.reload_image(self.bug_handler)
+            try:
 
-            if image_location_text:
-                image_location_text.insert(END, new_image_path)
-                image_location_text.configure(state=DISABLED)
-                image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
-            if find_img_button:
-                find_img_button.get_element().pack_forget()
-                find_img_button.get_element().destroy()
-                image_retrieved = bug_entry.get_image()
-            else:
-                image_retrieved = bug_entry.get_small_image()
-            image_retrieved.thumbnail(Application.Reporting.img_size)
-            image_to_show = ImageTk.PhotoImage(image_retrieved)
-            image_label.configure(image=image_to_show)
-            image_label.image = image_to_show
-            if try_again_button and self.bug_handler.images_good():
-                try_again_button.get_element().pack_forget()
-                try_again_button.get_element().destroy()
-                self.duplicates_button.get_element()['font'] = Font(size=15)
+                new_image_path = utils.find_image_path()
+                self.bug_handler.set_image(bug_entry.line, new_image_path)
+                bug_entry.reload_image(self.bug_handler)
 
-            self.late_image = new_image_path
+                if image_location_text:
+                    image_location_text.insert(END, new_image_path)
+                    image_location_text.configure(state=DISABLED)
+                    image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
+                if find_img_button:
+                    find_img_button.get_element().pack_forget()
+                    find_img_button.get_element().destroy()
+                    image_retrieved = bug_entry.get_image()
+                else:
+                    image_retrieved = bug_entry.get_small_image()
+                image_retrieved.thumbnail(Application.Reporting.img_size)
+                image_to_show = ImageTk.PhotoImage(image_retrieved)
+                image_label.configure(image=image_to_show)
+                image_label.image = image_to_show
+                if try_again_button and self.bug_handler.images_good():
+                    try_again_button.get_element().pack_forget()
+                    try_again_button.get_element().destroy()
+                    self.duplicates_button.get_element()['font'] = Font(size=15)
+
+                self.late_image = new_image_path
+
+            except (TclError, ValueError):
+                pass
 
         class DuplicatesThread(Thread):
             bug_line = None
