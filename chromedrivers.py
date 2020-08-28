@@ -60,7 +60,6 @@ def check_for_duplicates(username, password, bug_description=None,
     driver.find_element_by_xpath("//input[@value='Apply Filter']").click()  # apply filter button
 
 
-
 def gui_login(username, password):
     driver_handler = DriverHandler(config.read_config("preferred browser"), headless=True)
     log_into_mantis(driver_handler.get_driver(), username, password)

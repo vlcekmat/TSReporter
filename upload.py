@@ -6,6 +6,7 @@ from sector_seek import find_assign_to
 from chromedrivers import DriverHandler, log_into_mantis
 from information_compile import generate_description, get_image, extract_asset_name, clean_debug_info
 
+
 def upload_to_mantis(version, category, log_lines, project, username, password,
                      browser, path_to_asset=None, debug_info=None, web_driver=None, priority=None,
                      severity=None, late_image=None, prefix=None, rename_images=False, new_img_name=None):
@@ -57,12 +58,12 @@ def upload_to_mantis(version, category, log_lines, project, username, password,
 
     for p in range(len(bug_descriptions)):
         description_box.send_keys(bug_descriptions[p])
-    if category == 'a':
+    if 'a' in category:
         description_box.send_keys('\n' + asset_info)
 
     first_bug_name = bug_descriptions[0].split(';')[0]
     summary = version
-    if prefix and category != 'a':
+    if prefix and 'a' not in category:
         summary += f' - {prefix}'
     if 'a' in category and path_to_asset:
         asset_name = extract_asset_name(path_to_asset)
@@ -87,7 +88,7 @@ def upload_to_mantis(version, category, log_lines, project, username, password,
 
     if category == 'm':
         driver.find_element_by_xpath(f"//option[text()='map']").click()
-    elif category == 'a':
+    elif 'a' in category:
         driver.find_element_by_xpath(f"//option[text()='assets']").click()
 
     driver.find_element_by_xpath(f"//select[@name='priority']/option[text()='{priority}']").click()

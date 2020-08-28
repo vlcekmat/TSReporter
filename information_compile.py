@@ -39,10 +39,10 @@ def determine_bug_category(log):
         return ""
     category = split_log[0].split('_', maxsplit=1)[0]
 
-    if category in ["m", "a"]:
+    if category in ["m", "a", "aa", "ar", "av", "ac"]:
         return category
-    elif category in ["aa", "ar", "av", "ac"]:
-        return category[0]
+    # elif category in ["aa", "ar", "av", "ac"]:
+    #     return category[0]
     else:
         return ""
 

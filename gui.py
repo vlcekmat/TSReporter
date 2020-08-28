@@ -110,7 +110,7 @@ def get_theme(theme):
         return theme_dict["ph_theme"]
 
 
-version = "0.3.9"
+version = "0.4.0"
 
 
 class Application(Frame):
@@ -1268,7 +1268,7 @@ class Application(Frame):
         def make_options_sidebar(self, frame, current_bug_summary):
             # The report options sidebar is created here.
 
-            if self.category == 'a':
+            if 'a' in self.category:
                 self.show_text_input_asset_path(frame)
 
             priority_choices = ['Low', 'Normal', 'High', 'Urgent', 'Immediate']
