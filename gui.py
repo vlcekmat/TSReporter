@@ -1168,26 +1168,29 @@ class Application(Frame):
                                     try_again_button, canvas):
             # This method takes all Labels in thumbnails[] and tries to update them to the BugEntry's image
             # It also checks if all images are selected and if so, cleans up the buttons
-            self.look_for_images_again(current_bug)
-            for i in range(len(current_bug)):
-                if i == 0:
-                    image_to_show = ImageTk.PhotoImage(current_bug[i].get_image())
-                else:
-                    image_to_show = ImageTk.PhotoImage(current_bug[i].get_small_image())
-                thumbnails[i].configure(image=image_to_show)
-                thumbnails[i].image = image_to_show
-                current_bug[i].get_image().close()
-            if current_bug[0].image_location:
-                if find_img_button:
-                    find_img_button.get_element().pack_forget()
-                    find_img_button.get_element().destroy()
-                image_location_text.insert(END, current_bug[0].image_location)
-                image_location_text.configure(state=DISABLED)
-                image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
-            if self.bug_handler.images_good() and try_again_button:
-                try_again_button.get_element().pack_forget()
-                try_again_button.get_element().destroy()
-            canvas.config(scrollregion=canvas.bbox("all"))
+            try:
+                self.look_for_images_again(current_bug)
+                for i in range(len(current_bug)):
+                    if i == 0:
+                        image_to_show = ImageTk.PhotoImage(current_bug[i].get_image())
+                    else:
+                        image_to_show = ImageTk.PhotoImage(current_bug[i].get_small_image())
+                    thumbnails[i].configure(image=image_to_show)
+                    thumbnails[i].image = image_to_show
+                    current_bug[i].get_image().close()
+                if current_bug[0].image_location:
+                    if find_img_button:
+                        find_img_button.get_element().pack_forget()
+                        find_img_button.get_element().destroy()
+                    image_location_text.insert(END, current_bug[0].image_location)
+                    image_location_text.configure(state=DISABLED)
+                    image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
+                if self.bug_handler.images_good() and try_again_button:
+                    try_again_button.get_element().pack_forget()
+                    try_again_button.get_element().destroy()
+                canvas.config(scrollregion=canvas.bbox("all"))
+            except ValueError:
+                pass
 
         class BugEntry:
             # Each line of current bug is represented by a line and an image as instances of this class

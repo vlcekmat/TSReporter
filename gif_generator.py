@@ -161,6 +161,7 @@ class GifGeneratorPage(Frame):
 
     def convert_to_gif(self):
         self.gif_maker.save_gif(self.duration)
+        self.gif_created_text.pack()
 
     def callback(self, dur_var):
         dv = dur_var.get()
@@ -210,6 +211,7 @@ class GifGeneratorPage(Frame):
         if len(self.widgets_to_update) == 0:
             self.clear_gif_frames(master)
 
+    gif_created_text = None
     def init_widgets(self):
         background = Frame(master=self, bg=self.current_color_theme[4])
         background.pack(fill=BOTH, expand=True)
@@ -219,6 +221,10 @@ class GifGeneratorPage(Frame):
 
         top_frame = Frame(master=middle_frame, bg=self.current_color_theme[3])
         top_frame.pack(fill=BOTH, expand=False, pady=0, padx=0, side=TOP)
+
+        self.gif_created_text = Label(top_frame, bg=self.current_color_theme[3], fg=self.current_color_theme[2],
+                                      text='GIF successfully created in your "Edited Images" folder!',
+                                      font=Font(size=12))
 
         bottom_frame = Frame(master=background, bg=self.current_color_theme[4])
         bottom_frame.pack(fill=X, side=BOTTOM)
