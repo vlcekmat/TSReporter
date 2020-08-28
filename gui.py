@@ -681,7 +681,7 @@ class Application(Frame):
                 buttons_frame.pack(pady=10)
 
                 reported_text = Entry(buttons_frame, bg=Application.current_color_theme[3],
-                                      fg=Application.current_color_theme[1], bd=0, font="Helvetica 14", justify=CENTER)
+                                      fg=Application.current_color_theme[2], bd=0, font="Helvetica 14", justify=CENTER)
                 reported_text.pack(anchor="n", pady=5, padx=5, side=TOP)
                 reported_text.insert(0, setting.capitalize() + "?")
 
@@ -965,7 +965,7 @@ class Application(Frame):
 
                 asset_info_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[3],
                                        bd=0, height=1,
-                                       width=10, fg=app.current_color_theme[1])
+                                       width=10, fg=app.current_color_theme[2])
                 asset_info_text.grid(row=0, column=0)
                 asset_info_text.insert(END, "Asset Path")
                 asset_info_text.configure(state=DISABLED)
@@ -982,7 +982,7 @@ class Application(Frame):
         def show_prefix_input(self, master):
             asset_info_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[3],
                                    bd=0, height=1,
-                                   width=10, fg=app.current_color_theme[1])
+                                   width=10, fg=app.current_color_theme[2])
             if self.category == 'm':
                 asset_info_text.grid(row=4, column=0)
             asset_info_text.insert(END, "Prefix")
@@ -1002,7 +1002,7 @@ class Application(Frame):
         def show_rename_images_input(self, master):
             rename_images_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[3],
                                    bd=0, height=1,
-                                   width=10, fg=app.current_color_theme[1])
+                                   width=10, fg=app.current_color_theme[2])
             rename_images_text.grid(row=6, column=0)
             rename_images_text.insert(END, "Rename img")
             rename_images_text.configure(state=DISABLED)
@@ -1279,14 +1279,14 @@ class Application(Frame):
             priority_menu.configure(activebackground=Application.current_color_theme[4])
             priority_menu.configure(highlightbackground=Application.current_color_theme[4])
             priority_text = Text(frame, font=Font(size=12), bg=Application.current_color_theme[3],
-                                 bd=0, height=1, width=10, fg=Application.current_color_theme[1])
+                                 bd=0, height=1, width=10, fg=Application.current_color_theme[2])
             priority_text.grid(row=1, column=0)
             priority_text.insert(END, "Priority")
             priority_text.configure(state=DISABLED)
 
             priority_menu.grid(row=1, column=1, sticky=W+E)
             priority_menu.config(bg=Application.current_color_theme[3])
-            priority_menu.config(fg=Application.current_color_theme[1])
+            priority_menu.config(fg=Application.current_color_theme[2])
             priority_menu.config(font="Helvetica 10")
             self.priority_var.trace("w", self.priority_callback)  # This binds the callback to the write event
 
@@ -1300,7 +1300,7 @@ class Application(Frame):
 
             severity_text = Text(frame, font=Font(size=12), bg=Application.current_color_theme[3],
                                  bd=0, height=1,
-                                 width=10, fg=app.current_color_theme[1])
+                                 width=10, fg=app.current_color_theme[2])
             severity_text.grid(row=2, column=0)
             severity_text.insert(END, "Severity")
             severity_text.configure(state=DISABLED)
@@ -1318,7 +1318,7 @@ class Application(Frame):
             checkbox_frame = Frame(master=frame, bg=Application.current_color_theme[3])
 
             checkbox_description = Text(checkbox_frame, font=Font(size=8), bg=Application.current_color_theme[3],
-                                        bd=0, height=1, width=15, fg=Application.current_color_theme[1])
+                                        bd=0, height=1, width=15, fg=Application.current_color_theme[2])
 
             checkbox_description.insert(END, "Remember prefix")
             checkbox_description.configure(state=DISABLED)
@@ -1343,7 +1343,7 @@ class Application(Frame):
 
             rename_checkbox_description = Text(rename_checkbox_frame, font=Font(size=8),
                                                bg=Application.current_color_theme[3],
-                                        bd=0, height=1, width=15, fg=Application.current_color_theme[1])
+                                        bd=0, height=1, width=15, fg=Application.current_color_theme[2])
             rename_checkbox_description.pack(side=LEFT)
             rename_checkbox_description.insert(END, "Rename?")
             rename_checkbox_description.configure(state=DISABLED)
@@ -1474,14 +1474,14 @@ class Application(Frame):
 
             current_raw_summary = f"{current_raw}"
             current_raw_text = Text(middle_frame, height=1, width=100, bg=Application.current_color_theme[3],
-                                    fg=Application.current_color_theme[1], bd=0, font="Helvetica 10")
+                                    fg=Application.current_color_theme[2], bd=0, font="Helvetica 10")
             current_raw_text.pack(side=TOP, fill=X, pady=0, padx=5)
             current_raw_text.insert(END, current_raw_summary)
             current_raw_text.configure(state=DISABLED)
 
             current_bug_summary = f"Preview: {game_version} - {opt_prefix}{opt_asset}{current}"
             current_bug_text = Text(middle_frame, height=1, width=100, bg=Application.current_color_theme[3],
-                                    fg=Application.current_color_theme[1], bd=0, font="Helvetica 13")
+                                    fg=Application.current_color_theme[2], bd=0, font="Helvetica 13")
             current_bug_text.pack(side=TOP, fill=X, pady=5, padx=5)
             current_bug_text.insert(END, current_bug_summary)
             current_bug_text.configure(state=DISABLED)
@@ -1511,7 +1511,7 @@ class Application(Frame):
             head_img_label.pack(pady=0, padx=0, side=TOP)
             image_labels.append(head_img_label)
             image_location_text = Text(left_frame, height=1, width=60, bg=Application.current_color_theme[3],
-                                       fg=Application.current_color_theme[1], bd=0, font="Helvetica 10")
+                                       fg=Application.current_color_theme[2], bd=0, font="Helvetica 10")
             # The scrollable canvas is created here
             thumbnail_canvas = self.make_scrollable_canvas(frame_for_canvas, len(current_bug), image_labels)
             self.make_options_sidebar(frame_for_sidebar, current_bug_summary)
