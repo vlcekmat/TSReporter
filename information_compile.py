@@ -19,12 +19,12 @@ def get_image(log):
         coord_2 = str(round(Decimal(str(split_log[4]))))[:6]
 
     path = Path(images_folder_path)
-    for file in path.glob('*.jpg'):
+    for file in path.glob('*.gif'):
         if date_time_to_find in file.name and coord_0 in file.name and coord_2 in file.name:
             return file
         else:
             pass
-    for file in path.glob('*.gif'):
+    for file in path.glob('*.jpg'):
         if date_time_to_find in file.name and coord_0 in file.name and coord_2 in file.name:
             return file
         else:
