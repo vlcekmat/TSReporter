@@ -38,14 +38,12 @@ class TestDetermineBugCategory(unittest.TestCase):
     def test_determine_bug_category_wrong(self):
         log_line = "test_collisions by road ;[03/07/2020 11:16] (sec-0020-0016)" \
                    ";-77652.6;66.7637;-62775.1;0.323015;-0.789071 "
-        category = information_compile.determine_bug_category(log_line)
-        self.assertEqual(category, "")
-
-    def test_determine_bug_category_wrong2(self):
-        log_line = "u_Idaho - I50 - collisions by road ;[03/07/2020 11:16] (sec-0020-0016)" \
+        log_line2 = "u_Idaho - I50 - collisions by road ;[03/07/2020 11:16] (sec-0020-0016)" \
                    ";-77652.6;66.7637;-62775.1;0.323015;-0.789071 "
         category = information_compile.determine_bug_category(log_line)
+        category2 = information_compile.determine_bug_category(log_line2)
         self.assertEqual(category, "")
+        self.assertEqual(category2, "")
 
 
 class TestExtractAssetName(unittest.TestCase):
@@ -72,3 +70,20 @@ class TestExtractAssetName(unittest.TestCase):
                      "-63941.2;59.5;-32751.8]  sec-0016-0009 "
         asset_path = information_compile.extract_asset_path(debug_info)
         self.assertEqual(asset_path, "/model/vehicle/parked_cars_groups/static/parked_cars_5x1.pmd")
+
+
+class TestGenerateDescription(unittest.TestCase):
+    def test_description_line(self):
+        line = "m_a;b;c;d"
+        d_line = information_compile.generate_description_line(line)
+        self.assertEqual(d_line, "a;b;c;d")
+        line = ".m_a;b;c;d"
+        d_line = information_compile.generate_description_line(line)
+        self.assertEqual(d_line, "m_a;b;c;d")
+        line = "...m_aaa"
+        d_line = information_compile.generate_description_line(line)
+        self.assertEqual(d_line, "..m_aaa")
+        line = "aaa"
+        d_line = information_compile.generate_description_line(line)
+        self.assertEqual(d_line, "aaa")
+

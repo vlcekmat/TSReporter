@@ -38,13 +38,14 @@ def determine_bug_category(log):
     return ""
 
 
-def generate_description(line):
+def generate_description_line(line):
     # puts information from main in a cohesive report and returns it
     split_log = line.split(';')
-    if '_' in split_log[0]:  # First join is there to convert array to string easily
+    if split_log[0][0] == '.':
+        split_log[0] = split_log[0][1:]
+        log_without_category = ';'.join(split_log)
+    elif '_' in split_log[0]:  # First join is there to convert array to string easily
         log_without_category = ''.join(split_log[0].split('_', maxsplit=1)[1]) + ';' + ';'.join(split_log[1:])
-    elif '.' in split_log[0]:
-        log_without_category = ''.join(split_log[0][1:]) + ';' + ';'.join(split_log[1:])
     else:
         log_without_category = line
     return log_without_category

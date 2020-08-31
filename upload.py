@@ -4,7 +4,7 @@ from selenium.common.exceptions import WebDriverException
 
 from sector_seek import find_assign_to
 from chromedrivers import DriverHandler, log_into_mantis
-from information_compile import generate_description, get_image, extract_asset_name, clean_debug_info
+from information_compile import generate_description_line, get_image, extract_asset_name, clean_debug_info
 
 
 def upload_to_mantis(version, category, log_lines, project, username, password,
@@ -32,7 +32,7 @@ def upload_to_mantis(version, category, log_lines, project, username, password,
         else:
             line_to_process = log_lines.popleft()
 
-        bug_descriptions.append(generate_description(line_to_process))
+        bug_descriptions.append(generate_description_line(line_to_process))
 
         image_to_append = get_image(line_to_process)
         if image_to_append:

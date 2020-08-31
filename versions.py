@@ -2,7 +2,6 @@ from pathlib import Path
 import re
 import os
 
-from utils import is_int
 from config import read_config
 
 
