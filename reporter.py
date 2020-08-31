@@ -24,7 +24,6 @@ def report_bug(project, log_lines, version, username, password, _driver_handler,
         if 'DEBUG INFO' in a_path or 'Position' in a_path or 'Object' in a_path:  # To accommodate only partial debug i.
             d_info = a_path
             a_path = extract_asset_path(a_path)
-
     while True:
         try:
             driver_handler = _driver_handler
@@ -57,8 +56,8 @@ def batch_report_bugs(project, bugs_stack, version, username, password, browser=
         current_bug[0] = prefix + ''.join(split_bug[1:])
         use_log_lines = copy.deepcopy(current_bug)
         upload_to_mantis(
-            version, 'm', use_log_lines, "", project,
-            username, password, browser, web_driver=reporter_driver, priority=priority
+            version, 'm', use_log_lines, "", project, username, password,
+            browser, web_driver=reporter_driver, priority=priority
         )
     return True
 

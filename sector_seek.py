@@ -31,6 +31,7 @@ def request_sector_owner(sector_to_find, game, svn_not_found=False):
 def get_asset_assign(chosen_game, bug_type):
     # This lists the people responsible for different types of assets in both games
     # taken from the testing guide on wiki (currently at http://wiki.scs/wiki/Testing_Guide)
+    # If there's a change, this will need to be changed as well!
     ass_dict = {
             "A": {
                 "ar": "milan.lukes",

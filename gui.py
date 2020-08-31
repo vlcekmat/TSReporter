@@ -8,8 +8,6 @@ from threading import Thread
 from PIL import ImageTk, Image
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowException, WebDriverException
 
-import win32gui, win32con
-
 from information_compile import determine_bug_category, extract_asset_name
 from password import get_password
 from versions import find_version
@@ -104,13 +102,13 @@ def get_theme(theme):
     }
     if theme == 'all':
         return theme_dict
-    elif theme_dict[theme]:
+    elif theme and theme_dict[theme]:
         return theme_dict[theme]
     else:
-        return theme_dict["ph_theme"]
+        return theme_dict["ph"]
 
 
-version = "0.4.0"
+version = "0.4.1"
 
 
 class Application(Frame):
@@ -861,7 +859,7 @@ class Application(Frame):
         already_reported = None  # decides if button is 'BACK' or 'Main menu'
 
         bug_handler = None
-        driver_handler = None
+        driver_handler = None  # Holds the driver instance
 
         # These are used for the menus in report options
         severity_var = None
@@ -886,6 +884,8 @@ class Application(Frame):
         prefix_check_button = None
         prefix = None
         bug_preview = None
+
+        find_duplicates_button = None
 
         def __init__(self, project, bug_handler, reported=False, prefix=None, last_time_rename_checked=False):
             super().__init__()
@@ -1056,7 +1056,6 @@ class Application(Frame):
         def find_missing_image(self, image_label, bug_entry, try_again_button, find_img_button=None,
                                image_location_text=None):
             try:
-
                 new_image_path = utils.find_image_path()
                 self.bug_handler.set_image(bug_entry.line, new_image_path)
                 bug_entry.reload_image(self.bug_handler)
@@ -1081,11 +1080,11 @@ class Application(Frame):
                     self.duplicates_button.get_element()['font'] = Font(size=15)
 
                 self.late_image = new_image_path
-
             except (TclError, ValueError):
                 pass
 
         class DuplicatesThread(Thread):
+            # Threading duplicates search happens here
             bug_line = None
 
             def __init__(self, bug_line):
@@ -1100,7 +1099,6 @@ class Application(Frame):
             if self.category == 'a' and self.asset_path_input.get() not in ["Enter asset path/debug info", ""]:
                 self.submit_asset_info()
                 asset_path = self.asset_path_input.get()
-
             try:
                 if not self.driver_handler:
                     self.driver_handler = DriverHandler(config.read_config("preferred browser"))
@@ -1114,7 +1112,6 @@ class Application(Frame):
 
         class ReportingThread(Thread):
             bug_line = None
-
             def __init__(self, bug_line):
                 super().__init__()
                 self.bug_line = bug_line
@@ -1133,24 +1130,22 @@ class Application(Frame):
                 self.submit_asset_info()
                 reporter.asset_path = self.asset_path_input.get()
 
-            project = self.selected_project
-            game = project[0]
+            game = self.selected_project[0]
             game_version = find_version(game=game)
             current_bug_deque = self.bug_handler.get_current()
 
-            assign_to = find_assign_to(bug_line, chosen_game=game)
             username = config.read_config('mantis username')
-            password = app.password
-
             priority = self.priority_var.get().lower()
             severity = self.severity_var.get().lower()
 
             if not self.driver_handler:
                 self.driver_handler = DriverHandler(config.read_config("preferred browser"))
-                log_into_mantis(self.driver_handler.get_driver(), username, password)
+                if not self.driver_handler:
+                    self.driver_handler = "chrome"
+                log_into_mantis(self.driver_handler.get_driver(), username, app.password)
 
-            reporter.report_bug(project=project, log_lines=current_bug_deque, version=game_version,
-                                username=username, password=password,
+            reporter.report_bug(project=self.selected_project, log_lines=current_bug_deque, version=game_version,
+                                username=username, password=app.password,
                                 _driver_handler=self.driver_handler, priority=priority,
                                 severity=severity, late_image=self.late_image, prefix=prefix,
                                 rename_images=self.rename_images, new_img_name=self.rename_box.get())
@@ -1231,8 +1226,7 @@ class Application(Frame):
                                       highlightthickness=0, width=self.small_img_size[0]*2 + 10)
             thumbnail_canvas.grid(row=0, column=0, sticky="news")
 
-            # Make a Scrollbar if there are more than 5 images (bug head and 4 extra)
-            if bug_len > 5:
+            if bug_len > 5:  # Make a Scrollbar if there are more than 5 images (bug head and 4 extra)
                 sb = Scrollbar(frame, orient="vertical")
                 sb.grid(row=0, column=1, sticky="ns")
                 sb.config(command=thumbnail_canvas.yview)
@@ -1242,7 +1236,6 @@ class Application(Frame):
             thumbnail_frame = Frame(thumbnail_canvas, bg=Application.current_color_theme[3])
             thumbnail_canvas.create_window((0, 0), window=thumbnail_frame, anchor="nw")
 
-            # image_labels = []
             for line_no in range(bug_len - 1):
                 temp_img_label = Label(thumbnail_frame, bg=Application.current_color_theme[3])
                 temp_img_label.place(x=0, y=0)
@@ -1250,7 +1243,6 @@ class Application(Frame):
                 image_labels.append(temp_img_label)
 
             thumbnail_canvas.config(scrollregion=thumbnail_frame.bbox("all"))
-            # return image_labels
             return thumbnail_canvas
 
         @staticmethod
@@ -1270,7 +1262,6 @@ class Application(Frame):
 
         def make_options_sidebar(self, frame, current_bug_summary):
             # The report options sidebar is created here.
-
             if 'a' in self.category:
                 self.show_text_input_asset_path(frame)
 
@@ -1281,6 +1272,7 @@ class Application(Frame):
             priority_menu = OptionMenu(frame, self.priority_var, *priority_choices)
             priority_menu.configure(activebackground=Application.current_color_theme[4])
             priority_menu.configure(highlightbackground=Application.current_color_theme[4])
+
             priority_text = Text(frame, font=Font(size=12), bg=Application.current_color_theme[3],
                                  bd=0, height=1, width=10, fg=Application.current_color_theme[2])
             priority_text.grid(row=1, column=0)
@@ -1303,7 +1295,7 @@ class Application(Frame):
 
             severity_text = Text(frame, font=Font(size=12), bg=Application.current_color_theme[3],
                                  bd=0, height=1,
-                                 width=10, fg=app.current_color_theme[2])
+                                 width=10, fg=Application.current_color_theme[2])
             severity_text.grid(row=2, column=0)
             severity_text.insert(END, "Severity")
             severity_text.configure(state=DISABLED)
@@ -1327,7 +1319,6 @@ class Application(Frame):
             checkbox_description.configure(state=DISABLED)
 
             prefix_checked = BooleanVar()
-
             prefix_checkbox = Checkbutton(master=checkbox_frame, bg=Application.current_color_theme[3],
                                           activebackground=Application.current_color_theme[3], variable=prefix_checked,
                                           command=lambda: self.check_prefix(value=prefix_checked),
@@ -1372,21 +1363,14 @@ class Application(Frame):
             severity_menu.config(bg=Application.current_color_theme[3])
             severity_menu.config(fg=Application.current_color_theme[1])
             severity_menu.config(font="Helvetica 10")
-            self.severity_var.trace("w", self.severity_callback)
 
             for col in range(frame.grid_size()[0]):
                 frame.grid_columnconfigure(col, minsize=120)
             for row in range(frame.grid_size()[0]):
                 frame.grid_rowconfigure(row, minsize=40)
 
-        def severity_callback(self, *args):
-            pass
-            # These callback methods are called when the value of the OptionMenu changes
-            # https://www.delftstack.com/howto/python-tkinter/how-to-create-dropdown-menu-in-tkinter/
-
         def priority_callback(self, *args):
-            # See severity_callback()
-            # Below code is how automatic severity should work for map bugs
+            # Priority of map bugs determines their severity, see testing guide on wiki
             if self.category == 'm':
                 if self.priority_var.get() == "Low" and self.severity_var.get() == "Major":
                     self.severity_var.set("Minor")
@@ -1425,10 +1409,9 @@ class Application(Frame):
                 image_path_button, try_again_button, thumbnail_canvas
             )
 
-        def disable_button(self, button):
+        @staticmethod
+        def disable_button(button):
             button['state'] = DISABLED
-
-        find_duplicates_button = None
 
         def init_widgets(self, current_bug):
             # region Frames
@@ -1441,17 +1424,12 @@ class Application(Frame):
                                      fg=Application.current_color_theme[2], bd=0, font="Helvetica 12")
             version_info_text.pack(anchor="nw", pady=5, padx=5, side=TOP)
             version_info_text.insert(END, version_line)
-            # version_info_text.configure(state=DISABLED)
 
             assign_to = find_assign_to(current_bug[0].line, self.selected_project[0])
 
-            # assign_info_text = Text(background_frame, height=1, width=60, bg=Application.current_color_theme[4],
-            #                         fg=Application.current_color_theme[2], bd=0, font="Helvetica 12")
             if assign_to == "":
                 assign_to = "unknown"
             version_info_text.insert(END, f"\t- Assigning to {assign_to}")
-            # assign_info_text.pack(anchor="nw", pady=5, padx=5, side=TOP)
-            # assign_info_text.configure(state=DISABLED)
             version_info_text.configure(state=DISABLED)
 
             middle_frame = Frame(background_frame, bg=Application.current_color_theme[3])
@@ -1467,9 +1445,7 @@ class Application(Frame):
 
             current = self.bug_handler.get_current()[0][:-1]
             current_raw = current
-            category = ''
             if '_' in current:
-                category = f"{current.split('_')[0]}_"
                 current = current.split('_')[1]
                 current = current.split(';')[0]
             else:
@@ -1572,9 +1548,6 @@ class Application(Frame):
                 "Find\nduplicates", bottom_frame, side=RIGHT,
                 command=lambda: self.DuplicatesThread(self.bug_handler.get_current()[0][:-1]).start()
             )
-
-            # if image_path_button:
-            #     button_find_duplicates.get_element()['font'] = Font(size=10)
 
             self.duplicates_button = button_find_duplicates
 

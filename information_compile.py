@@ -22,29 +22,20 @@ def get_image(log):
     for file in path.glob('*.gif'):
         if date_time_to_find in file.name and coord_0 in file.name and coord_2 in file.name:
             return file
-        else:
-            pass
     for file in path.glob('*.jpg'):
         if date_time_to_find in file.name and coord_0 in file.name and coord_2 in file.name:
             return file
-        else:
-            pass
     return ""
 
 
 def determine_bug_category(log):
     # returns 'm' for map, 'a' for asset
     split_log = log.split(';')
-    if "_" not in split_log[0]:
-        return ""
-    category = split_log[0].split('_', maxsplit=1)[0]
-
-    if category in ["m", "a", "aa", "ar", "av", "ac"]:
-        return category
-    # elif category in ["aa", "ar", "av", "ac"]:
-    #     return category[0]
-    else:
-        return ""
+    if "_" in split_log[0]:
+        category = split_log[0].split('_', maxsplit=1)[0]
+        if category in ["m", "a", "aa", "ar", "av", "ac"]:
+            return category
+    return ""
 
 
 def generate_description(line):
@@ -57,13 +48,6 @@ def generate_description(line):
     else:
         log_without_category = line
     return log_without_category
-
-
-def generate_no_version_des(description):
-    # cuts the version off the given description
-    no_ver_des_field = ''.join(description).split('] - ')[1:]
-    no_ver_des = ''.join(no_ver_des_field)
-    return no_ver_des
 
 
 def extract_location_filter(bug_description):

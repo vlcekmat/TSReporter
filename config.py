@@ -1,9 +1,8 @@
 import fnmatch
-
-from utils import is_int, find_path, ask_yes_no
-import os
 from ast import literal_eval
-from sys import stdout
+
+from utils import is_int, find_path
+import os
 
 
 def read_config(key):
@@ -23,7 +22,7 @@ class ConfigHandler:
     cfg_dict = {}
 
     # This is the layout of the config.cfg file by lines. Use this to inform the user or validate config.cfg
-    # If a new config option needs to be added, add it here and validate_config() will ask it from user
+    # If a new config option needs to be added, add it here
     config_layout = {
             "trunk location": "path",
             "documents location": "path",
@@ -61,11 +60,7 @@ class ConfigHandler:
         config_wasnt_valid = False
         for layout_item in config_layout.keys():
             if layout_item not in ConfigHandler.cfg_dict.keys():
-                if config_layout[layout_item] == "secret":
-                    ConfigHandler.cfg_dict[layout_item] = ""
-                    config_wasnt_valid = True
-                    continue
-                ConfigHandler.cfg_dict[layout_item] = ConfigHandler.ask_config_line(layout_item)
+                ConfigHandler.cfg_dict[layout_item] = ""
                 config_wasnt_valid = True
         if ConfigHandler.cfg_dict["save password"] == "False":
             if ConfigHandler.cfg_dict["s_password"] != "":
@@ -75,50 +70,11 @@ class ConfigHandler:
             ConfigHandler.save_config()
 
     @staticmethod
-    def list_config():
-        # Lists contents of config.cfg
-        i = 1
-        for key in ConfigHandler.cfg_dict:
-            if ConfigHandler.config_layout[key] != "secret":
-                i += 1
-
-    @staticmethod
-    def save_config(o_stream=None):
+    def save_config():
         # Saves content of dictionary to config.cfg in correct format
         cfg_file = open("./config.cfg", "w", encoding='UTF-8')
         for key in ConfigHandler.cfg_dict:
             cfg_file.write(f'"{key}" : "{ConfigHandler.cfg_dict[key]}"\n')
-        if o_stream:
-            pass
-            # o_stream.write("Configuration changes saved")
-
-    @staticmethod
-    def config_edit():
-        # Shows contents of config.cfg to the user and gives them the option to edit any of the configurations
-        cfg_dict = ConfigHandler.config_layout
-
-        cfg_layout = []
-        for key in cfg_dict.keys():
-            cfg_layout.append(key)
-
-        while True:
-            ConfigHandler.list_config()
-            line_selection = input("> ")
-
-            if not is_int(line_selection) or not 0 <= int(line_selection) <= len(cfg_layout):
-                continue
-            else:
-                ls = int(line_selection)
-
-            if ls == 0:
-                break
-            else:
-                ls -= 1
-                ConfigHandler.cfg_dict[cfg_layout[ls]] = ConfigHandler.ask_config_line(cfg_layout[ls])
-                ConfigHandler.save_config(stdout)
-                continue
-        if read_config("save password") == "False":
-            write_config("s_password", "")
 
     @staticmethod
     def gui_config_edit(index, entered_text=None, yes_no_value=None, browser_chosen=None):
@@ -143,18 +99,6 @@ class ConfigHandler:
         ConfigHandler.save_config()
 
     @staticmethod
-    def config_setup():
-        # Opens windows dialogue windows and has the user select their Trunk, Steam and edited pictures directories
-        # Then reads Mantis username from user input
-        # Saves the directories to './config.cfg'
-        cfg_layout = ConfigHandler.config_layout.keys()
-        for entry in cfg_layout:
-            if ConfigHandler.config_layout[entry] == "secret":
-                continue
-            ConfigHandler.cfg_dict[entry] = ConfigHandler.ask_config_line(entry)
-        ConfigHandler.save_config(stdout)
-
-    @staticmethod
     def gui_config_setup():
         cfg_layout = ConfigHandler.config_layout.keys()
         for entry in cfg_layout:
@@ -171,7 +115,7 @@ class ConfigHandler:
             elif ConfigHandler.config_layout[entry] == "yn":
                 ConfigHandler.cfg_dict[entry] = False
 
-        ConfigHandler.save_config(stdout)
+        ConfigHandler.save_config()
 
     @staticmethod
     def ask_config_line(key_to_ask, entered_text=None, yes_no_value=None, preferred_browser=None):
@@ -191,18 +135,6 @@ class ConfigHandler:
                 new_value = entered_text
 
         return new_value
-
-
-def ask_preferred_browser():
-    # Asks user for preferred browser
-    while True:
-        pref_browser = input("Do you want to use Chrome, Firefox (or Edge)? Type C/F/E\n> ")
-        if pref_browser.upper() == 'C':
-            return 'chrome'
-        elif pref_browser.upper() == 'F':
-            return 'firefox'
-        elif pref_browser.upper() == 'E':
-            pass
 
 
 def validate_cfg_images():

@@ -30,7 +30,7 @@ class GifMaker:
     def add_frame(self, image_location, was_png):
         if len(self.frames) == 0:
             self.gif_name = self.save_gifs_here + '/' + image_location.split('/')[-1][0:-4] + ".gif"
-        new_frame = Image.open(image_location)
+        new_frame = Image.open(image_location)  # don't forget to close
         new_frame.thumbnail((1200, 700))
         self.frames.append((new_frame, was_png))
 
@@ -64,11 +64,13 @@ class GifGeneratorPage(Frame):
     current_color_theme = None
     app = None
     gif_maker = GifMaker()
-    preview_thread = None
-    duration = 1
+    preview_thread = None  # This thread handles the preview of the gif
+    duration = 1  # The FPS of the created gif, needs to be converted from frame duration
 
-    images_paths_frame = None
+    images_paths_frame = None  # This frame holds the textboxes with the locations of the frames and delete buttons
     widgets_to_update = []
+
+    gif_created_text = None
 
     def __init__(self, app, location):
         super().__init__()
@@ -80,10 +82,12 @@ class GifGeneratorPage(Frame):
         self.init_widgets()
 
     class GifPreviewThread(Thread):
-        duration = 1
-        frames_to_show = []
+        # Handles the preview of the gif by updating the preview label with the selected frames
+        # The speed at which is updates is set by the duration
+        duration = 1  # FPS
+        frames_to_show = []  # Frames that will make up the gif, here saved as
         label = None
-        stop = False
+        stop = False  # if true, thread stops
 
         def __init__(self, label):
             super().__init__()
@@ -105,11 +109,11 @@ class GifGeneratorPage(Frame):
         def run(self):
             try:
                 while True:
-                    if len(self.frames_to_show) == 0:
+                    if len(self.frames_to_show) == 0:  # This waits for a frame to appear
                         self.label.configure(image='')
                         sleep(0.5)
                         continue
-                    for frame in self.frames_to_show:
+                    for frame in self.frames_to_show:  # updates the frames
                         self.label.configure(image=frame)
                         self.label.image = frame
                         sleep(self.duration)
@@ -211,7 +215,6 @@ class GifGeneratorPage(Frame):
         if len(self.widgets_to_update) == 0:
             self.clear_gif_frames(master)
 
-    gif_created_text = None
     def init_widgets(self):
         background = Frame(master=self, bg=self.current_color_theme[4])
         background.pack(fill=BOTH, expand=True)
