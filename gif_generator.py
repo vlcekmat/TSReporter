@@ -220,7 +220,7 @@ class GifGeneratorPage(Frame):
         background.pack(fill=BOTH, expand=True)
 
         middle_frame = Frame(master=background, bg=self.current_color_theme[3])
-        middle_frame.pack(fill=BOTH, expand=True, pady=20, padx=20)
+        middle_frame.pack(fill=BOTH, expand=True, pady=10, padx=20)
 
         top_frame = Frame(master=middle_frame, bg=self.current_color_theme[3])
         top_frame.pack(fill=BOTH, expand=False, pady=0, padx=0, side=TOP)
@@ -232,11 +232,11 @@ class GifGeneratorPage(Frame):
         bottom_frame = Frame(master=background, bg=self.current_color_theme[4])
         bottom_frame.pack(fill=X, side=BOTTOM)
 
-        images_list_frame = Frame(master=top_frame, bg=self.current_color_theme[4], pady=10, padx=10)
+        images_list_frame = Frame(master=middle_frame, bg=self.current_color_theme[4], pady=10, padx=10)
         images_list_frame.pack(side=LEFT, padx=10, pady=10, fill="none", expand=True)
         self.images_paths_frame = images_list_frame
 
-        preview_frame = Frame(master=top_frame, bg=self.current_color_theme[3], pady=60, padx=20)
+        preview_frame = Frame(master=middle_frame, bg=self.current_color_theme[3], pady=60, padx=20)
         preview_frame.pack(side=RIGHT, padx=0, fill="none", expand=True)
 
         preview_label = Label(master=preview_frame, padx=0, pady=0, bg=self.current_color_theme[3])

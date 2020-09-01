@@ -25,7 +25,6 @@ def read_bugs_file(game_path, o_stream):
     if bug_lines[0][0] == '.':  # If first line starts with a '.', everything will break, don't even think about it
         o_stream.write("First report's name begins with a '.', go fix that!\n")
         return None
-
     return bug_lines
 
 

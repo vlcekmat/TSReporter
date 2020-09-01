@@ -116,7 +116,6 @@ def upload_to_mantis(version, category, log_lines, project, username, password,
                     summary = prefix + ' - ' + summary
 
             new_name = summary + old_extension
-
             rename_me = Path(rename_me)
 
             try:
@@ -135,5 +134,6 @@ def upload_to_mantis(version, category, log_lines, project, username, password,
         if late_image == upload_me:
             continue
         else:
-            driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))  # upload an image
+            # upload an image
+            driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))
     # endregion

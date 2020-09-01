@@ -3,6 +3,7 @@ import os
 from collections import deque
 from time import sleep
 from tkinter import *
+from tkinter import colorchooser
 from tkinter.font import Font
 from threading import Thread
 from PIL import ImageTk, Image
@@ -18,96 +19,12 @@ from chromedrivers import DriverHandler, gui_login
 from sector_seek import find_assign_to
 from chromedrivers import log_into_mantis
 import utils
+from utils import get_theme
 import reporter
 import gif_generator
 
 
 custom_theme = None
-
-
-def get_theme(theme):
-    theme_dict = {
-        "ph": {
-            # Change the values below to change the overall color theme of the app
-            1: 'white',  # Regular Buttons
-            2: '#ffa500',  # Quit Button, text
-            3: '#484848',  # Integrated Frames
-            4: '#2B2B2B'  # Background
-        },
-
-        "campfire": {
-            # Change the values below to change the overall color theme of the app
-            1: '#03A678',  # Regular Buttons
-            2: '#F28C0F',  # Quit Button, text
-            3: '#02735E',  # Integrated Frames
-            4: '#014040'  # Background
-        },
-
-        "hazard_theme": {
-            # Change the values below to change the overall color theme of the app
-            1: '#BD554A',  # Regular Buttons
-            2: '#CF423C',  # Quit Button, text
-            3: '#570B2A',  # Integrated Frames
-            4: '#33081E'  # Background
-        },
-
-        "candle": {
-            # Change the values below to change the overall color theme of the app
-            1: '#6EAFB5',  # Regular Buttons
-            2: '#FD9F75',  # Quit Button, text
-            3: '#185572',  # Integrated Frames
-            4: '#05395E'  # Background
-        },
-
-        "navy": {
-            # Change the values below to change the overall color theme of the app
-            1: '#387097',  # Regular Buttons
-            2: 'white',  # Quit Button, text
-            3: '#1F384C',  # Integrated Frames
-            4: '#1B2838'  # Background
-        },
-
-        "purple_rain": {
-            # Change the values below to change the overall color theme of the app
-            1: '#ECE8E1',  # Regular Buttons
-            2: '#FF4655',  # Quit Button, text
-            3: '#8C3243',  # Integrated Frames
-            4: '#271D26'  # Background
-        },
-
-        "storm": {
-            # Change the values below to change the overall color theme of the app
-            1: '#908CAC',  # Regular Buttons
-            2: '#C3BBD2',  # Quit Button, text
-            3: '#3F384F',  # Integrated Frames
-            4: '#1A1E26'  # Background
-        },
-
-        "grayscale": {
-            # Change the values below to change the overall color theme of the app
-            1: '#838383',  # Regular Buttons
-            2: '#D9D9D9',  # Quit Button, text
-            3: '#404040',  # Integrated Frames
-            4: '#262626'  # Background
-        },
-
-
-        "custom": {
-            # Change the values below to change the overall color theme of the app
-            1: 'white',  # Regular Buttons
-            2: 'white',  # Quit Button, text
-            3: 'white',  # Integrated Frames
-            4: 'white' # Background
-        }
-    }
-    if theme == 'all':
-        return theme_dict
-    elif theme and theme_dict[theme]:
-        return theme_dict[theme]
-    else:
-        return theme_dict["ph"]
-
-
 version = "0.4.1"
 
 
@@ -123,13 +40,12 @@ class Application(Frame):
     login = None
     gif_page = None
 
-    password = None  # Mantis password is saved here
-
-    current_color_theme = ""
-
     # It's important to keep in mind the class instances above,
     # when gui is active, exactly one has to have a non Null value, because having more than one pages active
     # at the same time is BS
+
+    password = None  # Mantis password is saved here
+    current_color_theme = ""
 
     def __init__(self):
         super().__init__()
@@ -143,7 +59,6 @@ class Application(Frame):
             self.settings_menu.open_page()
             if self.current_color_theme == "":
                 config.write_config("current_theme", "ph")
-
         else:
             config.ConfigHandler()
             self.current_color_theme = get_theme(config.read_config("current_theme"))
@@ -156,9 +71,6 @@ class Application(Frame):
         # All pages inherit from this class
         def open_page(self):
             self.pack(fill=BOTH, expand=True)
-
-        def close_page(self):
-            self.pack_forget()
 
     class AppButton:
         # The basic template that is used for most buttons in the app
@@ -202,15 +114,17 @@ class Application(Frame):
     class MainMenu(Page):
         # The first page that is displayed when the program starts
         # Its first instance is created in the constructor of the Application class
+
+        custom_colors = ['', '', '', '']
+
         def __init__(self):
             super().__init__()
             self.init_widgets()
 
         # region COMMANDS
-        # Commands are functions callable by buttons
         def go_to_settings(self, first_time=False):
-            # ACHTUNG! When you annul an instance of a page class, remember to create a new one of a different
-            # page class as following:
+            # ACHTUNG! When you annul an instance of a page class, remember to create
+            # a new one of a different page class as following:
             self.pack_forget()
             app.settings_menu = Application.SettingsMenu(first_time=first_time)
             app.settings_menu.open_page()
@@ -230,10 +144,9 @@ class Application(Frame):
 
         def go_to_gif_generator(self):
             self.pack_forget()
-            app.gif_page = gif_generator.GifGeneratorPage(app=app,
-                                                          location=config.read_config("edited images location"))
+            app.gif_page = gif_generator.GifGeneratorPage(
+                app=app, location=config.read_config("edited images location"))
             app.main_menu = None
-
         # endregion
 
         class ThemeOption:
@@ -259,9 +172,7 @@ class Application(Frame):
                 button['relief'] = RAISED
 
                 self.button = button
-
                 color_theme = get_theme(theme=self.theme_name)
-
                 for i in range(4):
                     label = Label(button, bg=color_theme[i + 1], width=3, state=DISABLED)
                     label.bind('<Button-1>', self._on_click)
@@ -270,14 +181,14 @@ class Application(Frame):
                 button.grid(column=0, row=row, pady=self.pady, padx=10)
                 return button
 
-        def configure_custom_theme(self):
+        def configure_custom_theme(self, theme_button):
             custom_theme_root = Tk()
-            custom_theme_root.geometry('400x400')
-            custom_theme_root.minsize(width=400, height=400)
-            custom_theme_root.maxsize(width=400, height=400)
+            custom_theme_root.geometry('250x300')
+            custom_theme_root.minsize(width=250, height=300)
+            custom_theme_root.maxsize(width=250, height=300)
             custom_theme_root.resizable(0, 0)
             custom_theme_root.wm_iconbitmap('.//resources/icon.ico')
-            custom_theme_root.wm_title('TSReporter - Custom Theme')
+            custom_theme_root.wm_title('Themes')
             background = Frame(master=custom_theme_root, bg=Application.current_color_theme[4])
             background.pack(fill=BOTH, expand=True)
 
@@ -285,58 +196,57 @@ class Application(Frame):
             top_frame.pack(fill=X, side=TOP)
 
             color_entries = []
+            color_types = ['Buttons', 'Text', 'Frames', 'Background']
             for i in range(4):
-                color_text = Label(master=top_frame, text=f"Color {i + 1}: ",
-                                   bg=Application.current_color_theme[4], fg=Application.current_color_theme[2])
+                color_text = Label(master=top_frame, bg=Application.current_color_theme[4],
+                                   fg=Application.current_color_theme[2], text=color_types[i] + ': ')
                 color_text.grid(column=0, row=i, sticky=W, pady=10)
-                color_entry = Entry(master=top_frame, width=10,
-                                bg=Application.current_color_theme[3],
-                                fg=Application.current_color_theme[2]
-                )
+                color_entry = Entry(master=top_frame, width=10, textvariable=self.custom_colors[i],
+                                    bg=Application.current_color_theme[3],
+                                    fg=Application.current_color_theme[2])
                 color_entry.grid(column=1, row=i, sticky=W, pady=10)
+                color_button = Button(master=top_frame, bg=Application.current_color_theme[4], text="Pick",
+                                      fg=Application.current_color_theme[2],
+                                      command=lambda ci=i, e=color_entry: self.choose_color(ci, e))
+                color_button.grid(column=2, row=i, pady=10, padx=5)
                 color_entries.append(color_entry)
 
             submit_button = Button(master=top_frame, text='Submit',
-                                         command=lambda: self.submit_custom_theme(entries=color_entries),
-                                   bg=Application.current_color_theme[4],
-                                   fg=Application.current_color_theme[2])
+                                   command=lambda: self.confirm_color(custom_theme_root),
+                                   bg=Application.current_color_theme[4], fg=Application.current_color_theme[2])
             submit_button.grid(column=0, row=10, pady=10)
-
             custom_theme_root.mainloop()
 
-        def submit_custom_theme(self, entries):
-            new_custom_dict = {
-                1: entries[0],
-                2: entries[1],
-                3: entries[2],
-                4: entries[4]
-            }
-            # TODO: CREATE CONFIG FOR THIS
+        def choose_color(self, color_index, entry):
+            color = colorchooser.askcolor()[1]
+            if not color:
+                color = ''
+            self.custom_colors[color_index] = color
+            entry.delete(0, END)
+            entry.insert(0, self.custom_colors[color_index])
 
-        def refresh_counter(self, ats_text, ets_text):
+        @staticmethod
+        def confirm_color(r):
+            r.destroy()
+
+        @staticmethod
+        def refresh_counter(ats_text, ets_text):
             ats_new_count = str(bugs.count_bugs('ats'))
             ets_new_count = str(bugs.count_bugs('ets'))
 
             ats_text['state'] = NORMAL
             ets_text['state'] = NORMAL
-
             rewrite_textbox(f"ATS: {ats_new_count}", ats_text)
             rewrite_textbox(f"ETS 2: {ets_new_count}", ets_text)
-
             ats_text['state'] = DISABLED
             ets_text['state'] = DISABLED
 
         def set_up_menu(self):
-            # Think of this as HTML, but much more messy and frustrating
-
-            try:
-                # Handles the variables needed for the bug counter for ATS
+            try:  # Handles the variables needed for the bug counter for ATS
                 ats_bugs_count = bugs.count_bugs("ats")
             except FileNotFoundError:
                 ats_bugs_count = 'N/A'
-
-            try:
-                # Same but for ETS
+            try:  # Same but for ETS
                 ets_bugs_count = bugs.count_bugs("ets")
             except FileNotFoundError:
                 ets_bugs_count = 'N/A'
@@ -347,7 +257,6 @@ class Application(Frame):
 
             top_frame = Frame(background_frame, bg=Application.current_color_theme[4])
             top_frame.pack(side=TOP, fill=X)
-            # duh
 
             color_button_frame = Frame(top_frame, bg=Application.current_color_theme[4])
             color_button_frame.pack(side=RIGHT, fill=Y, padx=30, pady=30)
@@ -360,19 +269,17 @@ class Application(Frame):
                 if color_theme != 'custom':
                     theme_option = self.ThemeOption(color_theme, master=theme_selection_frame, row=index)
                     index += 1
-            # custom_theme_option = self.ThemeOption('custom', master=theme_selection_frame, row=index, pady=20)
+            custom_theme_option = self.ThemeOption('custom', master=theme_selection_frame, row=index, pady=20)
 
             custom_theme_button = Button(master=theme_selection_frame, text='Custom Theme',
-                                         command=self.configure_custom_theme, bg=Application.current_color_theme[4],
+                                         command=lambda: self.configure_custom_theme(custom_theme_option),
+                                         bg=Application.current_color_theme[4],
                                          fg=Application.current_color_theme[2])
-            # custom_theme_button.grid(column=0, row=10, pady=10)
+            custom_theme_button.grid(column=0, row=10, pady=10)
 
             left_frame = Frame(top_frame, bg=Application.current_color_theme[3])
             left_frame.pack(expand=False, fill=Y, side=LEFT, pady=10, padx=30)
 
-            # From now on the variable names are pretty self-explanatory
-
-            # title_font = Font(size=20)
             title_font = "Helvetica 20 bold"
 
             title = Label(left_frame, text='TSReporter',
@@ -407,25 +314,25 @@ class Application(Frame):
 
             reports_count_text.pack()
 
-            ATS_bugs_count = Text(bugs_count_frame, width=10, height=1, borderwidth=0,
-                                   bg=Application.current_color_theme[3],
-                                   fg=Application.current_color_theme[2], font=subtitle_font)
-            ATS_bugs_count.insert(END, f'ATS: {ats_bugs_count}')
-            ATS_bugs_count['state'] = DISABLED
-            ATS_bugs_count.pack()
-
-            ETS2_bugs_count = Text(bugs_count_frame, width=10, height=1, borderwidth=0,
+            ats_bugs_counter = Text(bugs_count_frame, width=10, height=1, borderwidth=0,
                                     bg=Application.current_color_theme[3],
                                     fg=Application.current_color_theme[2], font=subtitle_font)
-            ETS2_bugs_count.insert(END, f'ETS 2: {ets_bugs_count}')
-            ETS2_bugs_count['state'] = DISABLED
-            ETS2_bugs_count.pack()
+            ats_bugs_counter.insert(END, f'ATS: {ats_bugs_count}')
+            ats_bugs_counter['state'] = DISABLED
+            ats_bugs_counter.pack()
+
+            ets2_bugs_counter = Text(bugs_count_frame, width=10, height=1, borderwidth=0,
+                                     bg=Application.current_color_theme[3],
+                                     fg=Application.current_color_theme[2], font=subtitle_font)
+            ets2_bugs_counter.insert(END, f'ETS 2: {ets_bugs_count}')
+            ets2_bugs_counter['state'] = DISABLED
+            ets2_bugs_counter.pack()
 
             refresh_button = Application.AppButton(frame=top_frame, text="Refresh", font_size=10,
                                                    pady=2, offy=1, text_spacing=1,
                                                    command=lambda: self.refresh_counter(
-                                                       ats_text=ATS_bugs_count,
-                                                       ets_text=ETS2_bugs_count)
+                                                       ats_text=ats_bugs_count,
+                                                       ets_text=ets_bugs_count)
                                                    )
             # endregion
 
@@ -646,7 +553,6 @@ class Application(Frame):
                 first_time = app.settings_menu.first_time
                 app.settings_menu.go_to_main_menu()
                 app.main_menu.go_to_settings(first_time=first_time)
-
         # region COMMANDS
 
         def go_to_main_menu(self):
@@ -887,6 +793,8 @@ class Application(Frame):
 
         find_duplicates_button = None
 
+        rename_box = None
+
         def __init__(self, project, bug_handler, reported=False, prefix=None, last_time_rename_checked=False):
             super().__init__()
             self.rename_images = last_time_rename_checked
@@ -997,12 +905,10 @@ class Application(Frame):
             text_input.bind('<KeyRelease>', lambda x: self.update_preview())
             self.prefix_box = text_input
 
-        rename_box = None
-
         def show_rename_images_input(self, master):
             rename_images_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[3],
-                                   bd=0, height=1,
-                                   width=10, fg=app.current_color_theme[2])
+                                      bd=0, height=1,
+                                      width=10, fg=app.current_color_theme[2])
             rename_images_text.grid(row=6, column=0)
             rename_images_text.insert(END, "Rename img")
             rename_images_text.configure(state=DISABLED)
@@ -1044,8 +950,8 @@ class Application(Frame):
             self.pack_forget()
             if self.remember_prefix and self.prefix:
                 app.reporting = Application.Reporting(
-                    Application.Reporting.selected_project, self.bug_handler, reported=True, prefix=self.prefix,
-                    last_time_rename_checked=self.rename_images
+                    Application.Reporting.selected_project, self.bug_handler, reported=True,
+                    prefix=self.prefix, last_time_rename_checked=self.rename_images
                 )
             else:
                 app.reporting = Application.Reporting(
@@ -1104,7 +1010,7 @@ class Application(Frame):
                     self.driver_handler = DriverHandler(config.read_config("preferred browser"))
                 reporter.check_for_duplicates(
                     config.read_config("mantis username"), app.password, bug_line,
-                    driver_handler=self.driver_handler, asset_path=asset_path
+                    driver_handler=self.driver_handler, a_path=asset_path
                 )
             except (SessionNotCreatedException, NoSuchWindowException, WebDriverException, AttributeError,
                     TypeError, NameError):
@@ -1112,14 +1018,15 @@ class Application(Frame):
 
         class ReportingThread(Thread):
             bug_line = None
+
             def __init__(self, bug_line):
                 super().__init__()
                 self.bug_line = bug_line
 
             def run(self):
-                app.reporting.open_report(bug_line=self.bug_line)
+                app.reporting.open_report()
 
-        def open_report(self, bug_line):
+        def open_report(self):
             # This is called when the 'Report' button is pressed, reporting will happen starting here
             prefix = None
 
@@ -1335,9 +1242,9 @@ class Application(Frame):
             rename_checkbox_frame = Frame(master=frame, bg=Application.current_color_theme[3])
             rename_checkbox_frame.grid(column=1, row=7, sticky=E)
 
-            rename_checkbox_description = Text(rename_checkbox_frame, font=Font(size=8),
-                                               bg=Application.current_color_theme[3],
-                                        bd=0, height=1, width=15, fg=Application.current_color_theme[2])
+            rename_checkbox_description = Text(rename_checkbox_frame, font=Font(size=8), bd=0,
+                                               bg=Application.current_color_theme[3], height=1,
+                                               width=15, fg=Application.current_color_theme[2])
             rename_checkbox_description.pack(side=LEFT)
             rename_checkbox_description.insert(END, "Rename?")
             rename_checkbox_description.configure(state=DISABLED)
@@ -1405,8 +1312,8 @@ class Application(Frame):
                 try_again_button.get_element().pack_forget()
             this_button.get_element()['text'] = "Image\npreview"
             this_button.get_element()['command'] = lambda: self.show_canvas(
-                thumbnails_frame, options_frame, this_button, current_bug, image_labels, image_location_text,
-                image_path_button, try_again_button, thumbnail_canvas
+                thumbnails_frame, options_frame, this_button, current_bug, image_labels,
+                image_location_text, image_path_button, try_again_button, thumbnail_canvas
             )
 
         @staticmethod
@@ -1426,7 +1333,6 @@ class Application(Frame):
             version_info_text.insert(END, version_line)
 
             assign_to = find_assign_to(current_bug[0].line, self.selected_project[0])
-
             if assign_to == "":
                 assign_to = "unknown"
             version_info_text.insert(END, f"\t- Assigning to {assign_to}")
