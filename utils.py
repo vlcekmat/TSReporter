@@ -1,5 +1,6 @@
 from tkinter import Tk
 from tkinter import filedialog
+import re
 
 
 def find_path():
@@ -8,6 +9,14 @@ def find_path():
     root.withdraw()
     dir_path = filedialog.askdirectory()
     return dir_path
+
+
+def is_hex_color(h):
+    match = re.search(r'^#([0-9a-fA-F]{6})$', h)
+    if match:
+        return True
+    else:
+        return False
 
 
 def find_image_path():

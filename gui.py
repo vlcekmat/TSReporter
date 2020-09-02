@@ -25,7 +25,7 @@ import gif_generator
 
 
 custom_theme = None
-version = "0.4.1"
+version = "0.4.2"
 
 
 class Application(Frame):
@@ -53,16 +53,16 @@ class Application(Frame):
         config_path = "./config.cfg"
         if not os.path.isfile(config_path):
             config.ConfigHandler()
-            self.current_color_theme = get_theme(config.read_config("current_theme"))
-            Application.current_color_theme = get_theme(config.read_config("current_theme"))
+            self.current_color_theme = get_theme(config.read_config("current theme"))
+            Application.current_color_theme = get_theme(config.read_config("current theme"))
             self.settings_menu = self.SettingsMenu(first_time=True)
             self.settings_menu.open_page()
             if self.current_color_theme == "":
-                config.write_config("current_theme", "ph")
+                config.write_config("current theme", "ph")
         else:
             config.ConfigHandler()
-            self.current_color_theme = get_theme(config.read_config("current_theme"))
-            Application.current_color_theme = get_theme(config.read_config("current_theme"))
+            self.current_color_theme = get_theme(config.read_config("current theme"))
+            Application.current_color_theme = get_theme(config.read_config("current theme"))
             self.main_menu = self.MainMenu()
             if config.read_config("save password") == "True":
                 self.password = get_password()
@@ -86,11 +86,11 @@ class Application(Frame):
                 color2 = Application.current_color_theme[0]
 
             self.text = text
+            # font_color = Application.current_color_theme[1]
 
             my_font = Font(size=font_size)
-            button = Button(frame, text=text, height=1, width=8, bg=color1,
-                            activebackground=color2, fg=font_color,
-                            padx=text_spacing, pady=pady, cursor='hand2')
+            button = Button(frame, text=text, height=1, width=8, bg=color1, activebackground=color2,
+                            fg=font_color, padx=text_spacing, pady=pady, cursor='hand2')
             self.element = button
             if command is not None:
                 button['command'] = command
@@ -166,7 +166,7 @@ class Application(Frame):
             def _on_click(self, _):
                 app.current_color_theme = get_theme(self.theme_name)
                 Application.current_color_theme = get_theme(self.theme_name)
-                config.write_config('current_theme', self.theme_name)
+                config.write_config('current theme', self.theme_name)
                 app.main_menu.go_to_settings()
                 app.settings_menu.go_to_main_menu()
 
@@ -214,39 +214,47 @@ class Application(Frame):
                 color_entry.insert(0, self.custom_colors[i])
                 color_entry.grid(column=1, row=i, sticky=W, pady=10)
                 color_button = Button(
-                    master=top_frame, bg=Application.current_color_theme[3], fg=Application.current_color_theme[1],
-                    text="Pick", command=lambda ci=i, e=color_entry: self.choose_color(ci, e)
+                    master=top_frame, bg=Application.current_color_theme[0], fg='#000000',
+                    text="Pick", command=lambda ci=i, e=color_entry: self.choose_color(
+                        ci, e, custom_theme_root)
                 )
                 color_button.grid(column=2, row=i, pady=10, padx=5)
                 color_entries.append(color_entry)
 
-            submit_button = Button(master=top_frame, text='Submit', bg=Application.current_color_theme[3],
-                                   command=lambda: self.confirm_color(custom_theme_root, theme_button, themes_frame),
-                                   fg=Application.current_color_theme[1])
+            submit_button = Button(master=top_frame, text='Submit', bg=Application.current_color_theme[0],
+                                   command=lambda: self.confirm_color(
+                                       custom_theme_root, theme_button, themes_frame, color_entries),
+                                   fg='#000000')
             submit_button.grid(column=0, row=10, pady=10)
             custom_theme_root.mainloop()
 
-        def choose_color(self, color_index, entry):
+        def choose_color(self, color_index, entry, rt):
             color = colorchooser.askcolor()[1]
+            rt.lift()
             if not color:
                 color = ''
             self.custom_colors[color_index] = color
             entry.delete(0, END)
             entry.insert(0, self.custom_colors[color_index])
 
-        def confirm_color(self, rt, theme_button, themes_frame):
+        def confirm_color(self, rt, theme_button, themes_frame, entries):
             self.theme_editor_exists = False
             theme_button.destroy()
             for i in range(len(self.custom_colors)):
                 if self.custom_colors[i] == "":
                     self.custom_colors[i] = "#ffffff"
+            for i in range(len(entries)):
+                if utils.is_hex_color(entries[i].get()):
+                    self.custom_colors[i] = entries[i].get()
             new_theme_str = self.custom_colors[0]
             for color in self.custom_colors[1:]:
                 new_theme_str += f";{color}"
-            config.write_config("custom_theme", new_theme_str)
-
-            new_custom_theme = self.ThemeOption('custom', master=themes_frame, row=9, pady=20)
+            config.write_config("custom theme", new_theme_str)
             rt.destroy()
+            new_custom_theme = self.ThemeOption('custom', master=themes_frame, row=9, pady=20)
+            Application.current_color_theme = get_theme(config.read_config('current theme'))
+            app.main_menu.go_to_settings()
+            app.settings_menu.go_to_main_menu()
 
         @staticmethod
         def refresh_counter(ats_text, ets_text):
@@ -258,7 +266,6 @@ class Application(Frame):
                 ets_new_count = str(bugs.count_bugs('ets'))
             except FileNotFoundError:
                 ets_new_count = 'N/A'
-
             ats_text['state'] = NORMAL
             ets_text['state'] = NORMAL
             rewrite_textbox(f"ATS: {ats_new_count}", ats_text)
@@ -296,9 +303,9 @@ class Application(Frame):
             custom_theme_option = self.ThemeOption('custom', master=theme_selection_frame, row=index, pady=20)
 
             custom_theme_button = Button(
-                master=theme_selection_frame, text='Custom Theme',
+                master=theme_selection_frame, text='Custom Theme', cursor='hand2',
                 command=lambda: self.configure_custom_theme(custom_theme_option, theme_selection_frame),
-                bg=Application.current_color_theme[3], fg=Application.current_color_theme[1])
+                bg=Application.current_color_theme[0], fg='#000000')
             custom_theme_button.grid(column=0, row=10, pady=10)
 
             left_frame = Frame(top_frame, bg=Application.current_color_theme[2])
@@ -340,14 +347,16 @@ class Application(Frame):
             ats_bugs_counter = Text(bugs_count_frame, width=10, height=1, borderwidth=0,
                                     bg=Application.current_color_theme[2],
                                     fg=Application.current_color_theme[1], font=subtitle_font)
-            ats_bugs_counter.insert(END, f'ATS: {ats_bugs_count}')
+            ats_bugs_counter.tag_configure("center", justify="center")
+            ats_bugs_counter.insert(END, f'ATS: {ats_bugs_count}', "center")
             ats_bugs_counter['state'] = DISABLED
             ats_bugs_counter.pack()
 
             ets2_bugs_counter = Text(bugs_count_frame, width=10, height=1, borderwidth=0,
                                      bg=Application.current_color_theme[2],
                                      fg=Application.current_color_theme[1], font=subtitle_font)
-            ets2_bugs_counter.insert(END, f'ETS 2: {ets_bugs_count}')
+            ets2_bugs_counter.tag_configure("center", justify="center")
+            ets2_bugs_counter.insert(END, f'ETS 2: {ets_bugs_count}', "center")
             ets2_bugs_counter['state'] = DISABLED
             ets2_bugs_counter.pack()
 
@@ -666,7 +675,7 @@ class Application(Frame):
 
             grid_i = 0
             for setting in config.ConfigHandler.config_layout.keys():
-                if config.ConfigHandler.config_layout[setting] == "secret":
+                if "secret" in config.ConfigHandler.config_layout[setting]:
                     continue
                 elif config.ConfigHandler.config_layout[setting] == "text":
                     self.SettingsOption(subbackground, parent_frame=self, row=grid_i, text=f'{setting.capitalize()}: ',
@@ -751,13 +760,13 @@ class Application(Frame):
             buttons_ats_background.pack(padx=30, pady=30, side=LEFT)
 
             buttons_ats_frame = Frame(buttons_ats_background, bg=Application.current_color_theme[2])
-            buttons_ats_frame.pack(side=LEFT, padx=10, pady=10)
+            buttons_ats_frame.pack(side=LEFT, padx=5, pady=5)
 
             buttons_ets_background = Frame(middle_frame, bg=Application.current_color_theme[1])
             buttons_ets_background.pack(padx=30, pady=30, side=RIGHT)
 
             buttons_ets_frame = Frame(buttons_ets_background, bg=Application.current_color_theme[2])
-            buttons_ets_frame.pack(side=LEFT, padx=10, pady=10)
+            buttons_ets_frame.pack(side=LEFT, padx=5, pady=5)
 
             buttons = []
             ats_projects = ['ATS - INTERNAL', 'ATS - PUBLIC', 'ATS - PUBLIC - SENIORS']
@@ -913,7 +922,7 @@ class Application(Frame):
         def show_prefix_input(self, master):
             asset_info_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[2],
                                    bd=0, height=1,
-                                   width=10, fg=app.current_color_theme[2])
+                                   width=10, fg=app.current_color_theme[1])
             if self.category == 'm':
                 asset_info_text.grid(row=4, column=0)
             asset_info_text.insert(END, "Prefix")
@@ -931,7 +940,7 @@ class Application(Frame):
         def show_rename_images_input(self, master):
             rename_images_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[2],
                                       bd=0, height=1,
-                                      width=10, fg=app.current_color_theme[2])
+                                      width=10, fg=app.current_color_theme[1])
             rename_images_text.grid(row=6, column=0)
             rename_images_text.insert(END, "Rename img")
             rename_images_text.configure(state=DISABLED)
@@ -1222,6 +1231,7 @@ class Application(Frame):
             severity_menu = OptionMenu(frame, self.severity_var, *severity_choices)
             severity_menu.configure(activebackground=Application.current_color_theme[3])
             severity_menu.configure(highlightbackground=Application.current_color_theme[3])
+            severity_menu.configure(fg=Application.current_color_theme[1])
 
             severity_text = Text(frame, font=Font(size=12), bg=Application.current_color_theme[2],
                                  bd=0, height=1,

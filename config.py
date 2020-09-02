@@ -30,10 +30,10 @@ class ConfigHandler:
             "mantis username": "text",
             "preferred browser": "browser",
             "save password": "yn",
-            "s_password": "secret",
-            "current_theme": "secret",
+            "s_password": "secret;hash",
+            "current theme": "secret;theme",
             # "renamed images location": "path"
-            "custom_theme": "color"
+            "custom theme": "secret;color"
     }
 
     def __init__(self, debug=False):
@@ -81,7 +81,7 @@ class ConfigHandler:
     def gui_config_edit(index, entered_text=None, yes_no_value=None, browser_chosen=None):
         cfg_layout = []
         for key in ConfigHandler.config_layout.keys():
-            if ConfigHandler.config_layout[key] != "secret":
+            if "secret" not in ConfigHandler.config_layout[key]:
                 cfg_layout.append(key)
 
         line_selection = index
@@ -101,26 +101,26 @@ class ConfigHandler:
 
     @staticmethod
     def get_default_config_value(config_line_type):
-        if config_line_type == "path":
+        if "path" in config_line_type:
             return "ENTER A PATH"
-        elif config_line_type == "text":
+        elif "text" in config_line_type:
             return ""
-        elif config_line_type == "browser":
+        elif "browser" in config_line_type:
             return "chrome"
-        elif config_line_type == "yn":
+        elif "yn" in config_line_type:
             return False
-        elif config_line_type == "color":
+        elif "color" in config_line_type:
             return "#ffffff;#ffffff;#ffffff;#ffffff"
+        elif "current theme" in config_line_type:
+            return "ph"
         else:
             return ""
 
     def gui_config_setup(self):
         cfg_layout = ConfigHandler.config_layout.keys()
         for entry in cfg_layout:
-            if ConfigHandler.config_layout[entry] == "secret":
+            if "secret" in ConfigHandler.config_layout[entry]:
                 ConfigHandler.cfg_dict[entry] = ""
-                if entry == "current_theme":
-                    ConfigHandler.cfg_dict[entry] = "ph"
             else:
                 ConfigHandler.cfg_dict[entry] = self.get_default_config_value(ConfigHandler.config_layout[entry])
         ConfigHandler.save_config()
@@ -158,7 +158,7 @@ def validate_cfg_images():
 
 
 def get_custom_theme():
-    theme_str = read_config("custom_theme")
+    theme_str = read_config("custom theme")
     custom_theme = []
     for color in theme_str.split(';'):
         custom_theme.append(color)
