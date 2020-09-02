@@ -56,85 +56,68 @@ def ask_yes_no():
         elif ans.upper() in ["N", "NO", "NOPE", "NAH", "F", "FALSE"]:
             return False
 
-
-def get_theme(theme):
-    theme_dict = {
-        "ph": {
-            # Change the values below to change the overall color theme of the app
-            1: 'white',  # Regular Buttons
-            2: '#ffa500',  # Quit Button, text
-            3: '#484848',  # Integrated Frames
-            4: '#2B2B2B'  # Background
-        },
-
-        "campfire": {
-            # Change the values below to change the overall color theme of the app
-            1: '#03A678',  # Regular Buttons
-            2: '#F28C0F',  # Quit Button, text
-            3: '#02735E',  # Integrated Frames
-            4: '#014040'  # Background
-        },
-
-        "hazard_theme": {
-            # Change the values below to change the overall color theme of the app
-            1: '#BD554A',  # Regular Buttons
-            2: '#CF423C',  # Quit Button, text
-            3: '#570B2A',  # Integrated Frames
-            4: '#33081E'  # Background
-        },
-
-        "candle": {
-            # Change the values below to change the overall color theme of the app
-            1: '#6EAFB5',  # Regular Buttons
-            2: '#FD9F75',  # Quit Button, text
-            3: '#185572',  # Integrated Frames
-            4: '#05395E'  # Background
-        },
-
-        "navy": {
-            # Change the values below to change the overall color theme of the app
-            1: '#387097',  # Regular Buttons
-            2: 'white',  # Quit Button, text
-            3: '#1F384C',  # Integrated Frames
-            4: '#1B2838'  # Background
-        },
-
-        "purple_rain": {
-            # Change the values below to change the overall color theme of the app
-            1: '#ECE8E1',  # Regular Buttons
-            2: '#FF4655',  # Quit Button, text
-            3: '#8C3243',  # Integrated Frames
-            4: '#271D26'  # Background
-        },
-
-        "storm": {
-            # Change the values below to change the overall color theme of the app
-            1: '#908CAC',  # Regular Buttons
-            2: '#C3BBD2',  # Quit Button, text
-            3: '#3F384F',  # Integrated Frames
-            4: '#1A1E26'  # Background
-        },
-
-        "grayscale": {
-            # Change the values below to change the overall color theme of the app
-            1: '#838383',  # Regular Buttons
-            2: '#D9D9D9',  # Quit Button, text
-            3: '#404040',  # Integrated Frames
-            4: '#262626'  # Background
-        },
-
-
-        "custom": {
-            # Change the values below to change the overall color theme of the app
-            1: 'white',  # Regular Buttons
-            2: 'white',  # Quit Button, text
-            3: 'white',  # Integrated Frames
-            4: 'white'  # Background
-        }
-    }
-    if theme == 'all':
-        return theme_dict
-    elif theme and theme_dict[theme]:
-        return theme_dict[theme]
-    else:
-        return theme_dict["ph"]
+# theme_dict = {
+#         "ph": {
+#             # Change the values below to change the overall color theme of the app
+#             1: 'white',  # Regular Buttons
+#             2: '#ffa500',  # Quit Button, text
+#             3: '#484848',  # Integrated Frames
+#             4: '#2B2B2B'  # Background
+#         },
+#
+#         "campfire": {
+#             # Change the values below to change the overall color theme of the app
+#             1: '#03A678',  # Regular Buttons
+#             2: '#F28C0F',  # Quit Button, text
+#             3: '#02735E',  # Integrated Frames
+#             4: '#014040'  # Background
+#         },
+#
+#         "hazard_theme": {
+#             # Change the values below to change the overall color theme of the app
+#             1: '#BD554A',  # Regular Buttons
+#             2: '#CF423C',  # Quit Button, text
+#             3: '#570B2A',  # Integrated Frames
+#             4: '#33081E'  # Background
+#         },
+#
+#         "candle": {
+#             # Change the values below to change the overall color theme of the app
+#             1: '#6EAFB5',  # Regular Buttons
+#             2: '#FD9F75',  # Quit Button, text
+#             3: '#185572',  # Integrated Frames
+#             4: '#05395E'  # Background
+#         },
+#
+#         "navy": {
+#             # Change the values below to change the overall color theme of the app
+#             1: '#387097',  # Regular Buttons
+#             2: 'white',  # Quit Button, text
+#             3: '#1F384C',  # Integrated Frames
+#             4: '#1B2838'  # Background
+#         },
+#
+#         "purple_rain": {
+#             # Change the values below to change the overall color theme of the app
+#             1: '#ECE8E1',  # Regular Buttons
+#             2: '#FF4655',  # Quit Button, text
+#             3: '#8C3243',  # Integrated Frames
+#             4: '#271D26'  # Background
+#         },
+#
+#         "storm": {
+#             # Change the values below to change the overall color theme of the app
+#             1: '#908CAC',  # Regular Buttons
+#             2: '#C3BBD2',  # Quit Button, text
+#             3: '#3F384F',  # Integrated Frames
+#             4: '#1A1E26'  # Background
+#         },
+#
+#         "grayscale": {
+#             # Change the values below to change the overall color theme of the app
+#             1: '#838383',  # Regular Buttons
+#             2: '#D9D9D9',  # Quit Button, text
+#             3: '#404040',  # Integrated Frames
+#             4: '#262626'  # Background
+#         }
+#     }

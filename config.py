@@ -1,7 +1,7 @@
 import fnmatch
 from ast import literal_eval
 
-from utils import is_int, find_path
+from utils import find_path
 import os
 
 
@@ -33,6 +33,7 @@ class ConfigHandler:
             "s_password": "secret",
             "current_theme": "secret",
             # "renamed images location": "path"
+            "custom_theme": "color"
     }
 
     def __init__(self, debug=False):
@@ -41,7 +42,7 @@ class ConfigHandler:
         else:
             config_path = "./config.cfg"
         if not os.path.isfile(config_path):
-            ConfigHandler.gui_config_setup()  # changed from config_setup()
+            self.gui_config_setup()
         else:
             cfg_file = open(config_path, "r", encoding='utf-8')
             cfg_lines = cfg_file.readlines()
@@ -50,17 +51,17 @@ class ConfigHandler:
             temp_dict = "{" + ", ".join(cfg_lines) + "}"
             ConfigHandler.cfg_dict = literal_eval(temp_dict)
             if not debug:
-                ConfigHandler.validate_config()
+                self.validate_config()
             cfg_file.close()
 
-    @staticmethod
-    def validate_config():
+    def validate_config(self):
         # Looks at the config_layout and checks if any lines are missing. If so, asks for them and saves to config
         config_layout = ConfigHandler.config_layout
         config_wasnt_valid = False
         for layout_item in config_layout.keys():
             if layout_item not in ConfigHandler.cfg_dict.keys():
-                ConfigHandler.cfg_dict[layout_item] = ""
+                # ConfigHandler.cfg_dict[layout_item] = ""
+                ConfigHandler.cfg_dict[layout_item] = self.get_default_config_value(config_layout[layout_item])
                 config_wasnt_valid = True
         if ConfigHandler.cfg_dict["save password"] == "False":
             if ConfigHandler.cfg_dict["s_password"] != "":
@@ -99,22 +100,29 @@ class ConfigHandler:
         ConfigHandler.save_config()
 
     @staticmethod
-    def gui_config_setup():
+    def get_default_config_value(config_line_type):
+        if config_line_type == "path":
+            return "ENTER A PATH"
+        elif config_line_type == "text":
+            return ""
+        elif config_line_type == "browser":
+            return "chrome"
+        elif config_line_type == "yn":
+            return False
+        elif config_line_type == "color":
+            return "#ffffff;#ffffff;#ffffff;#ffffff"
+        else:
+            return ""
+
+    def gui_config_setup(self):
         cfg_layout = ConfigHandler.config_layout.keys()
         for entry in cfg_layout:
             if ConfigHandler.config_layout[entry] == "secret":
                 ConfigHandler.cfg_dict[entry] = ""
                 if entry == "current_theme":
                     ConfigHandler.cfg_dict[entry] = "ph"
-            elif ConfigHandler.config_layout[entry] == "path":
-                ConfigHandler.cfg_dict[entry] = "ENTER A PATH"
-            elif ConfigHandler.config_layout[entry] == "text":
-                ConfigHandler.cfg_dict[entry] = ""
-            elif ConfigHandler.config_layout[entry] == "browser":
-                ConfigHandler.cfg_dict[entry] = "chrome"
-            elif ConfigHandler.config_layout[entry] == "yn":
-                ConfigHandler.cfg_dict[entry] = False
-
+            else:
+                ConfigHandler.cfg_dict[entry] = self.get_default_config_value(ConfigHandler.config_layout[entry])
         ConfigHandler.save_config()
 
     @staticmethod
@@ -147,3 +155,90 @@ def validate_cfg_images():
             return images_folder
     else:
         return ""
+
+
+def get_custom_theme():
+    theme_str = read_config("custom_theme")
+    custom_theme = []
+    for color in theme_str.split(';'):
+        custom_theme.append(color)
+    if len(custom_theme) == 4:
+        return custom_theme
+    else:
+        return ['#ffffff', '#ffffff', '#ffffff', '#ffffff']
+
+
+def get_theme(theme):
+    theme_dict = {
+        "ph": [
+            # Change the values below to change the overall color theme of the app
+            'white',  # Regular Buttons
+            '#ffa500',  # Quit Button, text
+            '#484848',  # Integrated Frames
+            '#2B2B2B'  # Background
+        ],
+
+        "campfire": [
+            # Change the values below to change the overall color theme of the app
+            '#03A678',  # Regular Buttons
+            '#F28C0F',  # Quit Button, text
+            '#02735E',  # Integrated Frames
+            '#014040'  # Background
+        ],
+
+        "hazard_theme": [
+            # Change the values below to change the overall color theme of the app
+            '#BD554A',  # Regular Buttons
+            '#CF423C',  # Quit Button, text
+            '#570B2A',  # Integrated Frames
+            '#33081E'  # Background
+        ],
+
+        "candle": [
+            # Change the values below to change the overall color theme of the app
+            '#6EAFB5',  # Regular Buttons
+            '#FD9F75',  # Quit Button, text
+            '#185572',  # Integrated Frames
+            '#05395E'  # Background
+        ],
+
+        "navy": [
+            # Change the values below to change the overall color theme of the app
+            '#387097',  # Regular Buttons
+            'white',  # Quit Button, text
+            '#1F384C',  # Integrated Frames
+            '#1B2838'  # Background
+        ],
+
+        "purple_rain": [
+            # Change the values below to change the overall color theme of the app
+            '#ECE8E1',  # Regular Buttons
+            '#FF4655',  # Quit Button, text
+            '#8C3243',  # Integrated Frames
+            '#271D26'  # Background
+        ],
+
+        "storm": [
+            # Change the values below to change the overall color theme of the app
+            '#908CAC',  # Regular Buttons
+            '#C3BBD2',  # Quit Button, text
+            '#3F384F',  # Integrated Frames
+            '#1A1E26'  # Background
+        ],
+
+        "grayscale": [
+            # Change the values below to change the overall color theme of the app
+            '#838383',  # Regular Buttons
+            '#D9D9D9',  # Quit Button, text
+            '#404040',  # Integrated Frames
+            '#262626'  # Background
+        ]
+    }
+    if theme == 'all':
+        return theme_dict
+    if theme == 'custom':
+        return get_custom_theme()
+    elif theme and theme_dict[theme]:
+        return theme_dict[theme]
+    else:
+        return theme_dict["ph"]

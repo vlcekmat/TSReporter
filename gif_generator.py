@@ -157,7 +157,7 @@ class GifGeneratorPage(Frame):
     def clear_gif_frames(self, images_frame):
         self.gif_maker.clear_frames()
         self.preview_thread.clear_preview_frames()
-        images_frame['bg'] = self.app.current_color_theme[3]
+        images_frame['bg'] = self.app.current_color_theme[2]
         for list in self.widgets_to_update:
             for index in range(2):
                 list[index].destroy()
@@ -203,7 +203,7 @@ class GifGeneratorPage(Frame):
             img_path_text.grid(row=index, column=2)
             img_path_text.insert(END, img_path.split('/')[-1])
             img_path_text['state'] = DISABLED
-            master['bg'] = self.app.current_color_theme[4]
+            master['bg'] = self.app.current_color_theme[3]
             index += 1
 
         for widget_tuple in self.widgets_to_update:
