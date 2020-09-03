@@ -216,30 +216,30 @@ class GifGeneratorPage(Frame):
             self.clear_gif_frames(master)
 
     def init_widgets(self):
-        background = Frame(master=self, bg=self.current_color_theme[4])
+        background = Frame(master=self, bg=self.current_color_theme[3])
         background.pack(fill=BOTH, expand=True)
 
-        middle_frame = Frame(master=background, bg=self.current_color_theme[3])
+        middle_frame = Frame(master=background, bg=self.current_color_theme[2])
         middle_frame.pack(fill=BOTH, expand=True, pady=10, padx=20)
 
-        top_frame = Frame(master=middle_frame, bg=self.current_color_theme[3])
+        top_frame = Frame(master=middle_frame, bg=self.current_color_theme[2])
         top_frame.pack(fill=BOTH, expand=False, pady=0, padx=0, side=TOP)
 
-        self.gif_created_text = Label(top_frame, bg=self.current_color_theme[3], fg=self.current_color_theme[2],
+        self.gif_created_text = Label(top_frame, bg=self.current_color_theme[2], fg=self.current_color_theme[1],
                                       text='GIF successfully created in your "Edited Images" folder!',
                                       font=Font(size=12))
 
-        bottom_frame = Frame(master=background, bg=self.current_color_theme[4])
+        bottom_frame = Frame(master=background, bg=self.current_color_theme[3])
         bottom_frame.pack(fill=X, side=BOTTOM)
 
-        images_list_frame = Frame(master=middle_frame, bg=self.current_color_theme[4], pady=10, padx=10)
+        images_list_frame = Frame(master=middle_frame, bg=self.current_color_theme[3], pady=10, padx=10)
         images_list_frame.pack(side=LEFT, padx=10, pady=10, fill="none", expand=True)
         self.images_paths_frame = images_list_frame
 
-        preview_frame = Frame(master=middle_frame, bg=self.current_color_theme[3], pady=60, padx=20)
+        preview_frame = Frame(master=middle_frame, bg=self.current_color_theme[2], pady=60, padx=20)
         preview_frame.pack(side=RIGHT, padx=0, fill="none", expand=True)
 
-        preview_label = Label(master=preview_frame, padx=0, pady=0, bg=self.current_color_theme[3])
+        preview_label = Label(master=preview_frame, padx=0, pady=0, bg=self.current_color_theme[2])
         preview_label.pack()
         self.preview_thread = self.GifPreviewThread(preview_label)
         self.preview_thread.start()
@@ -253,13 +253,13 @@ class GifGeneratorPage(Frame):
                                          command=lambda: self.find_image())
         clear_button = self.app.AppButton('Clear', frame=bottom_frame, side=RIGHT,
                                           command=lambda: self.clear_gif_frames(images_list_frame))
-        fps_frame = Frame(master=bottom_frame, bg=self.current_color_theme[4])
+        fps_frame = Frame(master=bottom_frame, bg=self.current_color_theme[3])
         fps_frame.pack(side=RIGHT, padx=10)
 
-        fps_text = Label(master=fps_frame, bg=self.current_color_theme[4], fg=self.current_color_theme[2],
+        fps_text = Label(master=fps_frame, bg=self.current_color_theme[3], fg=self.current_color_theme[1],
                          text='Delay', font=Font(size=15)).grid(row=0, column=0)
         dur_var = StringVar()
         dur_var.set(1000)
         dur_var.trace("w", lambda name, index, mode, var=dur_var: self.callback(var))
-        fps_entry = Entry(master=fps_frame, bg=self.current_color_theme[3], fg=self.current_color_theme[2],
+        fps_entry = Entry(master=fps_frame, bg=self.current_color_theme[2], fg=self.current_color_theme[1],
                           width=10, font=Font(size=15), textvariable=dur_var).grid(row=1, column=0)

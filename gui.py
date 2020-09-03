@@ -116,7 +116,7 @@ class Application(Frame):
         # Its first instance is created in the constructor of the Application class
 
         custom_colors = ['', '', '', '']
-        theme_editor_exists = False
+        theme_editor_exists = False  # for singleton behaviour
 
         def __init__(self):
             super().__init__()
@@ -304,7 +304,7 @@ class Application(Frame):
 
             custom_theme_button = Button(
                 master=theme_selection_frame, text='Custom Theme', cursor='hand2',
-                command=lambda: self.configure_custom_theme(custom_theme_option, theme_selection_frame),
+                command=lambda: self.configure_custom_theme(custom_theme_option, theme_selection_frame, root),
                 bg=Application.current_color_theme[0], fg='#000000')
             custom_theme_button.grid(column=0, row=10, pady=10)
 
@@ -1278,8 +1278,8 @@ class Application(Frame):
             rename_checkbox_frame.grid(column=1, row=7, sticky=E)
 
             rename_checkbox_description = Label(rename_checkbox_frame, font=Font(size=8), bd=0, text="Rename?",
-                                               bg=Application.current_color_theme[2], height=1,
-                                               width=15, fg=Application.current_color_theme[1])
+                                                bg=Application.current_color_theme[2], height=1,
+                                                width=15, fg=Application.current_color_theme[1])
             rename_checkbox_description.pack(side=LEFT)
             # rename_checkbox_description.insert(END, "Rename?")
             # rename_checkbox_description.configure(state=DISABLED)
