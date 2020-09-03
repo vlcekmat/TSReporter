@@ -56,7 +56,6 @@ def check_for_duplicates(username, password, bug_description=None,
     else:
         final_filter = extract_location_filter(bug_description)
 
-    # Interact with the website here
     driver.get('https://qa.scssoft.com/view_all_bug_page.php')
     driver.find_element_by_xpath("//a[@class='btn btn-sm btn-primary btn-white btn-round']").click()  # reset button
     driver.find_element_by_id('filter-search-txt').send_keys(final_filter)  # filter box

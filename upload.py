@@ -1,5 +1,4 @@
 from pathlib import Path
-
 from selenium.common.exceptions import WebDriverException
 
 from sector_seek import find_assign_to

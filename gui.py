@@ -200,13 +200,13 @@ class Application(Frame):
             background = Frame(master=custom_theme_root, bg=Application.current_color_theme[3])
             background.pack(fill=BOTH, expand=True)
 
-            top_frame = Frame(master=background, bg=Application.current_color_theme[3], pady=10, padx=10)
-            top_frame.pack(fill=X, side=TOP)
+            top_frame = Frame(master=background, bg=Application.current_color_theme[2], pady=10, padx=10)
+            top_frame.pack(side=TOP, padx=20, pady=20, fill=BOTH)
 
             color_entries = []
             color_types = ['Buttons', 'Text', 'Frames', 'Background']
             for i in range(4):
-                color_text = Label(master=top_frame, bg=Application.current_color_theme[3],
+                color_text = Label(master=top_frame, bg=Application.current_color_theme[2],
                                    fg=Application.current_color_theme[1], text=color_types[i] + ': ')
                 color_text.grid(column=0, row=i, sticky=W, pady=10)
                 color_entry = Entry(master=top_frame, width=10, bg=Application.current_color_theme[2],
@@ -230,7 +230,7 @@ class Application(Frame):
 
         def choose_color(self, color_index, entry, rt):
             color = colorchooser.askcolor()[1]
-            rt.lift()
+            rt.lift()  # This moves the window on top of the main app
             if not color:
                 color = ''
             self.custom_colors[color_index] = color
@@ -441,14 +441,11 @@ class Application(Frame):
                     for i in range(3):
                         loading_text['text'] += '.'
                         sleep(0.5)
-        # region COMMANDS
 
         def try_log_in(self, text_field, login_frame):
             self.entered_password = text_field.get()
             login_frame.pack_forget()
             self.LoginThread(login_frame).start()
-
-        # endregion
 
         def go_to_projects(self):
             self.pack_forget()
@@ -920,13 +917,13 @@ class Application(Frame):
                 self.asset_path_input = text_input
 
         def show_prefix_input(self, master):
-            asset_info_text = Text(master, font=Font(size=12), bg=Application.current_color_theme[2],
-                                   bd=0, height=1,
+            asset_info_text = Label(master, font=Font(size=12), bg=Application.current_color_theme[2],
+                                   bd=0, height=1, text="Prefix",
                                    width=10, fg=app.current_color_theme[1])
             if self.category == 'm':
                 asset_info_text.grid(row=4, column=0)
-            asset_info_text.insert(END, "Prefix")
-            asset_info_text.configure(state=DISABLED)
+            # asset_info_text.insert(END, "Prefix")
+            # asset_info_text.configure(state=DISABLED)
             text_input = Entry(master, bg=Application.current_color_theme[2],
                                fg=Application.current_color_theme[1], width=25,
                                font=Font(size=10))
@@ -1199,7 +1196,7 @@ class Application(Frame):
             else:
                 self.rename_box['state'] = DISABLED
 
-        def make_options_sidebar(self, frame, current_bug_summary):
+        def make_options_sidebar(self, frame):
             # The report options sidebar is created here.
             if 'a' in self.category:
                 self.show_text_input_asset_path(frame)
@@ -1209,14 +1206,16 @@ class Application(Frame):
             self.priority_var.set(priority_choices[0])
 
             priority_menu = OptionMenu(frame, self.priority_var, *priority_choices)
-            priority_menu.configure(activebackground=Application.current_color_theme[3])
-            priority_menu.configure(highlightbackground=Application.current_color_theme[3])
+            priority_menu.config(activebackground=Application.current_color_theme[3])
+            priority_menu.config(activeforeground=Application.current_color_theme[1])
+            priority_menu.config(highlightbackground=Application.current_color_theme[3])
 
-            priority_text = Text(frame, font=Font(size=12), bg=Application.current_color_theme[2],
-                                 bd=0, height=1, width=10, fg=Application.current_color_theme[1])
+            priority_text = Label(frame, font=Font(size=12), bg=Application.current_color_theme[2],
+                                  bd=0, height=1, width=10, fg=Application.current_color_theme[1],
+                                  text="Priority")
             priority_text.grid(row=1, column=0)
-            priority_text.insert(END, "Priority")
-            priority_text.configure(state=DISABLED)
+            # priority_text.insert(END, "Priority")
+            # priority_text.config(state=DISABLED)
 
             priority_menu.grid(row=1, column=1, sticky=W+E)
             priority_menu.config(bg=Application.current_color_theme[2])
@@ -1227,23 +1226,26 @@ class Application(Frame):
             severity_choices = ['Minor', 'Major']
             self.severity_var = StringVar(frame)
             self.severity_var.set(severity_choices[0])
+            severity_text = Label(frame, font=Font(size=12), bg=Application.current_color_theme[2],
+                                  bd=0, height=1, text="Severity",
+                                  width=10, fg=Application.current_color_theme[1])
+            severity_text.grid(row=2, column=0)
+            # severity_text.insert(END, "Severity")
+            # severity_text.config(state=DISABLED)
 
             severity_menu = OptionMenu(frame, self.severity_var, *severity_choices)
-            severity_menu.configure(activebackground=Application.current_color_theme[3])
-            severity_menu.configure(highlightbackground=Application.current_color_theme[3])
-            severity_menu.configure(fg=Application.current_color_theme[1])
-
-            severity_text = Text(frame, font=Font(size=12), bg=Application.current_color_theme[2],
-                                 bd=0, height=1,
-                                 width=10, fg=Application.current_color_theme[1])
-            severity_text.grid(row=2, column=0)
-            severity_text.insert(END, "Severity")
-            severity_text.configure(state=DISABLED)
-
+            severity_menu.config(activebackground=Application.current_color_theme[3])
+            severity_menu.config(activeforeground=Application.current_color_theme[1])
+            severity_menu.config(highlightbackground=Application.current_color_theme[3])
             severity_menu.grid(row=2, column=1, sticky=W+E)
+
+            severity_menu.config(bg=Application.current_color_theme[2])
+            severity_menu.config(fg=Application.current_color_theme[1])
+            severity_menu.config(font="Helvetica 10")
+
             if self.category == 'm':
                 severity_menu['state'] = DISABLED
-            elif self.category == 'a':
+            elif 'a' in self.category:
                 priority_menu['state'] = DISABLED
                 self.priority_var.set(priority_choices[1])
                 self.severity_var.set(severity_choices[0])
@@ -1252,11 +1254,11 @@ class Application(Frame):
 
             checkbox_frame = Frame(master=frame, bg=Application.current_color_theme[2])
 
-            checkbox_description = Text(checkbox_frame, font=Font(size=8), bg=Application.current_color_theme[2],
-                                        bd=0, height=1, width=15, fg=Application.current_color_theme[1])
-
-            checkbox_description.insert(END, "Remember prefix")
-            checkbox_description.configure(state=DISABLED)
+            checkbox_description = Label(checkbox_frame, font=Font(size=8), text="Remember prefix",
+                                         bg=Application.current_color_theme[2], fg=Application.current_color_theme[1],
+                                         bd=0, height=1, width=15, )
+            # checkbox_description.insert(END, "Remember prefix")
+            # checkbox_description.configure(state=DISABLED)
 
             prefix_checked = BooleanVar()
             prefix_checkbox = Checkbutton(master=checkbox_frame, bg=Application.current_color_theme[2],
@@ -1275,12 +1277,12 @@ class Application(Frame):
             rename_checkbox_frame = Frame(master=frame, bg=Application.current_color_theme[2])
             rename_checkbox_frame.grid(column=1, row=7, sticky=E)
 
-            rename_checkbox_description = Text(rename_checkbox_frame, font=Font(size=8), bd=0,
+            rename_checkbox_description = Label(rename_checkbox_frame, font=Font(size=8), bd=0, text="Rename?",
                                                bg=Application.current_color_theme[2], height=1,
                                                width=15, fg=Application.current_color_theme[1])
             rename_checkbox_description.pack(side=LEFT)
-            rename_checkbox_description.insert(END, "Rename?")
-            rename_checkbox_description.configure(state=DISABLED)
+            # rename_checkbox_description.insert(END, "Rename?")
+            # rename_checkbox_description.configure(state=DISABLED)
 
             rename_checked = BooleanVar()
 
@@ -1299,10 +1301,6 @@ class Application(Frame):
                                     bd=0, height=1, width=15, fg=Application.current_color_theme[0])
 
             self.prefix_check_button = prefix_checkbox
-
-            severity_menu.config(bg=Application.current_color_theme[2])
-            severity_menu.config(fg=Application.current_color_theme[0])
-            severity_menu.config(font="Helvetica 10")
 
             for col in range(frame.grid_size()[0]):
                 frame.grid_columnconfigure(col, minsize=120)
@@ -1432,7 +1430,7 @@ class Application(Frame):
                                        fg=Application.current_color_theme[1], bd=0, font="Helvetica 10")
             # The scrollable canvas is created here
             thumbnail_canvas = self.make_scrollable_canvas(frame_for_canvas, len(current_bug), image_labels)
-            self.make_options_sidebar(frame_for_sidebar, current_bug_summary)
+            self.make_options_sidebar(frame_for_sidebar)
 
             # endregion Frames
             if self.already_reported:
