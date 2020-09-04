@@ -304,7 +304,7 @@ class Application(Frame):
 
             custom_theme_button = Button(
                 master=theme_selection_frame, text='Custom Theme', cursor='hand2',
-                command=lambda: self.configure_custom_theme(custom_theme_option, theme_selection_frame, root),
+                command=lambda: self.configure_custom_theme(custom_theme_option, theme_selection_frame),
                 bg=Application.current_color_theme[0], fg='#000000')
             custom_theme_button.grid(column=0, row=10, pady=10)
 
@@ -918,8 +918,8 @@ class Application(Frame):
 
         def show_prefix_input(self, master):
             asset_info_text = Label(master, font=Font(size=12), bg=Application.current_color_theme[2],
-                                   bd=0, height=1, text="Prefix",
-                                   width=10, fg=app.current_color_theme[1])
+                                    bd=0, height=1, text="Prefix",
+                                    width=10, fg=app.current_color_theme[1])
             if self.category == 'm':
                 asset_info_text.grid(row=4, column=0)
             # asset_info_text.insert(END, "Prefix")

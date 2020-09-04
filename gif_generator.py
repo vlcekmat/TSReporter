@@ -158,9 +158,9 @@ class GifGeneratorPage(Frame):
         self.gif_maker.clear_frames()
         self.preview_thread.clear_preview_frames()
         images_frame['bg'] = self.app.current_color_theme[2]
-        for list in self.widgets_to_update:
+        for w_list in self.widgets_to_update:
             for index in range(2):
-                list[index].destroy()
+                w_list[index].destroy()
         self.widgets_to_update = []
 
     def convert_to_gif(self):

@@ -130,9 +130,9 @@ def upload_to_mantis(version, category, log_lines, project, username, password,
         images.reverse()
 
     for upload_me in images:
-        if late_image == upload_me:
-            continue
-        else:
+        # if late_image == upload_me:
+        #     continue
+        # else:
             # upload an image
-            driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))
+        driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))
     # endregion
