@@ -363,8 +363,8 @@ class Application(Frame):
             refresh_button = Application.AppButton(frame=top_frame, text="Refresh", font_size=10,
                                                    pady=2, offy=1, text_spacing=1,
                                                    command=lambda: self.refresh_counter(
-                                                       ats_text=ats_bugs_count,
-                                                       ets_text=ets_bugs_count)
+                                                       ats_text=ats_bugs_counter,
+                                                       ets_text=ets2_bugs_counter)
                                                    )
             # endregion
 
