@@ -66,8 +66,11 @@ def extract_location_filter(bug_description):
 
 def extract_asset_name(path_to_asset):
     # From '/model/advert/billboard/billboard_uni_astand.pmd' it will return 'billboard_uni_astand'
-    asset_name_suffix = path_to_asset.split('/')[-1]
-    asset_name = asset_name_suffix.split('.')[0]
+    asset_file = path_to_asset.split('/')[-1]
+    if '.' in asset_file:
+        asset_name = asset_file.split('.')[0]
+    else:
+        asset_name = asset_file
     return asset_name
 
 
@@ -77,6 +80,7 @@ def extract_asset_path(debug_info):
     for part in debug_info.split(' '):
         if '/' in part:
             asset_path = part.split("'")[1]
+            break
     return asset_path
 
 

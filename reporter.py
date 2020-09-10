@@ -1,4 +1,3 @@
-# from batch import ask_for_prefix
 from chromedrivers import DriverHandler, log_into_mantis
 from upload import upload_to_mantis
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowException, WebDriverException

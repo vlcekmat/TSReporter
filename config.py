@@ -60,7 +60,6 @@ class ConfigHandler:
         config_wasnt_valid = False
         for layout_item in config_layout.keys():
             if layout_item not in ConfigHandler.cfg_dict.keys():
-                # ConfigHandler.cfg_dict[layout_item] = ""
                 ConfigHandler.cfg_dict[layout_item] = self.get_default_config_value(config_layout[layout_item])
                 config_wasnt_valid = True
         if ConfigHandler.cfg_dict["save password"] == "False":
@@ -73,9 +72,9 @@ class ConfigHandler:
     @staticmethod
     def save_config():
         # Saves content of dictionary to config.cfg in correct format
-        cfg_file = open("./config.cfg", "w", encoding='UTF-8')
-        for key in ConfigHandler.cfg_dict:
-            cfg_file.write(f'"{key}" : "{ConfigHandler.cfg_dict[key]}"\n')
+        with open("./config.cfg", "w", encoding='UTF-8') as cfg_file:
+            for key in ConfigHandler.cfg_dict:
+                cfg_file.write(f'"{key}" : "{ConfigHandler.cfg_dict[key]}"\n')
 
     @staticmethod
     def gui_config_edit(index, entered_text=None, yes_no_value=None, browser_chosen=None):
@@ -143,18 +142,6 @@ class ConfigHandler:
                 new_value = entered_text
 
         return new_value
-
-
-def validate_cfg_images():
-    # Gets edited image location from the config and checks that it exists and has at least one valid file
-    images_folder = read_config("edited images location")
-    if images_folder == "":
-        return ""
-    for is_this_image in os.listdir(images_folder):
-        if fnmatch.fnmatch(is_this_image, "*.jpg") or fnmatch.fnmatch(is_this_image, "*.gif"):
-            return images_folder
-    else:
-        return ""
 
 
 def get_custom_theme():

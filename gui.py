@@ -9,17 +9,17 @@ from threading import Thread
 from PIL import ImageTk, Image
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowException, WebDriverException
 
-from information_compile import determine_bug_category, extract_asset_name
+from information_compile import determine_bug_category, extract_asset_name, extract_asset_path
 from password import get_password
 from versions import find_version
 import bugs
 import config
+from config import get_theme
 from gui_bughandler import BugHandler
 from chromedrivers import DriverHandler, gui_login
 from sector_seek import find_assign_to
 from chromedrivers import log_into_mantis
 import utils
-from config import get_theme
 import reporter
 import gif_generator
 
@@ -879,7 +879,10 @@ class Application(Frame):
 
                 if self.asset_path_input:
                     if self.asset_path_input.get() not in ['Enter asset path/debug info', '']:
-                        opt_asset = f"{extract_asset_name(self.asset_path_input.get())} - "
+                        if 'DEBUG INFO' in self.asset_path_input.get():
+                            opt_asset = f"{extract_asset_name(extract_asset_path(self.asset_path_input.get()))} - "
+                        else:
+                            opt_asset = f"{extract_asset_name(self.asset_path_input.get())} - "
                 current = self.bug_handler.get_current()[0][:-1]
                 current = current.split(';')[0]
 
