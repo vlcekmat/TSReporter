@@ -268,8 +268,12 @@ class Application(Frame):
                 ets_new_count = 'N/A'
             ats_text['state'] = NORMAL
             ets_text['state'] = NORMAL
-            rewrite_textbox(f"ATS: {ats_new_count}", ats_text)
-            rewrite_textbox(f"ETS 2: {ets_new_count}", ets_text)
+            ats_text.delete("1.0", END)
+            ats_text.insert("1.0", f"ATS: {ats_new_count}", "center")
+            ets_text.delete("1.0", END)
+            ets_text.insert("1.0", f"ETS 2: {ets_new_count}", "center")
+            # rewrite_textbox(f"ATS: {ats_new_count}", ats_text)
+            # rewrite_textbox(f"ETS 2: {ets_new_count}", ets_text)
             ats_text['state'] = DISABLED
             ets_text['state'] = DISABLED
 
