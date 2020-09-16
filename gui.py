@@ -272,8 +272,6 @@ class Application(Frame):
             ats_text.insert("1.0", f"ATS: {ats_new_count}", "center")
             ets_text.delete("1.0", END)
             ets_text.insert("1.0", f"ETS 2: {ets_new_count}", "center")
-            # rewrite_textbox(f"ATS: {ats_new_count}", ats_text)
-            # rewrite_textbox(f"ETS 2: {ets_new_count}", ets_text)
             ats_text['state'] = DISABLED
             ets_text['state'] = DISABLED
 
@@ -1250,12 +1248,12 @@ class Application(Frame):
             severity_menu.config(fg=Application.current_color_theme[1])
             severity_menu.config(font="Helvetica 10")
 
-            if self.category == 'm':
+            if self.category == 'm' or 'a' in self.category:
                 severity_menu['state'] = DISABLED
-            elif 'a' in self.category:
-                priority_menu['state'] = DISABLED
-                self.priority_var.set(priority_choices[1])
-                self.severity_var.set(severity_choices[0])
+            # elif 'a' in self.category:
+            #     priority_menu['state'] = DISABLED
+            #     self.priority_var.set(priority_choices[1])
+            #     self.severity_var.set(severity_choices[0])
 
             self.show_prefix_input(frame)
 
@@ -1316,7 +1314,7 @@ class Application(Frame):
 
         def priority_callback(self, *args):
             # Priority of map bugs determines their severity, see testing guide on wiki
-            if self.category == 'm':
+            if self.category == 'm' or 'a' in self.category:
                 if self.priority_var.get() == "Low" and self.severity_var.get() == "Major":
                     self.severity_var.set("Minor")
                 elif self.priority_var.get() != "Low" and self.severity_var.get() == "Minor":
