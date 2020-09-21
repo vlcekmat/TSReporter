@@ -3,20 +3,35 @@ from decimal import Decimal
 from config import read_config
 
 
+def _time_format_error():
+    print("WARNING, unknown date/time format. The bugs.txt time format must have changed. "
+          "Contact a programmer to fix this.")
+
+
 def get_image(log):
     # returns a Path() of the particular image file based on date, time and coordinates
     images_folder_path = read_config("edited images location")
     split_log = log.split(';')
 
-    raw_date_time = split_log[1][1: 17]
-    split_date = raw_date_time.split(' ')[0].split('/')
-    split_time = raw_date_time.split(' ')[1].split(':')
-    date_time_to_find = f'{split_date[2]}{split_date[1]}{split_date[0]}_{split_time[0]}{split_time[1]}'
+    # ...;[28/08/2021 14:21] (sec-0019-0008);... -> 28/08/2021 14:21
+    raw_dt = split_log[1].split(']')[0][1:]
+    if '/' not in raw_dt or ':' not in raw_dt:
+        _time_format_error()
+        return None
+
+    s_date = raw_dt.split(' ')[0].split('/')
+    s_time = raw_dt.split(' ')[1].split(':')
+
+    if len(s_time) == 3:
+        date_time_to_find = f'{s_date[2]}{s_date[1]}{s_date[0]}_{s_time[0]}{s_time[1]}{s_time[2]}'
+    elif len(s_time) == 2 and len(s_date) == 3:
+        date_time_to_find = f'{s_date[2]}{s_date[1]}{s_date[0]}_{s_time[0]}{s_time[1]}'
+    else:
+        _time_format_error()
+        return None
+
     coord_0 = str(round(Decimal(str(split_log[2]))))[:-1]
     coord_2 = str(round(Decimal(str(split_log[4]))))[:-1]
-
-    if '-' in coord_2:
-        coord_2 = str(round(Decimal(str(split_log[4]))))[:6]
 
     path = Path(images_folder_path)
     for file in path.glob('*.gif'):

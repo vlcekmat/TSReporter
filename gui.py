@@ -1,5 +1,6 @@
 import copy
 import os
+import subprocess
 from collections import deque
 from time import sleep
 from tkinter import *
@@ -25,7 +26,7 @@ import gif_generator
 
 
 custom_theme = None
-version = "0.4.2"
+version = "0.4.4"
 
 
 class Application(Frame):
@@ -297,11 +298,9 @@ class Application(Frame):
             theme_selection_frame = Frame(color_button_frame, bg=Application.current_color_theme[2])
             theme_selection_frame.pack()
 
-            index = 0
-            for color_theme in get_theme('all'):
+            for index, color_theme in enumerate(get_theme('all')):
                 if color_theme != 'custom':
                     theme_option = self.ThemeOption(color_theme, master=theme_selection_frame, row=index)
-                    index += 1
             custom_theme_option = self.ThemeOption('custom', master=theme_selection_frame, row=index, pady=20)
 
             custom_theme_button = Button(
@@ -822,9 +821,8 @@ class Application(Frame):
         prefix = None
         bug_preview = None
 
-        find_duplicates_button = None
-
         rename_box = None
+        head_img_label = None
 
         def __init__(self, project, bug_handler, reported=False, prefix=None, last_time_rename_checked=False):
             super().__init__()
@@ -993,7 +991,7 @@ class Application(Frame):
                     last_time_rename_checked=self.rename_images
                 )
 
-        def find_missing_image(self, image_label, bug_entry, try_again_button, find_img_button=None,
+        def find_missing_image(self, bug_entry, try_again_button, find_img_button=None,
                                image_location_text=None):
             try:
                 new_image_path = utils.find_image_path()
@@ -1012,8 +1010,8 @@ class Application(Frame):
                     image_retrieved = bug_entry.get_small_image()
                 image_retrieved.thumbnail(Application.Reporting.img_size)
                 image_to_show = ImageTk.PhotoImage(image_retrieved)
-                image_label.configure(image=image_to_show)
-                image_label.image = image_to_show
+                self.head_img_label.configure(image=image_to_show)
+                self.head_img_label.image = image_to_show
                 if try_again_button and self.bug_handler.images_good():
                     try_again_button.get_element().pack_forget()
                     try_again_button.get_element().destroy()
@@ -1121,12 +1119,17 @@ class Application(Frame):
                     image_location_text.insert(END, current_bug[0].image_location)
                     image_location_text.configure(state=DISABLED)
                     image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
+                    self.head_img_label.bind('<Button-1>',
+                                             lambda x=current_bug[0].image_location: open_image_in_editor(x))
                 if self.bug_handler.images_good() and try_again_button:
                     try_again_button.get_element().pack_forget()
                     try_again_button.get_element().destroy()
                 canvas.config(scrollregion=canvas.bbox("all"))
             except ValueError:
                 pass
+
+        def make_this_img_head(self, current_bug, index):
+            current_bug[0], current_bug[index] = current_bug[index], current_bug[0]
 
         class BugEntry:
             # Each line of current bug is represented by a line and an image as instances of this class
@@ -1427,11 +1430,11 @@ class Application(Frame):
             # All image labels are created here, they will be grid-placed into the thumbnail_frame
             # Except the first one, that is the bug head and gets the big preview
             image_labels = []  # Use this array to reference the labels and update them
-            head_img_label = Label(left_frame, bg=Application.current_color_theme[2])
-            head_img_label.place(x=0, y=0)
-            head_img_label.pack(pady=0, padx=0, side=TOP)
-            image_labels.append(head_img_label)
-            image_location_text = Text(left_frame, height=1, width=60, bg=Application.current_color_theme[2],
+            self.head_img_label = Label(left_frame, bg=Application.current_color_theme[2])
+            self.head_img_label.place(x=0, y=0)
+            self.head_img_label.pack(pady=0, padx=0, side=TOP)
+            image_labels.append(self.head_img_label)
+            image_location_text = Text(left_frame, height=1, width=80, bg=Application.current_color_theme[2],
                                        fg=Application.current_color_theme[1], bd=0, font="Helvetica 10")
             # The scrollable canvas is created here
             thumbnail_canvas = self.make_scrollable_canvas(frame_for_canvas, len(current_bug), image_labels)
@@ -1471,8 +1474,8 @@ class Application(Frame):
 
             if image_path_button:
                 image_path_button.get_element()['command'] = lambda: self.find_missing_image(
-                    head_img_label, current_bug[0], try_again_button, image_path_button, image_location_text
-                )  # Ignore the warning, this works!
+                    current_bug[0], try_again_button, image_path_button, image_location_text
+                )
 
             self.update_image_thumbnails(current_bug, image_labels, image_location_text, image_path_button,
                                          try_again_button, thumbnail_canvas)
@@ -1599,6 +1602,11 @@ def rewrite_textbox(message, textbox):
     textbox.delete("1.0", END)
     textbox.insert(END, message)
     textbox.configure(state=DISABLED)
+
+
+def open_image_in_editor(img_path):
+    img_path = './test.jpg'
+    subprocess.call(['start', img_path], shell=True)
 
 
 # region Program init
