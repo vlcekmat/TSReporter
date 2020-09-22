@@ -24,7 +24,6 @@ import utils
 import reporter
 import gif_generator
 
-
 custom_theme = None
 version = "0.4.4"
 
@@ -149,6 +148,7 @@ class Application(Frame):
             app.gif_page = gif_generator.GifGeneratorPage(
                 app=app, location=config.read_config("edited images location"))
             app.main_menu = None
+
         # endregion
 
         class ThemeOption:
@@ -298,9 +298,12 @@ class Application(Frame):
             theme_selection_frame = Frame(color_button_frame, bg=Application.current_color_theme[2])
             theme_selection_frame.pack()
 
-            for index, color_theme in enumerate(get_theme('all')):
+            index = 1
+            # for index, color_theme in enumerate(get_theme('all')):
+            for color_theme in get_theme('all'):
                 if color_theme != 'custom':
                     theme_option = self.ThemeOption(color_theme, master=theme_selection_frame, row=index)
+                index += 1
             custom_theme_option = self.ThemeOption('custom', master=theme_selection_frame, row=index, pady=20)
 
             custom_theme_button = Button(
@@ -474,7 +477,8 @@ class Application(Frame):
                 login_text['text'] = "Invalid password or username..."
             login_text.pack(pady=5)
 
-            password_entry = Entry(login_frame, width=25, bg=Application.current_color_theme[0], font=Font(size=16), show="*")
+            password_entry = Entry(login_frame, width=25, bg=Application.current_color_theme[0], font=Font(size=16),
+                                   show="*")
             password_entry.pack(padx=10)
 
             login_button = Application.AppButton(
@@ -583,6 +587,7 @@ class Application(Frame):
                 first_time = app.settings_menu.first_time
                 app.settings_menu.go_to_main_menu()
                 app.main_menu.go_to_settings(first_time=first_time)
+
         # region COMMANDS
 
         def go_to_main_menu(self):
@@ -599,10 +604,12 @@ class Application(Frame):
         def show_text_input(self, master):
             if not self.dialog_activated:
                 self.dialog_activated = True
-                text_input = Entry(master, bg=Application.current_color_theme[2], fg=Application.current_color_theme[1], width=25,
+                text_input = Entry(master, bg=Application.current_color_theme[2], fg=Application.current_color_theme[1],
+                                   width=25,
                                    font=Font(size=20))
                 text_input.pack()
-                submit_button = Button(master, bg=Application.current_color_theme[2], fg=Application.current_color_theme[1],
+                submit_button = Button(master, bg=Application.current_color_theme[2],
+                                       fg=Application.current_color_theme[1],
                                        text='Submit',
                                        command=lambda: self.submit(text_input))
                 root.bind('<Return>', lambda x: self.submit(text_input))
@@ -654,6 +661,7 @@ class Application(Frame):
             config.ConfigHandler().gui_config_edit(index=4, browser_chosen=chosen_browser)
             self.go_to_main_menu()
             app.main_menu.go_to_settings(first_time=self.first_time)
+
         # endregion
 
         def init_widgets(self):
@@ -664,7 +672,8 @@ class Application(Frame):
             background.pack(fill=BOTH, expand=True, padx=10, pady=10)
 
             if self.first_time:
-                warning_text = Label(background, bg=Application.current_color_theme[3], fg=Application.current_color_theme[1], font=Font(size=20))
+                warning_text = Label(background, bg=Application.current_color_theme[3],
+                                     fg=Application.current_color_theme[1], font=Font(size=20))
                 warning_text['text'] = "FIRST TIME SETUP"
                 warning_text.pack()
 
@@ -732,6 +741,7 @@ class Application(Frame):
                 rewrite_textbox(bug_handler.message, frame)
             else:
                 self.go_to_reporting(project, bug_handler)
+
         # endregion
 
         def init_widgets(self):
@@ -1119,8 +1129,10 @@ class Application(Frame):
                     image_location_text.insert(END, current_bug[0].image_location)
                     image_location_text.configure(state=DISABLED)
                     image_location_text.pack(anchor="s", pady=5, padx=5, side=BOTTOM)
-                    self.head_img_label.bind('<Button-1>',
-                                             lambda x=current_bug[0].image_location: open_image_in_editor(x))
+                    self.head_img_label.bind(
+                        '<Button-1>',
+                        lambda event: open_image_in_editor(current_bug[0].image_location)
+                        )
                 if self.bug_handler.images_good() and try_again_button:
                     try_again_button.get_element().pack_forget()
                     try_again_button.get_element().destroy()
@@ -1167,7 +1179,7 @@ class Application(Frame):
             # Here, a canvas is created to display the image thumbnails and allow for scrolling
             # Taken from https://stackoverflow.com/questions/43731784/tkinter-canvas-scrollbar-with-grid
             thumbnail_canvas = Canvas(frame, bg=Application.current_color_theme[2],
-                                      highlightthickness=0, width=self.small_img_size[0]*2 + 10)
+                                      highlightthickness=0, width=self.small_img_size[0] * 2 + 10)
             thumbnail_canvas.grid(row=0, column=0, sticky="news")
 
             if bug_len > 5:  # Make a Scrollbar if there are more than 5 images (bug head and 4 extra)
@@ -1225,7 +1237,7 @@ class Application(Frame):
             # priority_text.insert(END, "Priority")
             # priority_text.config(state=DISABLED)
 
-            priority_menu.grid(row=1, column=1, sticky=W+E)
+            priority_menu.grid(row=1, column=1, sticky=W + E)
             priority_menu.config(bg=Application.current_color_theme[2])
             priority_menu.config(fg=Application.current_color_theme[1])
             priority_menu.config(font="Helvetica 10")
@@ -1245,7 +1257,7 @@ class Application(Frame):
             severity_menu.config(activebackground=Application.current_color_theme[3])
             severity_menu.config(activeforeground=Application.current_color_theme[1])
             severity_menu.config(highlightbackground=Application.current_color_theme[3])
-            severity_menu.grid(row=2, column=1, sticky=W+E)
+            severity_menu.grid(row=2, column=1, sticky=W + E)
 
             severity_menu.config(bg=Application.current_color_theme[2])
             severity_menu.config(fg=Application.current_color_theme[1])
@@ -1338,9 +1350,9 @@ class Application(Frame):
 
             this_button.get_element()['text'] = "Report\noptions"
             this_button.get_element()['command'] = lambda: self.show_sidebar(
-                    thumbnails_frame, options_frame, this_button, current_bug, image_labels, image_location_text,
-                    image_path_button, try_again_button, thumbnail_canvas
-                )
+                thumbnails_frame, options_frame, this_button, current_bug, image_labels, image_location_text,
+                image_path_button, try_again_button, thumbnail_canvas
+            )
 
         def show_sidebar(self, thumbnails_frame, options_frame, this_button, current_bug, image_labels,
                          image_location_text, image_path_button, try_again_button, thumbnail_canvas):
@@ -1486,7 +1498,8 @@ class Application(Frame):
 
             button_report = Application.AppButton(
                 "REPORT", bottom_frame, side=RIGHT,
-                command=lambda: [self.ReportingThread(self.bug_handler.get_current()[0][:-1]).start(), self.disable_button(button_report.get_element())]
+                command=lambda: [self.ReportingThread(self.bug_handler.get_current()[0][:-1]).start(),
+                                 self.disable_button(button_report.get_element())]
             )
 
             button_find_duplicates = Application.AppButton(
@@ -1605,8 +1618,9 @@ def rewrite_textbox(message, textbox):
 
 
 def open_image_in_editor(img_path):
-    img_path = './test.jpg'
-    subprocess.call(['start', img_path], shell=True)
+    split_path = str(img_path).split('\\')
+    good_path = f'"{"/".join(split_path)}"'
+    os.system(good_path)
 
 
 # region Program init
