@@ -1446,7 +1446,7 @@ class Application(Frame):
             self.head_img_label.place(x=0, y=0)
             self.head_img_label.pack(pady=0, padx=0, side=TOP)
             image_labels.append(self.head_img_label)
-            image_location_text = Text(left_frame, height=1, width=80, bg=Application.current_color_theme[2],
+            image_location_text = Text(left_frame, height=1, width=75, bg=Application.current_color_theme[2],
                                        fg=Application.current_color_theme[1], bd=0, font="Helvetica 10")
             # The scrollable canvas is created here
             thumbnail_canvas = self.make_scrollable_canvas(frame_for_canvas, len(current_bug), image_labels)
