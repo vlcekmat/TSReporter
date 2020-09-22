@@ -193,10 +193,10 @@ class GifGeneratorPage(Frame):
         self.destroy_widgets()
         index = 0
         for img_path in [f[0].filename for f in self.gif_maker.frames]:
-            delete_image_button = Button(master=master, bg=page.current_color_theme[3], fg=page.current_color_theme[2],
+            delete_image_button = Button(master=master, bg=page.current_color_theme[3], fg=page.current_color_theme[1],
                                          text="Delete", activebackground=page.current_color_theme[3],
-                                         padx=5, pady=2, activeforeground=page.current_color_theme[2])
-            img_path_text = Text(master=master, bg=page.current_color_theme[4], fg=page.current_color_theme[2],
+                                         padx=5, pady=2, activeforeground=page.current_color_theme[1])
+            img_path_text = Text(master=master, bg=page.current_color_theme[3], fg=page.current_color_theme[1],
                             font=Font(size=10), width=40, height=1, borderwidth=0)
             self.widgets_to_update.append((img_path_text, delete_image_button))
             delete_image_button.grid(row=index, column=0)
