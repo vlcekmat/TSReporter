@@ -55,8 +55,10 @@ def check_for_duplicates(username, password, bug_description=None,
     else:
         final_filter = extract_location_filter(bug_description)
 
-    driver.get('https://qa.scssoft.com/set_project.php?project_id=0')
-    driver.find_element_by_xpath("//a[@class='btn btn-sm btn-primary btn-white btn-round']").click()  # reset button
+    # driver.get('https://qa.scssoft.com/set_project.php?project_id=0')
+    # driver.get('https://qa.scssoft.com/view_all_bug_page.php?filter=5f6b64750d976')
+    driver.get('https://qa.scssoft.com/search.php?project_id=0&sort=last_updated&dir=DESC&per_page=80&hide_status=-2&match_type=0')
+    # driver.find_element_by_xpath("//a[@class='btn btn-sm btn-primary btn-white btn-round']").click()  # reset button
     driver.find_element_by_id('filter-search-txt').send_keys(final_filter)  # filter box
     driver.find_element_by_xpath("//input[@value='Apply Filter']").click()  # apply filter button
 

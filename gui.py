@@ -1498,8 +1498,9 @@ class Application(Frame):
 
             button_report = Application.AppButton(
                 "REPORT", bottom_frame, side=RIGHT,
-                command=lambda: [self.ReportingThread(self.bug_handler.get_current()[0][:-1]).start(),
-                                 self.disable_button(button_report.get_element())]
+                command=lambda: [self.ReportingThread(self.bug_handler.get_current()[0][:-1]).start()
+                                 # , self.disable_button(button_report.get_element())
+                                 ]
             )
 
             button_find_duplicates = Application.AppButton(
