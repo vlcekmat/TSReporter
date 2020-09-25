@@ -116,30 +116,22 @@ def upload_to_mantis(version, category, log_lines, project, username, password,
 
             new_name = summary + old_extension
             rename_me = Path(rename_me)
+            base_summary = summary
 
-            try:
-                rename_me = rename_me.rename(Path(directory, new_name))
-                images.insert(0, rename_me)
-                image_index += 1
-            except FileExistsError:
-                summary += f' ({dupl_index})'
-                new_name = summary + old_extension
-                dupl_index += 1
+            while True:
                 try:
                     rename_me = rename_me.rename(Path(directory, new_name))
+                    images.insert(0, rename_me)
+                    image_index += 1
+                    break
+                except FileExistsError:
+                    summary = f'{base_summary} ({dupl_index})'
+                    new_name = summary + old_extension
+                    dupl_index += 1
                 except FileNotFoundError:
-                    continue
-                images.insert(0, rename_me)
-                image_index += 1
-            except FileNotFoundError:
-                pass
+                    break
 
         images.reverse()
-
     for upload_me in images:
-        # if late_image == upload_me:
-        #     continue
-        # else:
-            # upload an image
         driver.find_element_by_xpath("//input[@class='dz-hidden-input']").send_keys(str(upload_me))
     # endregion
