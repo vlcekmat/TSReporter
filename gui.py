@@ -25,7 +25,7 @@ import reporter
 import gif_generator
 
 custom_theme = None
-version = "0.4.4"
+version = "0.5"
 
 
 class Application(Frame):

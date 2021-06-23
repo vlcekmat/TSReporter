@@ -17,6 +17,7 @@ class DriverHandler:
             if headless:
                 options.headless = True
             options.add_experimental_option('excludeSwitches', ['enable-logging'])
+            options.add_experimental_option("excludeSwitches", ["enable-automation"])
             options.add_argument('--start-maximized')
             self.driver = webdriver.Chrome(executable_path='chromedriver.exe', options=options)
         elif browser == 'firefox':
