@@ -1075,7 +1075,7 @@ class Application(Frame):
             if self.prefix_box.get() not in ["Enter prefix", ""]:
                 prefix = self.prefix_box.get()
 
-            if self.category == 'a' and self.asset_path_input.get() not in ["Enter asset path/debug info", ""]:
+            if 'a' in self.category and self.asset_path_input.get() not in ["Enter asset path/debug info", ""]:
                 self.submit_asset_info()
                 reporter.asset_path = self.asset_path_input.get()
 
