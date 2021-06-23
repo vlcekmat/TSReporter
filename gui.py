@@ -1044,7 +1044,7 @@ class Application(Frame):
 
         def open_duplicates(self, bug_line):
             asset_path = None
-            if self.category == 'a' and self.asset_path_input.get() not in ["Enter asset path/debug info", ""]:
+            if 'a' in self.category and self.asset_path_input.get() not in ["Enter asset path/debug info", ""]:
                 self.submit_asset_info()
                 asset_path = self.asset_path_input.get()
             try:
