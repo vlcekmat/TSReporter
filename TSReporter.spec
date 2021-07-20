@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['gui.py'],
-             pathex=['D:\\ToolsAndOther\\Desktop\\TSReporter\\TSReporter'],
+             pathex=['C:\\Users\\User\\Desktop\\TSReporter\\Dev\\TSReporter'],
              binaries=[],
              datas=[],
              hiddenimports=[],

@@ -1,5 +1,6 @@
 import copy
 import os
+import sys
 import subprocess
 from collections import deque
 from time import sleep
@@ -25,7 +26,7 @@ import reporter
 import gif_generator
 
 custom_theme = None
-version = "0.5"
+version = "0.5.1"
 
 
 class Application(Frame):

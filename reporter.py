@@ -37,7 +37,8 @@ def report_bug(project, log_lines, version, username, password, _driver_handler,
             break
         except (SessionNotCreatedException, NoSuchWindowException, WebDriverException,
                 AttributeError, TypeError, NameError) as error:
-            print(f'{error_message} {error}')
+            with open("./error_log.txt", "w", encoding='UTF-8') as error_log_file:
+                error_log_file.write(f"{error_message} {error}")
     return True
 
 

@@ -1,4 +1,4 @@
-#!D:\ToolsAndOther\Desktop\TSReporter\TSReporter\venv\Scripts\python.exe
+#!C:\Users\User\Desktop\TSReporter\Dev\TSReporter\venv\Scripts\python.exe
 # EASY-INSTALL-ENTRY-SCRIPT: 'future==0.18.2','console_scripts','futurize'
 import re
 import sys
