@@ -120,7 +120,11 @@ class GifGeneratorPage(Frame):
                     if self.stop:
                         break
             except RuntimeError:
-                pass
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                with open("./error_log.txt", "w", encoding='UTF-8') as error_log_file:
+                    print("Writing error log")
+                    error_log_file.write(f"An error occurred: ")
+                    error_log_file.write(f"{exc_type} {exc_obj} {exc_tb}")
 
     def go_to_main_menu(self):
         self.preview_thread.stop = True

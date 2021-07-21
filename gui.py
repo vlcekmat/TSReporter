@@ -1030,7 +1030,11 @@ class Application(Frame):
 
                 self.late_image = new_image_path
             except (TclError, ValueError):
-                pass
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                with open("./error_log.txt", "w", encoding='UTF-8') as error_log_file:
+                    print("Writing error log")
+                    error_log_file.write(f"An error occurred: ")
+                    error_log_file.write(f"{exc_type} {exc_obj} {exc_tb}")
 
         class DuplicatesThread(Thread):
             # Threading duplicates search happens here
@@ -1058,6 +1062,11 @@ class Application(Frame):
             except (SessionNotCreatedException, NoSuchWindowException, WebDriverException, AttributeError,
                     TypeError, NameError):
                 self.driver_handler = None
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                with open("./error_log.txt", "w", encoding='UTF-8') as error_log_file:
+                    print("Writing error log")
+                    error_log_file.write(f"An error occurred: ")
+                    error_log_file.write(f"{exc_type} {exc_obj} {exc_tb}")
 
         class ReportingThread(Thread):
             bug_line = None
@@ -1139,7 +1148,11 @@ class Application(Frame):
                     try_again_button.get_element().destroy()
                 canvas.config(scrollregion=canvas.bbox("all"))
             except ValueError:
-                pass
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                with open("./error_log.txt", "w", encoding='UTF-8') as error_log_file:
+                    print("Writing error log")
+                    error_log_file.write(f"An error occurred: ")
+                    error_log_file.write(f"{exc_type} {exc_obj} {exc_tb}")
 
         def make_this_img_head(self, current_bug, index):
             current_bug[0], current_bug[index] = current_bug[index], current_bug[0]
@@ -1549,6 +1562,11 @@ class Application(Frame):
                                                           last_time_rename_checked=self.rename_images)
                 except TypeError:
                     app.main_menu = Application.MainMenu()
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    with open("./error_log.txt", "w", encoding='UTF-8') as error_log_file:
+                        print("Writing error log")
+                        error_log_file.write(f"An error occurred: ")
+                        error_log_file.write(f"{exc_type} {exc_obj} {exc_tb}")
             else:
                 app.main_menu = Application.MainMenu()
 

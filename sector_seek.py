@@ -25,7 +25,7 @@ def request_sector_owner(sector_to_find, game, svn_not_found=False):
             sector_owner = js[sector_to_find]["owner"]["svn_name"]
     except KeyError:
         return ""
-    return sector_owner
+    return sector_owner.lower()
 
 
 def get_asset_assign(chosen_game, bug_type):

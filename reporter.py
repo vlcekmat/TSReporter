@@ -4,6 +4,8 @@ from selenium.common.exceptions import SessionNotCreatedException, NoSuchWindowE
 from information_compile import determine_bug_category, extract_asset_path, extract_asset_name, extract_location_filter
 import copy
 from config import read_config
+import sys
+import os
 
 asset_path = None
 
@@ -17,7 +19,7 @@ def report_bug(project, log_lines, version, username, password, _driver_handler,
     log_lines.appendleft(log_first)
     category = determine_bug_category(log_first)
 
-    error_message = "Don't interact with the browser during the process, trying again..."
+    error_message = "An error occurred: "
     d_info = None
     a_path = asset_path
     if 'A' in category.upper() and a_path:
@@ -37,8 +39,11 @@ def report_bug(project, log_lines, version, username, password, _driver_handler,
             break
         except (SessionNotCreatedException, NoSuchWindowException, WebDriverException,
                 AttributeError, TypeError, NameError) as error:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
             with open("./error_log.txt", "w", encoding='UTF-8') as error_log_file:
+                print("Writing error log")
                 error_log_file.write(f"{error_message} {error}")
+                error_log_file.write(f"{exc_type} {exc_obj} {exc_tb}")
     return True
 
 

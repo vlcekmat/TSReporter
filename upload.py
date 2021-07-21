@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 from selenium.common.exceptions import WebDriverException
 
@@ -81,7 +82,11 @@ def upload_to_mantis(version, category, log_lines, project, username, password,
                 assign_to = find_assign_to(f"{category}_{bug_descriptions[0]}", project[0], svn_not_found=True)
                 driver.find_element_by_xpath(f"//option[text()='{assign_to}']").click()
             except WebDriverException:
-                pass
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                with open("./error_log.txt", "w", encoding='UTF-8') as error_log_file:
+                    print("Writing error log")
+                    error_log_file.write(f"An error occurred: ")
+                    error_log_file.write(f"{exc_type} {exc_obj} {exc_tb}")
 
     driver.find_element_by_xpath(f"//option[text()='always']").click()
 
@@ -129,7 +134,11 @@ def upload_to_mantis(version, category, log_lines, project, username, password,
                     new_name = summary + old_extension
                     dupl_index += 1
                 except FileNotFoundError:
-                    break
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    with open("./error_log.txt", "w", encoding='UTF-8') as error_log_file:
+                        print("Writing error log")
+                        error_log_file.write(f"An error occurred: ")
+                        error_log_file.write(f"{exc_type} {exc_obj} {exc_tb}")
 
         images.reverse()
     for upload_me in images:
