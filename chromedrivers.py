@@ -6,6 +6,8 @@ from information_compile import extract_location_filter
 from information_compile import extract_asset_name
 from config import read_config
 from password import save_password
+from msedge.selenium_tools import EdgeOptions
+from msedge.selenium_tools import Edge
 
 
 class DriverHandler:
@@ -25,6 +27,13 @@ class DriverHandler:
             if headless:
                 options.headless = True
             self.driver = webdriver.Firefox(executable_path='geckodriver.exe', options=options)
+            self.driver.maximize_window()
+        elif browser == 'edge':
+            options = EdgeOptions()
+            options.use_chromium = True
+            if headless:
+                options.headless = True
+            self.driver = Edge(executable_path='msedgedriver.exe', options=options)
             self.driver.maximize_window()
 
     def get_driver(self):

@@ -37,8 +37,16 @@ def get_image(log):
     for file in path.glob('*.gif'):
         if date_time_to_find in file.name and coord_0 in file.name and coord_2 in file.name:
             return file
+        elif date_time_to_find in file.name and str((int(coord_0) - 1)) in file.name and coord_2 in file.name:
+            return file
+        elif date_time_to_find in file.name and str((int(coord_0) + 1)) in file.name and coord_2 in file.name:
+            return file
     for file in path.glob('*.jpg'):
         if date_time_to_find in file.name and coord_0 in file.name and coord_2 in file.name:
+            return file
+        elif date_time_to_find in file.name and str((int(coord_0) - 1)) in file.name and coord_2 in file.name:
+            return file
+        elif date_time_to_find in file.name and str((int(coord_0) + 1)) in file.name and coord_2 in file.name:
             return file
     return ""
 

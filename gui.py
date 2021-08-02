@@ -26,7 +26,7 @@ import reporter
 import gif_generator
 
 custom_theme = None
-version = "0.5.1"
+version = "0.5.2"
 
 
 class Application(Frame):
@@ -644,7 +644,7 @@ class Application(Frame):
         def show_browser_selection(self, master):
             if not self.dialog_activated:
                 self.dialog_activated = True
-                options = ["Chrome", "Firefox"]
+                options = ["Chrome", "Firefox", "Edge"]
                 frame = Frame(master, bg=Application.current_color_theme[2], padx=10, pady=10)
                 frame.pack()
                 dialog_text = Label(master=frame, text="Select your preferred browser", font=Font(size=10),
